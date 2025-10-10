@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Na RedeStore - Times Internacionais</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span>Frete grátis para todo território Brasileiro</span>
+      <span class="dot">•</span>
+      <span>Parcelamento em até 10x sem juros</span>
+    </div>
+    <div class="top-bar-right">
+      <a href="https://chat.whatsapp.com/ItoES41rn7OCJEWNGhpMrN" target="_blank">Central de Ajuda</a>
+      <span class="dot">•</span>
+      <a href="#">Rastrear Pedido</a>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-top">
+      <a href="index.html" class="logotipo">
+        <span style="color:#fff;">Na</span><span style="color:#422BFF;">Rede</span> <span style="color:#fff;">Store</span>
+      </a>
+      <div class="user-bar">
+        <a href="login.html" class="user-link">
+          <span class="icon">
+            <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="10" cy="7" r="4"/>
+              <path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>
+            </svg>
+          </span>
+          <span class="label"><b>Entrar</b></span>
+        </a>
+        <a href="checkout.html" class="user-link">
+          <span class="icon">
+            <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="8" cy="17" r="1"/>
+              <circle cx="16" cy="17" r="1"/>
+              <path d="M2 2h2l3.6 7.59a1 1 0 0 0 .92.61h7.72a1 1 0 0 0 .98-.8l1.38-6.59H6"/>
+            </svg>
+          </span>
+          <span class="label"><b>Carrinho</b></span>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+    <form class="search-bar">
+      <span class="search-icon">
+        <svg width="20" height="20" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="9" r="7"/>
+          <line x1="15" y1="15" x2="19" y2="19"/>
+        </svg>
+      </span>
+      <input type="text" id="pesquisa" placeholder="Buscar camisetas, times, produtos..." oninput="mostrarSugestoes()" autocomplete="off">
+      <div id="sugestoes" class="sugestoes-container" style="display: none;"></div>
+    </form>
+    <nav>
+      <ul class="nav-links">
+        <li><a class="menu-btn" href="index.html">Início</a></li>
+        <li><a class="menu-btn" href="Destaques.html">Destaques</a></li>
+        <li><a class="menu-btn" href="Camisas Brasileiras.html">Times Brasileiros</a></li>
+        <li><a class="menu-btn" href="Seleções.html">Seleções</a></li>
+        <li><span class="menu-btn active">Times Internacionais</span></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="produtos-area">
+    <h2 class="titulo-central">Times Internacionais</h2>
+    <div class="produtos-row" id="produtos-row">
+      <div class="produto">
+        <p>Real Madrid</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Real-Madrid.jpeg?raw=true" alt="Camisa do Real Madrid" width="200" height="200">
+        <a href="#" class="preco">R$ 299,90</a>
+      </div>
+      <div class="produto">
+        <p>Barcelona</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Barcelona.jpeg?raw=true" alt="Camisa do Barcelona" width="200" height="200">
+        <a href="#" class="preco">R$ 279,90</a>
+      </div>
+      <div class="produto">
+        <p>Manchester United</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/united.jpeg?raw=true" alt="Camisa do Manchester United" width="200" height="200">
+        <a href="#" class="preco">R$ 299,90</a>
+      </div>
+      <div class="produto">
+        <p>Liverpool</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Liverpool.jpg?raw=true" alt="Camisa do Liverpool" width="200" height="200">
+        <a href="#" class="preco">R$ 289,90</a>
+      </div>
+      <div class="produto">
+        <p>Bayern de Munique</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Bayern.jpeg?raw=true" alt="Camisa do Bayern de Munique" width="200" height="200">
+        <a href="#" class="preco">R$ 299,90</a>
+      </div>
+      <div class="produto">
+        <p>Paris Saint-Germain</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Pari-Saint.jpeg?raw=true" alt="Camisa do Paris Saint-Germain" width="200" height="200">
+        <a href="#" class="preco">R$ 289,90</a>
+      </div>
+      <div class="produto">
+        <p>Arsenal</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Arsenal.jpeg?raw=true" alt="Camisa do Arsenal" width="200" height="200">
+        <a href="#" class="preco">R$ 269,90</a>
+      </div>
+      <div class="produto">
+        <p>Chelsea</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Chelsea.jpeg?raw=true" alt="Camisa do Chelsea" width="200" height="200">
+        <a href="#" class="preco">R$ 279,90</a>
+      </div>
+      <div class="produto">
+        <p>Manchester City</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Manchester%20City.jpeg?raw=true" alt="Camisa do Manchester City" width="200" height="200">
+        <a href="#" class="preco">R$ 289,90</a>
+      </div>
+      <div class="produto">
+        <p>Juventus</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Juventus.jpeg?raw=true" alt="Camisa da Juventus" width="200" height="200">
+        <a href="#" class="preco">R$ 269,90</a>
+      </div>
+      <div class="produto">
+        <p>AC Milan</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Ac-Milan.jpeg?raw=true" alt="Camisa do AC Milan" width="200" height="200">
+        <a href="#" class="preco">R$ 259,90</a>
+      </div>
+      <div class="produto">
+        <p>Atlético Madrid</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Atletico%20Madrid.jpeg?raw=true" alt="Camisa do Atlético Madrid" width="200" height="200">
+        <a href="#" class="preco">R$ 249,90</a>
+      </div>
+  </div>
+
+  <div class="newsletter-header">
+    <h2>Assine nossa Newsletter</h2>
+    <p>Receba ofertas exclusivas e novidades em primeira mão!</p>
+  </div>
+  <div class="newsletter">
+    <form action="/envio" method="post">
+      <label for="email">Seu-email</label>
+      <input type="email" id="email" name="email" placeholder="seu@exemplo.com" required autocomplete="email">
+      <button type="submit">Inscrever-se</button>
+    </form>
+    <p class="privacy-note">Nunca compartilharemos seu e-mail. Leia nossa <a href="#">Política de Privacidade</a>.</p>
+  </div>
+
+  <section class="sobre-loja">
+    <div class="sobre-container">
+      <div class="sobre-left">
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="Destaques.html">Destaques</a></li>
+          <li><a href="Camisas Brasileiras.html">Times Brasileiros</a></li>
+          <li><a href="Seleções.html">Seleções</a></li>
+          <li><a href="Camisas Internacional.html">Times Internacionais</a></li>
+        </ul>
+      </div>
+      <div class="sobre-right">
+        <h3><a href="index.html" style="text-decoration: none;"><span style="color:#fff;">Na </span><span style="color: blue;">Rede</span><span style="color:#fff;">Store</span></a></h3>
+        <p>A NaRede Store é a sua loja online de camisetas de futebol oficiais. Fundada em 2025, nossa missão é oferecer produtos de alta qualidade para torcedores apaixonados.</p>
+        <p>Nosso compromisso é com você, oferecendo frete grátis, parcelamento em até 10x sem juros e um atendimento especializado.</p>
+      </div>
+      <div class="contato-container">
+        <h3 class="contato">Contato</h3>
+        <p class="bairro">
+          Rua São Januario, 3070 - São Cristóvão, CEP: 13846-220 - Rio de Janeiro - RJ<br>
+          Visite o nosso Blog!<br>
+          +55 (21)98281-6261<br>
+          contato@naredestore.com.br
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <span>© 2025 <a href="index.html" style="color: #cfcfcf; text-decoration: none;">NaRede Store</a>. Todos os direitos reservados.</span>
+      </div>
+      <div class="top-bar-right">
+        <span>Formas de Pagamento:</span>
+        <table>
+          <tr>
+            <td><img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/visa.png?raw=true" alt="Visa" width="70"></td>
+            <td><img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/mastercard.png?raw=true" alt="MasterCard" width="70"></td>
+            <td><img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/amex.png?raw=true" alt="American Express" width="70"></td>
+            <td><img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/paypal.png?raw=true" alt="PayPal" width="70"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ...existing script...
+    const todosProdutos = {
+      'flamengo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'vasco': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'santos': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'palmeiras': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'são paulo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'sao paulo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'corinthians': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'fluminense': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'gremio': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'grêmio': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'atletico mineiro': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'atlético mineiro': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'botafogo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'bahia': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'cruzeiro': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'brasil': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'argentina': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'alemanha': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'frança': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'franca': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'inglaterra': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'holanda': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'itália': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'italia': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'portugal': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'méxico': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'mexico': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'japão': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'japao': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'chile': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'suíça': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'suica': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'real madrid': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'bayern': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'bayern de munique': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'barcelona': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'manchester united': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'manchester': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'united': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'paris saint-germain': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'psg': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'paris': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'liverpool': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'arsenal': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'chelsea': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'manchester city': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'city': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'juventus': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'ac milan': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'milan': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'milão': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'atletico madrid': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'atlético madrid': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' }
+    };
+
+    function mostrarSugestoes() {
+      const termo = document.getElementById('pesquisa').value.toLowerCase().trim();
+      const sugestoesContainer = document.getElementById('sugestoes');
+      
+      if (termo === '') {
+        sugestoesContainer.style.display = 'none';
+        pesquisarProduto();
+        return;
+      }
+      
+      const sugestoes = Object.keys(todosProdutos).filter(produto => 
+        produto.toLowerCase().includes(termo)
+      ).slice(0, 5);
+      
+      if (sugestoes.length > 0) {
+        const html = sugestoes.map(sugestao => 
+          `<div class="sugestao-item" onclick="selecionarSugestao('${sugestao}')">${sugestao}</div>`
+        ).join('');
+        
+        sugestoesContainer.innerHTML = html;
+        sugestoesContainer.style.display = 'block';
+      } else {
+        sugestoesContainer.style.display = 'none';
+      }
+      
+      pesquisarProduto();
+    }
+    
+    function selecionarSugestao(produto) {
+      document.getElementById('pesquisa').value = produto;
+      document.getElementById('sugestoes').style.display = 'none';
+      pesquisarProduto();
+    }
+
+    function pesquisarProduto() {
+      const termo = document.getElementById('pesquisa').value.toLowerCase().trim();
+      const produtos = document.querySelectorAll('.produto');
+      
+      if (termo === '') {
+        produtos.forEach(produto => {
+          produto.style.display = 'flex';
+        });
+        return;
+      }
+      
+      let encontrouNaPagina = false;
+      produtos.forEach(produto => {
+        const nome = produto.querySelector('p').textContent.toLowerCase();
+        if (nome.includes(termo)) {
+          produto.style.display = 'flex';
+          encontrouNaPagina = true;
+        } else {
+          produto.style.display = 'none';
+        }
+      });
+      
+      if (!encontrouNaPagina) {
+        for (const [produto, info] of Object.entries(todosProdutos)) {
+          if (produto.includes(termo)) {
+            window.location.href = info.arquivo;
+            return;
+          }
+        }
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.search-bar')) {
+        document.getElementById('sugestoes').style.display = 'none';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputPesquisa = document.getElementById('pesquisa');
+      inputPesquisa.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          document.getElementById('sugestoes').style.display = 'none';
+          pesquisarProduto();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

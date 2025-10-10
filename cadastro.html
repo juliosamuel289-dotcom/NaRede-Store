@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro | NaRede Store</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg,#422BFF ,#422BFF);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .register-container {
+      background: white;
+      width: 380px;
+      padding: 2rem 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    .register-container h2 {
+      font-size: 1.8rem;
+      color: #222;
+      margin-bottom: 1rem;
+    }
+
+    .register-container h2 span {
+      color: #422BFF;
+      font-weight: 600;
+    }
+
+    .register-container p {
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+
+    .register-container input {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border: 1.5px solid #ddd;
+      border-radius: 10px;
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+
+    .register-container input:focus {
+      border-color: #422BFF;
+      box-shadow: 0 0 0 3px rgba(122,63,255,0.1);
+      outline: none;
+    }
+
+    .register-container button {
+      width: 100%;
+      background-color: #422BFF;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: 600;
+    }
+
+    .register-container button:hover {
+      background-color: #351ECC;
+    }
+
+    .register-container a {
+      display: inline-block;
+      margin-top: 12px;
+      color: #422BFF;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .register-container a:hover {
+      text-decoration: underline;
+    }
+
+    .back-link {
+      margin-top: 20px;
+      display: block;
+      color: #666;
+      font-size: 0.85rem;
+    }
+
+    .back-link:hover {
+      color: #422BFF;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h2>Na<span>Rede</span> Store</h2>
+    <p>Crie sua conta</p>
+    <form>
+      <input type="text" placeholder="Nome completo" required />
+      <input type="email" placeholder="E-mail" required />
+      <input type="password" placeholder="Senha" required />
+      <input type="password" placeholder="Confirmar senha" required />
+      <button type="submit">Cadastrar</button>
+    </form>
+    <a href="login.html">Já tem uma conta? Entrar</a>
+    <a class="back-link" href="index.html">
+     ← Voltar à loja</a>
+  </div>
+</body>
+</html>

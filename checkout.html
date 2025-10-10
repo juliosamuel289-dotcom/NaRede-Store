@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout | NaRede Store</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body {
+      background: linear-gradient(135deg,#422BFF,#422BFF);
+      display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px;
+    }
+    .checkout-container {
+      background: white; width: 460px; padding: 2rem 2.5rem; border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: left; max-height: 95vh; overflow-y: auto;
+    }
+    h2 { text-align: center; color: #222; margin-bottom: 0.6rem; }
+    h2 span { color: #422BFF; font-weight: 600; }
+    p.subtitle { text-align: center; color: #666; margin-bottom: 1rem; }
+    label { display:block; margin-bottom: 6px; color:#444; font-size:0.9rem; }
+    .field { margin-bottom: 14px; }
+    input, select {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 10px;
+      transition: 0.15s; font-size: 0.95rem;
+    }
+    input:focus, select:focus {
+      border-color: #422BFF; box-shadow: 0 0 0 3px rgba(122,63,255,0.08); outline: none;
+    }
+
+    .card-fields { display: none; margin-top: 6px; }
+    .row { display:flex; gap:10px; }
+    .col-2 { flex:1; }
+
+    button {
+      width: 100%; background-color: #422BFF; color: white; padding: 12px; border: none;
+      border-radius: 10px; font-size: 1rem; cursor: pointer; font-weight: 600; transition: .2s;
+      margin-top: 6px;
+    }
+    button:hover { background-color: #351ECC; }
+
+    .back-link { display:block; margin-top: 12px; color: #422BFF; text-decoration:none; text-align:center; font-size:0.9rem; }
+
+    .confirmation {
+      display: none; background: #e8f7e8; color: #1a801a; border: 1px solid #1a801a;
+      border-radius: 10px; padding: 1rem; margin-top: 1rem; font-weight: bold; text-align: center;
+      animation: fadeIn .4s ease;
+    }
+    @keyframes fadeIn { from {opacity:0; transform:scale(.98)} to {opacity:1; transform:scale(1)} }
+    .small { font-size:0.85rem; color:#666; margin-top:6px; }
+  </style>
+</head>
+<body>
+  <div class="checkout-container">
+    <h2>Finalizar <span>Compra</span></h2>
+    <p class="subtitle">Preencha seus dados para concluir o pedido</p>
+
+    <form id="checkoutForm" novalidate>
+      <div class="field">
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" placeholder="Nome completo" required>
+      </div>
+
+      <div class="field">
+        <label for="endereco">Endereço completo</label>
+        <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade - CEP" required>
+      </div>
+
+      <div class="field">
+        <label for="pagamento">Forma de pagamento</label>
+        <select id="pagamento" required>
+          <option value="">Selecione a forma de pagamento</option>
+          <option value="pix">Pix</option>
+          <option value="cartao">Cartão de crédito</option>
+          <option value="boleto">Boleto bancário</option>
+        </select>
+      </div>
+
+      <!-- Campos do cartão (aparecem somente se pagamento = cartao) -->
+      <div class="card-fields" id="cardFields">
+        <div class="field">
+          <label for="cardNumber">Número do cartão</label>
+          <!-- pattern simples: 13-19 dígitos (aceita espaços) -->
+          <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" inputmode="numeric" maxlength="19" autocomplete="cc-number" >
+        </div>
+
+        <div class="row">
+          <div class="field col-2">
+            <label for="cardName">Nome no cartão</label>
+            <input type="text" id="cardName" placeholder="Nome como no cartão" autocomplete="cc-name">
+          </div>
+
+          <div class="field col-2">
+            <label for="cardExp">Validade (MM/AA)</label>
+            <input type="text" id="cardExp" placeholder="MM/AA" maxlength="5" inputmode="numeric" autocomplete="cc-exp">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field col-2">
+            <label for="cardCvv">CVV</label>
+            <input type="password" id="cardCvv" placeholder="123" maxlength="4" inputmode="numeric" autocomplete="cc-csc">
+          </div>
+
+          <div class="field col-2">
+            <label for="installments">Parcelas (opcional)</label>
+            <select id="installments">
+              <option value="1">1x sem juros</option>
+              <option value="2">2x</option>
+              <option value="3">3x</option>
+              <option value="4">4x</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="small">Os dados do cartão são apenas de exemplo — para um fluxo real você precisará integrar um gateway de pagamentos (ex: PagSeguro, MercadoPago, Stripe).</p>
+      </div>
+
+      <button type="submit">Finalizar compra</button>
+      <a href="index.html" class="back-link">← Voltar à loja</a>
+    </form>
+
+    <div class="confirmation" id="confirmMsg">
+      ✅ Compra concluída com sucesso!<br>Obrigado por comprar na <strong>NaRede Store</strong> 💜
+    </div>
+  </div>
+
+  <script>
+    const pagamento = document.getElementById('pagamento');
+    const cardFields = document.getElementById('cardFields');
+    const form = document.getElementById('checkoutForm');
+    const confirmMsg = document.getElementById('confirmMsg');
+
+    // mostra/esconde campos do cartão conforme seleção
+    pagamento.addEventListener('change', () => {
+      if (pagamento.value === 'cartao') {
+        cardFields.style.display = 'block';
+      } else {
+        cardFields.style.display = 'none';
+      }
+    });
+
+    // máscara simples para número do cartão e validade (apenas para UX)
+    const cardNumber = document.getElementById('cardNumber');
+    cardNumber.addEventListener('input', (e) => {
+      // remove tudo que não é número
+      let v = e.target.value.replace(/\D/g, '').slice(0,16);
+      // insere espaços a cada 4 dígitos
+      v = v.replace(/(.{4})/g, '$1 ').trim();
+      e.target.value = v;
+    });
+
+    const cardExp = document.getElementById('cardExp');
+    cardExp.addEventListener('input', (e) => {
+      let v = e.target.value.replace(/\D/g, '').slice(0,4);
+      if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+      e.target.value = v;
+    });
+
+    // submissão simples: valida campos obrigatórios e mostra confirmação
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+
+      // validação básica
+      const nome = document.getElementById('nome').value.trim();
+      const endereco = document.getElementById('endereco').value.trim();
+      const forma = pagamento.value;
+
+      if (!nome || !endereco || !forma) {
+        alert('Preencha Nome, Endereço e escolha a forma de pagamento.');
+        return;
+      }
+
+      if (forma === 'cartao') {
+        const num = cardNumber.value.replace(/\s/g, '');
+        const name = document.getElementById('cardName').value.trim();
+        const exp = document.getElementById('cardExp').value.trim();
+        const cvv = document.getElementById('cardCvv').value.trim();
+
+        // validações simples (não substituem validação real no servidor)
+        if (num.length < 13 || num.length > 16) { alert('Número do cartão inválido.'); return; }
+        if (!name) { alert('Informe o nome do cartão.'); return; }
+        if (!/^\d{2}\/\d{2}$/.test(exp)) { alert('Validade inválida. Use MM/AA'); return; }
+        if (cvv.length < 3 || cvv.length > 4) { alert('CVV inválido.'); return; }
+      }
+
+      // se passou pelas validações
+      confirmMsg.style.display = 'block';
+      form.reset();
+      cardFields.style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

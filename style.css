@@ -1,0 +1,906 @@
+/* Importação da fonte */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+/* Barra superior */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111;
+  color: #cfcfcf;
+  font-size: 12px;
+  padding: 5px 20px 8px 12px;
+  border-bottom: 1px solid #444;
+}
+/* Alinhamento dos itens da barra superior */
+.top-bar-left, .top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+/* Links da barra superior */
+.top-bar a {
+  color: #cfcfcf;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+/* Efeito hover nos links */
+.top-bar a:hover {
+  color: #fff;
+}
+/* Pontos separadores */
+.top-bar .dot {
+  margin: 0 3px;
+  font-size: 12px;
+  color: #888;
+}
+/* Barra de pesquisa */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #f3f3f3;
+  border-radius: 10px;
+  padding: 3px 16px;
+  width: 550px;
+  border: none;
+  margin: 20px auto 0 auto;
+  box-sizing: border-box;
+}
+/* Ícone de pesquisa */
+.search-bar .search-icon {
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+}
+/* Campo de entrada de texto */
+.search-bar input[type="text"] {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  color: #3e3d3d;
+  width: 100%;
+  font-family: "Poppins", sans-serif;
+}
+
+.search-bar input[type="text"]::placeholder {
+  color: #a2a2a2;
+  opacity: 1;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Container de sugestões */
+.sugestoes-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Item de sugestão */
+.sugestao-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  color: #333;
+  transition: background-color 0.2s;
+  text-transform: capitalize;
+}
+
+/* Último item sem borda */
+.sugestao-item:last-child {
+  border-bottom: none;
+}
+
+/* Hover no item de sugestão */
+.sugestao-item:hover {
+  background-color: #f8f9fa;
+  color: #422BFF;
+}
+
+/* Posicionamento relativo da search-bar para sugestões */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #f3f3f3;
+  border-radius: 10px;
+  padding: 3px 16px;
+  width: 550px;
+  border: none;
+  margin: 20px auto 0 auto;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Cabeçalho principal */
+header {
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  padding: 0 0 20px 0;
+}
+
+/* Linha superior do header: logotipo e barra de usuário */
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: left;
+  width: 100%;
+  padding: 10px 5px 0 12px;
+  box-sizing: border-box;
+}
+
+/* Logotipo */
+.logotipo {
+  align-items: right;
+  font-size: 30px;
+  font-weight: bold;
+  font-family: "Poppins", sans-serif;
+  text-decoration: none;
+  color: inherit;
+}
+
+a.logotipo {
+  text-decoration: none;
+  color: inherit;
+}
+
+a.logotipo:hover {
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+/* Barra do usuário */
+.user-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: right;
+
+
+}
+
+/* Link do usuário */
+.user-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 16px;
+  position: relative;
+  transition: color 0.2s;
+  border: 10px;
+  padding: 6px 10px;
+  
+}
+
+.user-link:hover .label {
+  color: #422BFF;
+}
+
+/* Ícone SVG */
+.icon svg {
+  display: block;
+}
+
+/* Estilo do badge do carrinho */
+.cart-badge {
+  background: #422BFF;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 10px;
+  margin-left: 6px;
+  display: inline-block;
+}
+
+/* Navegação */
+nav {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 20px;
+}
+/* Links de navegação */
+.nav-links {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+/* Itens da lista de navegação */
+.nav-links li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* Links do menu */
+.menu-btn {
+  display: inline-block;
+  background: #422BFF;
+  color: #fff;
+  font-size: 15px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+}
+/* Efeito hover nos botões do menu */
+.menu-btn:hover {
+  background: #2a1a99;
+  color: #fff;
+}
+
+/* Botão padrão */
+button {
+  padding: 10px 20px;
+  border: none;
+  background: #422BFF;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+/* Efeito hover no botão */
+button:hover {
+  background: #2a1a99;
+}
+
+/* Estilo geral */
+body {
+  margin: 0;
+  padding: 0;
+  background: #000; /* Fundo preto */
+  font-family: "Poppins", sans-serif;
+}
+
+/* Estilos adicionais dos arquivos HTML originais */
+.produtos-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.produto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 8px;
+    background: #111; /* Fundo escuro para contraste */
+}
+
+.produto p {
+    margin-bottom: 8px;
+    font-weight: bold;
+    text-align: center;
+    color: #fff; /* Texto branco */
+    font-size: 16px;
+}
+
+.tamanhos {
+    color: #ccc !important; /* Cor mais suave para os tamanhos */
+    font-size: 12px !important;
+    font-weight: normal !important;
+    margin-bottom: 8px !important;
+}
+
+.produto img {
+    transition: transform 0.3s;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.produto img:hover,
+.produto img:active {
+    transform: scale(1.1);
+    z-index: 2;
+}
+
+.preco {
+    color: #22c55e; /* Verde mais suave */
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.preco:hover,
+.preco:active,
+.preco:visited {
+    color: #16a34a; /* Verde mais escuro no hover */
+    text-decoration: underline;
+    text-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+}
+
+/* Área de produtos */
+.produtos-area {
+    text-align: center;
+    background: #000;
+    color: #fff;
+    padding: 32px 0;
+}
+
+.titulo-central {
+    text-align: center;
+    font-size: 2rem;
+    color: #fff;
+    margin: 32px 0 24px 0;
+    letter-spacing: 2px;
+}
+
+/* Estilos do footer completo */
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 48px 0 0 0;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.footer-col {
+    flex: 1;
+    min-width: 180px;
+    margin-bottom: 32px;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 8px;
+}
+
+.footer-col ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.footer-col ul li a:hover {
+    text-decoration: underline;
+}
+
+.footer-logo {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.footer-desc {
+    font-size: 1rem;
+    margin-bottom: 12px;
+}
+
+.footer-contact-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.footer-contact {
+    font-size: 1rem;
+    margin-bottom: 12px;
+}
+
+.footer-newsletter {
+    background: #181818;
+    color: #fff;
+    padding: 32px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+}
+
+.footer-newsletter-title {
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.footer-newsletter-desc {
+    font-size: 1.2rem;
+    margin-bottom: 24px;
+}
+
+.footer-newsletter-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.footer-newsletter-form label {
+    font-size: 1.1rem;
+    margin-right: 8px;
+}
+
+.footer-newsletter-form input {
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    width: 320px;
+    font-size: 1rem;
+}
+
+.footer-newsletter-form button {
+    background: #4B00E6;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 32px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.footer-newsletter-priv {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+}
+
+.footer-newsletter-priv a {
+    color: #A259E6;
+}
+
+.footer-bar {
+    background: #000;
+    color: #fff;
+    padding: 16px 0;
+    margin-top: 32px;
+    font-size: 1rem;
+}
+
+.footer-bar-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-payments {
+    display: flex;
+    gap: 8px;
+}
+
+.footer-payments img {
+    height: 28px;
+    vertical-align: middle;
+}
+
+/* Cores específicas para o footer */
+.blue {
+    color: #4B00E6;
+}
+
+.purple {
+    color: #A259E6;
+}
+
+/* Seção sobre a loja */
+.sobre-loja {
+    background: #000;
+    color: #fff;
+    padding: 20px 0;
+}
+
+.contato-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.contato-container h3 {
+    margin-bottom: 10px;
+}
+
+.contato-container .bairro {
+    line-height: 1.5;
+}
+@media (max-width: 800px) {
+  li, a, :no-button {
+    font-size: 10x
+  }
+
+
+}
+/* Centraliza o carrossel de produto na página */
+.product-gallery {
+  display: flex;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: right;   /* Centraliza horizontalmente */
+  margin: 10px auto;         /* Espaço acima/abaixo e centraliza */
+  width: 100%;
+  max-width: 1000px;          /* Limita a largura máxima */
+  
+}
+/* Container do carrossel */
+.products-row {
+  display: flex;
+  justify-content: center; /* Centraliza no eixo horizontal */
+  align-items: flex-start; /* Mantém alinhado pelo topo */
+  gap: 40px; /* Espaço entre os produtos */
+  flex-wrap: wrap; /* Quebra linha se a tela for menor */
+  margin: 40px auto;
+  max-width: 1200px; /* largura máxima para não ficar esticado demais */
+}
+
+.product-horizontal {
+  display: flex;
+  flex-direction: column; /* Empilha galeria + card */
+  align-items: center; /* Centraliza cada produto */
+  text-align: center;
+  font-size: 12px;
+}
+/* Estilo do produto individual */
+.product-horizontal {
+  display: flex;
+  gap: 30px;
+  align-items: space-between;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0001;
+  padding: 0px 24px;
+  margin: 0;
+}
+/* Container das miniaturas */
+.thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 350px;
+  overflow-y: auto;
+}
+/* Estilo das miniaturas */
+.thumbnails img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border 0.2s;
+}
+/* Efeito hover e seleção nas miniaturas */
+.thumbnails img:hover,
+.thumbnails img.selected {
+  border: 2px solid #422BFF;
+}
+/* Container da imagem principal */
+.main-image {
+  position: relative;
+}
+/* Estilo da imagem principal */
+.main-image img {
+  width: 350px;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #fff;
+}
+/* Label de desconto */
+.discount-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #ff0000;
+  color: #ffffff;
+  font-weight: bold;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 18px;
+  border-radius: 0 0 8px 8px;
+}
+/* Seção principal (hero) */
+.hero-section { /* Container principal do hero */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  background: #422bff;
+  padding: 60px 0;
+  min-height: 500px;
+}
+/* Conteúdo do hero */
+.hero-content { /* Container para o texto e botões */
+  max-width: 500px;
+  color: #fff;
+  flex-direction: column;
+  gap: 30px;
+}
+.hero-badge {/* Badge de destaque */
+  background: #fff;
+  color: #422bff;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 0px 0px;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+/* Título do hero */
+.hero-title {
+  font-size: 2.8rem;
+  font-weight: italic;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.hero-desc {/* Descrição do hero */
+  font-size: 1.1rem;
+  color: #e0e0ff;
+  margin-bottom: 25px;
+}
+
+.hero-buttons { /* Container para os botões */
+  display: inline-flex;
+  gap: 14px;
+}
+/* Estilo base para ambos os botões */
+.hero-btn {
+  background: #fff;
+  color: #422bff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  display: inline-block;
+}
+/* Estilo específico para o botão primário */
+.hero-btn.primary {
+  background: #fff;
+  color: #422bff;
+}
+/* Estilo para o botão secundário */
+.hero-btn:not(.primary) {
+  background: #e0e0ff;
+  color: #422bff;
+}
+/* Efeito hover para ambos os botões */
+.hero-btn:hover {
+  background: #2a1a99;
+  color: #ffffff;
+}
+/* Imagem do hero */
+.hero-image img {
+  width: 700px;
+  height: 600px;
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px #0002;
+  background: #ffffff;
+}
+/* Benefícios */
+.benefits {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  background: #fafbfc;
+  padding: 40px 0 30px 0;
+  margin: 30px auto;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+/* Estilo individual dos benefícios */
+.benefit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 220px;
+  text-align: center;
+  gap: 10px;
+}
+/* Ícone dos benefícios */
+.benefit-icon {
+  margin-bottom: 8px;
+}
+/* Título dos benefícios */
+.benefit-title {
+  font-weight: 600;
+  color: #222;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+/* Descrição dos benefícios */
+.benefit-desc {
+  color: #444;
+  font-size: 14px;
+}
+/* Responsividade dos benefícios */
+@media (max-width: 900px) {
+  .benefits {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+  .benefit {
+    width: 100%;
+    max-width: 350px;
+  }
+}
+.highlight-btn {
+  background: #ff0000;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 22px;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  cursor: default; /* Não funcional */
+  transition: background 0.2s;
+}
+/* Efeito hover no botão de destaque */
+.highlight-btn:hover {
+  background: #ad3939;
+}
+/* Seção de newsletter */
+.newsletter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #000000;
+  color: #fff;
+  padding: 40px 20px;
+  gap: 20px;
+
+}
+.type button {
+  background: #ffffff;
+  color: #4b09ff;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.privacy-note {
+  font-size: 12px;
+  color: #ccc;
+  max-width: 400px;
+  text-align: center;
+}
+/* Cabeçalho da newsletter */
+.newsletter-header {
+  text-align: center;
+  margin-bottom: 0px;
+  background-color: #000000;
+  padding: 5px 100px;
+  color: #fff;
+}
+/* Título da newsletter */
+.newsletter-header h2 {
+  margin: 0;
+  font-size: 2rem;
+}/* Descrição da newsletter */
+.newsletter-header p {
+  margin: 8px 0 0 0;
+  font-size: 1rem;
+  color: #ccc;
+}
+input[type="email"]{ 
+  padding:10px; /* Espaçamento interno */
+  width:200px;/* Largura do campo */
+  border:1px solid #ccc; /* Borda cinza clara */
+  border-radius:6px; /* Bordas arredondadas */
+}
+button{ 
+  padding:.6rem; /* Espaçamento interno */
+  border-radius:6px; /* Bordas arredondadas */
+  cursor:pointer; /* Cursor de ponteiro */
+  color: #fff;/* Cor do texto */
+}
+.sobre-container {
+  display: flex;/* Usa flexbox */
+  gap: 0px;/* Espaço entre as seções */
+  justify-content: space-between;/* Espaço entre os itens */
+  align-items: flex-start;/* Alinha pelo topo */
+  max-width: 3000px;/* Largura máxima */
+  margin: 0px auto;/* Centraliza horizontalmente */
+  padding: 20px; /* Espaçamento interno */
+  background-color: #000;
+}
+
+.sobre-left {/* Estilo da seção esquerda */
+  flex: 1;
+}
+
+.sobre-left ul {/* Estilo da lista */
+  list-style: none;
+  padding: 0;
+}
+
+.sobre-left li {/* Estilo dos itens da lista */
+  margin-bottom: 8px;
+  color: #a19999;
+
+;
+  font-size: 10px;
+}
+
+.sobre-left li a {
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.sobre-left li a:hover {
+  color: #422BFF;
+  text-decoration: underline;
+}
+
+.sobre-right {/* Estilo da seção direita */
+  flex: 2;
+  max-width: 600px;
+  text-align: left;
+  color: #a19999;
+  font-size: 10px;
+}
+.contato {/* Estilo do contato */
+  font-size: 13px;
+  font-weight: bold;
+  color: #ffffff;
+  display: flex;
+  align-items: flex-start; /* Alinha pelo topo */
+  margin: 0;
+  padding: 20px 0 10px 0;
+  min-width: 90px; /* largura fixa para alinhar melhor */
+}
+.bairro {/* Estilo do bairro */
+  display: flex;
+  color: #a19999;
+  font-size: 10px;
+  margin: 0px;
+  text-align: left;
+}
+
+/* Estilo para preço do Pix */
+.preco-pix {
+  color: #22c55e !important; /* Verde */
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  font-weight: bold;
+}
+
+.preco-pix:hover {
+  color: #16a34a !important; /* Verde mais escuro no hover */
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+  text-decoration: underline;
+}
+
+.preco-pix strong {
+  color: inherit; /* Herda a cor do pai */
+}

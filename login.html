@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | NaRede Store</title>
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg,#422BFF ,#422BFF);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-container {
+      background: white;
+      width: 360px;
+      padding: 2rem 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    .login-container h2 {
+      font-size: 1.8rem;
+      color: #222;
+      margin-bottom: 1rem;
+    }
+
+    .login-container h2 span {
+      color: #422BFF;
+      font-weight: 600;
+    }
+
+    .login-container p {
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border: 1.5px solid #ddd;
+      border-radius: 10px;
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+
+    .login-container input:focus {
+      border-color: #422BFF;
+      box-shadow: 0 0 0 3px rgba(122,63,255,0.1);
+      outline: none;
+    }
+
+    .login-container button {
+      width: 100%;
+      background-color: #422BFF;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: 600;
+    }
+
+    .login-container button:hover {
+      background-color: #422BFF;
+    }
+
+
+    .login-container a {
+      display: inline-block;
+      margin-top: 12px;
+      color: #422BFF;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .login-container a:hover {
+      text-decoration: underline;
+    }
+
+
+    .back-link {
+      margin-top: 20px;
+      display: block;
+      color: #666;
+      font-size: 0.85rem;
+    }
+
+    .back-link:hover {
+      color: #422BFF;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Na<span>Rede</span> Store</h2>
+    <p>Entrar na sua conta</p>
+    <form>
+      <input type="email" placeholder="E-mail" required />
+      <input type="password" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <a href="#">Esqueceu a senha?</a><br>
+    <a href="cadastro.html">Não tem conta? Cadastre-se</a>
+    <a class="back-link" href="index.html">← Voltar à loja</a>
+  </div>
+</body>
