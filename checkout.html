@@ -4,24 +4,44 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Checkout | NaRede Store</title>
+  <link rel="stylesheet" href="theme-toggle.css">
+  <link rel="stylesheet" href="accessibility.css">
+  <link rel="stylesheet" href="responsive.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
     body {
-      background: linear-gradient(135deg,#422BFF,#422BFF);
+      background: #0d1117;
       display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px;
+      transition: background 0.3s ease;
+    }
+    body.light-mode {
+      background: #ffffff;
     }
     .checkout-container {
-      background: white; width: 460px; padding: 2rem 2.5rem; border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: left; max-height: 95vh; overflow-y: auto;
+      background: #161b22; width: 460px; padding: 2rem 2.5rem; border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: left; max-height: 95vh; overflow-y: auto;
+      transition: all 0.3s ease;
     }
-    h2 { text-align: center; color: #222; margin-bottom: 0.6rem; }
+    body.light-mode .checkout-container {
+      background: white;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    h2 { text-align: center; color: #f0f6fc; margin-bottom: 0.6rem; }
+    body.light-mode h2 { color: #222; }
     h2 span { color: #422BFF; font-weight: 600; }
-    p.subtitle { text-align: center; color: #666; margin-bottom: 1rem; }
-    label { display:block; margin-bottom: 6px; color:#444; font-size:0.9rem; }
+    p.subtitle { text-align: center; color: #8b949e; margin-bottom: 1rem; }
+    body.light-mode p.subtitle { color: #666; }
+    label { display:block; margin-bottom: 6px; color:#8b949e; font-size:0.9rem; }
+    body.light-mode label { color:#444; }
     .field { margin-bottom: 14px; }
     input, select {
-      width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 10px;
-      transition: 0.15s; font-size: 0.95rem;
+      width: 100%; padding: 12px 14px; border: 1.5px solid #30363d; border-radius: 10px;
+      transition: 0.15s; font-size: 0.95rem; background-color: #0d1117; color: #f0f6fc;
+    }
+    body.light-mode input, body.light-mode select {
+      border: 1.5px solid #ddd;
+      background-color: #ffffff;
+      color: #222;
     }
     input:focus, select:focus {
       border-color: #422BFF; box-shadow: 0 0 0 3px rgba(122,63,255,0.08); outline: none;
@@ -46,10 +66,160 @@
       animation: fadeIn .4s ease;
     }
     @keyframes fadeIn { from {opacity:0; transform:scale(.98)} to {opacity:1; transform:scale(1)} }
-    .small { font-size:0.85rem; color:#666; margin-top:6px; }
+    .small { font-size:0.85rem; color:#8b949e; margin-top:6px; }
+    body.light-mode .small { color:#666; }
   </style>
 </head>
 <body>
+  <!-- Botão de Alternância de Tema -->
+  <button class="theme-toggle-btn" id="themeToggle" aria-label="Alternar tema" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
+    <svg id="themeIcon" viewBox="0 0 24 24">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
+
+  <!-- Botão de Acessibilidade -->
+  <button class="accessibility-btn" id="accessibilityToggle" aria-label="Menu de Acessibilidade" style="position: fixed; top: 20px; right: 90px; z-index: 10000;">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M21 9H15V22H13V16H11V22H9V9H3V7H21V9Z"/>
+    </svg>
+  </button>
+
+  <!-- Menu de Acessibilidade -->
+  <div class="accessibility-menu" id="accessibilityMenu">
+    <h3>Acessibilidade</h3>
+    
+    <div class="accessibility-option">
+      <label for="fontSize">Tamanho da Fonte</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="fontSize">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="highContrast">Alto Contraste</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="highContrast">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="grayscale">Escala de Cinza</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="grayscale">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="highlightLinks">Destacar Links</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="highlightLinks">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="largeCursor">Cursor Grande</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="largeCursor">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="lineSpacing">Espaçamento de Linha</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="lineSpacing">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="hideImages">Ocultar Imagens</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="hideImages">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="readingMode">Modo Leitura</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="readingMode">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="reducedMotion">Reduzir Movimento</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="reducedMotion">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="audioDescription">Áudio Descrição</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="audioDescription">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="textToSpeech">Texto para Fala</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="textToSpeech">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="readingGuide">Guia de Leitura</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="readingGuide">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="focusMode">Modo Foco</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="focusMode">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="dyslexiaFont">Fonte para Dislexia</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="dyslexiaFont">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="visualIndicators">Indicadores Visuais</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="visualIndicators">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="monochrome">Monocromático</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="monochrome">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <button class="reset-btn" id="resetAccessibility">Resetar Tudo</button>
+  </div>
+
   <div class="checkout-container">
     <h2>Finalizar <span>Compra</span></h2>
     <p class="subtitle">Preencha seus dados para concluir o pedido</p>
@@ -190,5 +360,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
+  <script src="theme-toggle.js"></script>
+  <script src="accessibility.js"></script>
 </body>
 </html>

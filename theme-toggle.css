@@ -1,0 +1,298 @@
+/* Sistema de Tema - Modo Claro e Escuro */
+:root {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --border-color: #30363d;
+  --accent-color: #422BFF;
+}
+
+body.light-mode {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f8fa;
+  --text-primary: #000000;
+  --text-secondary: #656d76;
+  --border-color: #d0d7de;
+  --accent-color: #422BFF;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+/* Botão de alternância de tema */
+.theme-toggle-btn {
+  background: var(--accent-color);
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.theme-toggle-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: #ffffff;
+}
+
+/* Aplica cores do tema - Modo Claro */
+body.light-mode {
+  background-color: #ffffff !important;
+}
+
+body.light-mode .top-bar {
+  background-color: #f6f8fa !important;
+  color: #000000 !important;
+}
+
+body.light-mode .top-bar span,
+body.light-mode .top-bar a {
+  color: #000000 !important;
+}
+
+body.light-mode header {
+  background-color: #ffffff !important;
+}
+
+/* Logo - mantém cores específicas em AMBOS os modos */
+.logotipo span[style*="#422BFF"],
+.logotipo span[style*="blue"] {
+  color: #422BFF !important;
+}
+
+body.light-mode .logotipo span[style*="#fff"] {
+  color: #000000 !important;
+}
+
+body.light-mode nav a {
+  color: #000000 !important;
+}
+
+/* Ícones do Entrar e Carrinho no modo claro */
+body.light-mode .user-link svg {
+  stroke: #000000 !important;
+}
+
+body.light-mode .user-link .label {
+  color: #000000 !important;
+}
+
+body.light-mode .cart-badge {
+  background-color: #422BFF !important;
+  color: #ffffff !important;
+}
+
+body.light-mode .search-bar input {
+  background-color: #f6f8fa !important;
+  color: #000000 !important;
+  border-color: #d0d7de !important;
+}
+
+body.light-mode .search-bar button {
+  background-color: #422BFF !important;
+  color: #ffffff !important;
+}
+
+/* Cards de produtos - texto preto em AMBOS os modos */
+.produto-card,
+.produto-card h3,
+.produto-card p,
+.produto-card strong,
+.produto-card a {
+  color: #000000 !important;
+}
+
+/* Preços PIX - Verde fluorescente em AMBOS os modos */
+.preco-pix,
+.preco-pix strong,
+a.preco-pix,
+a.preco-pix strong {
+  color: #00ff41 !important;
+  text-decoration: none !important;
+}
+
+.preco-pix:hover,
+a.preco-pix:hover strong {
+  color: #00cc33 !important;
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+}
+
+body.light-mode .preco-pix,
+body.light-mode .preco-pix strong,
+body.light-mode a.preco-pix,
+body.light-mode a.preco-pix strong {
+  color: #00ff41 !important;
+}
+
+body.light-mode .preco-pix:hover,
+body.light-mode a.preco-pix:hover strong {
+  color: #00cc33 !important;
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+}
+
+/* Preços gerais (.preco) - Verde fluorescente em AMBOS os modos */
+.preco,
+a.preco {
+  color: #00ff41 !important;
+  text-decoration: none !important;
+}
+
+.preco:hover,
+a.preco:hover,
+.preco:active,
+a.preco:active {
+  color: #00cc33 !important;
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+  text-decoration: none !important;
+}
+
+body.light-mode .preco,
+body.light-mode a.preco {
+  color: #00ff41 !important;
+}
+
+body.light-mode .preco:hover,
+body.light-mode a.preco:hover {
+  color: #00cc33 !important;
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+}
+
+body.light-mode .produtos h2,
+body.light-mode h1, body.light-mode h2, body.light-mode h3,
+body.light-mode p, body.light-mode span, body.light-mode a,
+body.light-mode label, body.light-mode li {
+  color: #000000 !important;
+}
+
+body.light-mode .produto {
+  background-color: #ffffff !important;
+  border-color: #d0d7de !important;
+}
+
+body.light-mode .produto:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+body.light-mode footer {
+  background-color: #f6f8fa !important;
+  background: #f6f8fa !important;
+  color: #000000 !important;
+}
+
+body.light-mode footer * {
+  color: #000000 !important;
+}
+
+body.light-mode .sugestoes {
+  background-color: #ffffff !important;
+  border-color: #d0d7de !important;
+}
+
+body.light-mode .sugestoes div:hover {
+  background-color: #f6f8fa !important;
+}
+
+/* Hero section sempre com gradiente roxo (em ambos os modos) */
+.hero-section {
+  background: linear-gradient(135deg, #600871 0%, #8B1A9C 100%) !important;
+}
+
+body.light-mode .hero-section {
+  background: linear-gradient(135deg, #600871 0%, #8B1A9C 100%) !important;
+}
+
+.hero-section,
+.hero-section *,
+.hero-content,
+.hero-content *,
+.hero-title,
+.hero-desc {
+  color: #ffffff !important;
+}
+
+body.light-mode .hero-section,
+body.light-mode .hero-section *,
+body.light-mode .hero-content,
+body.light-mode .hero-content *,
+body.light-mode .hero-title,
+body.light-mode .hero-desc {
+  color: #000000 !important;
+}
+
+.hero-badge {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.hero-btn {
+  background-color: #7b097d !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+.hero-btn:hover {
+  background-color: #ffffff !important;
+  color: #7b097d !important;
+}
+
+/* Newsletter no modo claro */
+body.light-mode .newsletter,
+body.light-mode .newsletter-header,
+body.light-mode div[style*="background"] {
+  background-color: #f6f8fa !important;
+  background: #f6f8fa !important;
+}
+
+body.light-mode .newsletter *,
+body.light-mode .newsletter h2,
+body.light-mode .newsletter p,
+body.light-mode .newsletter label {
+  color: #000000 !important;
+}
+
+body.light-mode .newsletter input {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #d0d7de !important;
+}
+
+/* Seções no modo claro */
+body.light-mode section {
+  background-color: #ffffff !important;
+}
+
+body.light-mode .hero-section,
+body.light-mode .benefits,
+body.light-mode .highlight-section,
+body.light-mode .sobre-loja {
+  background-color: #f6f8fa !important;
+}
+
+body.light-mode .footer-newsletter-form input {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #d0d7de !important;
+}
+
+body.light-mode .footer-bar {
+  background-color: #e1e4e8 !important;
+  border-top-color: #d0d7de !important;
+}

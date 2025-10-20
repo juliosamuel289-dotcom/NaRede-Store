@@ -1,0 +1,666 @@
+/* Sistema de Acessibilidade */
+
+/* Botão de Acessibilidade - Mesmo estilo do Dark Mode */
+.accessibility-btn {
+  background: var(--accent-color);
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+/* Para páginas de formulário - botão fixo (igual theme-toggle) */
+.accessibility-btn[style*="position: fixed"] {
+  border: 2px solid var(--border-color);
+  width: 50px;
+  height: 50px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.accessibility-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.accessibility-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: #ffffff;
+}
+
+/* Menu de Acessibilidade */
+.accessibility-menu {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: #161b22;
+  border: 2px solid #30363d;
+  border-radius: 12px;
+  padding: 15px;
+  width: 280px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 10000;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  display: none;
+  animation: slideIn 0.3s ease;
+}
+
+/* Scrollbar personalizada */
+.accessibility-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.accessibility-menu::-webkit-scrollbar-track {
+  background: #0d1117;
+  border-radius: 4px;
+}
+
+.accessibility-menu::-webkit-scrollbar-thumb {
+  background: #422BFF;
+  border-radius: 4px;
+}
+
+.accessibility-menu::-webkit-scrollbar-thumb:hover {
+  background: #351ECC;
+}
+
+.accessibility-menu.active {
+  display: block;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.accessibility-menu h3 {
+  color: #f0f6fc;
+  font-size: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #30363d;
+}
+
+.accessibility-menu h3 svg {
+  width: 18px;
+  height: 18px;
+  fill: #422BFF;
+  flex-shrink: 0;
+}
+
+.accessibility-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #30363d;
+  gap: 10px;
+}
+
+.accessibility-option:last-child {
+  border-bottom: none;
+}
+
+.accessibility-option label {
+  color: #8b949e;
+  font-size: 13px;
+  cursor: pointer;
+  flex: 1;
+  line-height: 1.3;
+}
+
+.accessibility-option button {
+  background: #422BFF;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.accessibility-option button:hover {
+  background: #351ECC;
+  transform: scale(1.05);
+}
+
+.font-size-controls {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.font-size-controls button {
+  padding: 6px 10px;
+  font-weight: bold;
+  min-width: 35px;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: #30363d;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+
+.toggle-switch.active {
+  background: #422BFF;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.toggle-switch.active::after {
+  transform: translateX(20px);
+}
+
+/* Modo Claro - Menu de Acessibilidade */
+body.light-mode .accessibility-menu {
+  background: #ffffff;
+  border-color: #d0d7de;
+}
+
+body.light-mode .accessibility-menu h3 {
+  color: #000000;
+}
+
+body.light-mode .accessibility-option label {
+  color: #666;
+}
+
+body.light-mode .accessibility-option {
+  border-bottom-color: #d0d7de;
+}
+
+body.light-mode .toggle-switch {
+  background: #d0d7de;
+}
+
+/* Tamanhos de Fonte */
+body.font-small {
+  font-size: 14px;
+}
+
+body.font-normal {
+  font-size: 16px;
+}
+
+body.font-large {
+  font-size: 18px;
+}
+
+body.font-extra-large {
+  font-size: 20px;
+}
+
+/* Alto Contraste */
+body.high-contrast {
+  filter: contrast(1.3);
+}
+
+body.high-contrast * {
+  border-color: #000 !important;
+}
+
+body.high-contrast.light-mode * {
+  border-color: #000 !important;
+}
+
+/* Modo Escala de Cinza */
+body.grayscale {
+  filter: grayscale(100%);
+}
+
+body.grayscale.high-contrast {
+  filter: grayscale(100%) contrast(1.3);
+}
+
+/* Destaque de Links */
+body.highlight-links a {
+  background-color: rgba(255, 255, 0, 0.3) !important;
+  padding: 2px 4px !important;
+  border-radius: 3px !important;
+}
+
+body.light-mode.highlight-links a {
+  background-color: rgba(255, 255, 0, 0.5) !important;
+}
+
+/* Cursor Grande */
+body.large-cursor,
+body.large-cursor * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="white" stroke="black" stroke-width="2" d="M2 2 L2 28 L12 20 L16 30 L20 28 L16 18 L26 18 Z"/></svg>') 2 2, auto !important;
+}
+
+/* Espaçamento de Linha */
+body.line-spacing-normal * {
+  line-height: 1.5 !important;
+}
+
+body.line-spacing-large * {
+  line-height: 2 !important;
+}
+
+body.line-spacing-extra-large * {
+  line-height: 2.5 !important;
+}
+
+/* Ocultar Imagens */
+body.hide-images img {
+  opacity: 0.1 !important;
+  filter: grayscale(100%) !important;
+}
+
+/* Modo Leitura (Destaque de Texto) */
+body.reading-mode {
+  background: #f5f5dc !important;
+  color: #000 !important;
+}
+
+body.reading-mode * {
+  background: transparent !important;
+  color: #000 !important;
+}
+
+body.reading-mode header,
+body.reading-mode footer,
+body.reading-mode .top-bar,
+body.reading-mode aside {
+  opacity: 0.3;
+}
+
+/* Animações Reduzidas */
+body.reduced-motion * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Botão de Reset */
+.accessibility-reset {
+  width: 100%;
+  margin-top: 12px;
+  background: #dc3545 !important;
+  padding: 10px !important;
+  font-size: 13px !important;
+  font-weight: bold !important;
+  border-radius: 8px !important;
+}
+
+.accessibility-reset:hover {
+  background: #c82333 !important;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .accessibility-btn {
+    right: 20px;
+    top: 80px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .accessibility-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .accessibility-menu {
+    right: 10px;
+    left: 10px;
+    width: auto;
+    top: 140px;
+  }
+}
+
+/* ===== RECURSOS AVANÇADOS PARA PESSOAS COM DEFICIÊNCIA ===== */
+
+/* Controles de Áudio */
+.audio-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #161b22;
+  border: 2px solid #422BFF;
+  border-radius: 12px;
+  padding: 12px;
+  z-index: 9999;
+  display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  min-width: 250px;
+  max-width: 300px;
+}
+
+.audio-controls.active {
+  display: block;
+  animation: slideUp 0.4s ease;
+}
+
+.audio-controls h4 {
+  color: #f0f6fc;
+  font-size: 13px;
+  margin: 0 0 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.audio-controls h4 svg {
+  width: 16px;
+  height: 16px;
+  fill: #422BFF;
+}
+
+.audio-control-btn {
+  width: 100%;
+  background: #422BFF;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.audio-control-btn:hover {
+  background: #351ECC;
+  transform: translateX(3px);
+}
+
+.audio-control-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: #fff;
+}
+
+.audio-control-btn.playing {
+  background: #28a745;
+}
+
+.audio-control-btn.playing:hover {
+  background: #218838;
+}
+
+body.light-mode .audio-controls {
+  background: #ffffff;
+  border-color: #422BFF;
+}
+
+body.light-mode .audio-controls h4 {
+  color: #000;
+}
+
+/* Modo de Foco (para TDAH/Autismo) */
+body.focus-mode * {
+  outline: 3px solid transparent !important;
+  transition: outline 0.2s ease !important;
+}
+
+body.focus-mode *:focus,
+body.focus-mode *:hover {
+  outline: 3px solid #422BFF !important;
+  outline-offset: 2px !important;
+}
+
+body.focus-mode :not(:hover):not(:focus) {
+  opacity: 0.6 !important;
+}
+
+/* Guia de Leitura (Régua) */
+.reading-guide {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: #422BFF;
+  box-shadow: 0 2px 10px rgba(66, 43, 255, 0.5),
+              0 -2px 10px rgba(66, 43, 255, 0.5);
+  z-index: 9998;
+  display: none;
+  pointer-events: none;
+}
+
+.reading-guide.active {
+  display: block;
+}
+
+.reading-guide::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(to bottom, transparent, rgba(66, 43, 255, 0.1));
+}
+
+.reading-guide::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(to top, transparent, rgba(66, 43, 255, 0.1));
+}
+
+/* Máscara de Leitura */
+.reading-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9997;
+  display: none;
+}
+
+.reading-mask.active {
+  display: block;
+}
+
+.reading-mask-overlay {
+  position: absolute;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.reading-mask-top {
+  top: 0;
+  height: 0;
+}
+
+.reading-mask-bottom {
+  bottom: 0;
+  height: 0;
+}
+
+/* Leitor de Texto em Voz Alta */
+.text-reader-highlight {
+  background: rgba(66, 43, 255, 0.3) !important;
+  padding: 2px 0 !important;
+  border-radius: 3px !important;
+}
+
+/* Indicadores Visuais para Surdos */
+body.visual-indicators .audio-element::before,
+body.visual-indicators video::before {
+  content: '🔊 Som ativo';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #422BFF;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  z-index: 100;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+/* Modo Dislexia (Fonte OpenDyslexic) */
+body.dyslexia-font,
+body.dyslexia-font * {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive !important;
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+  line-height: 2 !important;
+}
+
+/* Tooltips de Ajuda */
+.accessibility-tooltip {
+  position: absolute;
+  background: #000;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10001;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.accessibility-tooltip.show {
+  opacity: 1;
+}
+
+/* Botão de Emergência/Ajuda */
+.emergency-help-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #dc3545;
+  color: #fff;
+  border: 3px solid #fff;
+  border-radius: 50px;
+  padding: 15px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10000;
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
+  display: none;
+  animation: bounce 2s infinite;
+}
+
+.emergency-help-btn.active {
+  display: block;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-10px); }
+}
+
+.emergency-help-btn:hover {
+  background: #c82333;
+  box-shadow: 0 8px 25px rgba(220, 53, 69, 0.7);
+}
+
+/* Modo Monocromático (para Daltonismo) */
+body.monochrome {
+  filter: grayscale(100%) contrast(1.2);
+}
+
+/* Modo Alto Contraste Avançado */
+body.ultra-contrast {
+  filter: contrast(2) brightness(1.1);
+}
+
+body.ultra-contrast * {
+  border-width: 2px !important;
+  font-weight: 600 !important;
+}
+
+/* Responsivo para recursos avançados */
+@media (max-width: 768px) {
+  .audio-controls {
+    left: 10px;
+    bottom: 10px;
+    min-width: 200px;
+    padding: 12px;
+  }
+
+  .emergency-help-btn {
+    bottom: 10px;
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+  
+  .accessibility-menu {
+    right: 5px;
+    left: 5px;
+    width: auto;
+    top: 140px;
+    max-height: calc(100vh - 160px);
+    padding: 12px;
+  }
+  
+  .accessibility-menu h3 {
+    font-size: 14px;
+  }
+  
+  .accessibility-option {
+    padding: 8px 0;
+  }
+  
+  .accessibility-option label {
+    font-size: 12px;
+  }
+  
+  .font-size-controls button {
+    min-width: 30px;
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+}

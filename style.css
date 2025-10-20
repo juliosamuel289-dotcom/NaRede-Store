@@ -317,7 +317,7 @@ body {
 }
 
 .preco {
-    color: #22c55e; /* Verde mais suave */
+    color: #00ff41; /* Verde fluorescente */
     font-weight: bold;
     font-size: 18px;
     margin-top: 8px;
@@ -329,9 +329,9 @@ body {
 .preco:hover,
 .preco:active,
 .preco:visited {
-    color: #16a34a; /* Verde mais escuro no hover */
-    text-decoration: underline;
-    text-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+    color: #00cc33; /* Verde mais escuro no hover */
+    text-decoration: none;
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
 }
 
 /* Área de produtos */
@@ -888,7 +888,7 @@ button{
 
 /* Estilo para preço do Pix */
 .preco-pix {
-  color: #22c55e !important; /* Verde */
+  color: #00ff41 !important; /* Verde fluorescente */
   text-decoration: none;
   cursor: pointer;
   transition: color 0.3s ease, text-shadow 0.3s ease;
@@ -896,9 +896,9 @@ button{
 }
 
 .preco-pix:hover {
-  color: #16a34a !important; /* Verde mais escuro no hover */
-  text-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
-  text-decoration: underline;
+  color: #00cc33 !important; /* Verde mais escuro no hover */
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+  text-decoration: none;
 }
 
 .preco-pix strong {

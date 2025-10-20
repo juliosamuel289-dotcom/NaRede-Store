@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Na RedeStore - Times Brasileiros</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="theme-toggle.css">
+  <link rel="stylesheet" href="accessibility.css">
+  <link rel="stylesheet" href="responsive.css">
 </head>
 <body>
   <div class="top-bar">
@@ -35,6 +38,18 @@
           </span>
           <span class="label"><b>Entrar</b></span>
         </a>
+        <!-- Botão de Alternância de Tema -->
+        <button class="theme-toggle-btn user-link" id="themeToggle" aria-label="Alternar tema" style="border: none; background: var(--accent-color);">
+          <svg id="themeIcon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+        <!-- Botão de Acessibilidade -->
+        <button class="accessibility-btn user-link" id="accessibilityToggle" aria-label="Menu de Acessibilidade">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M21 9H15V22H13V16H11V22H9V9H3V7H21V9Z"/>
+          </svg>
+        </button>
         <a href="checkout.html" class="user-link">
           <span class="icon">
             <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -172,7 +187,7 @@
         </ul>
       </div>
       <div class="sobre-right">
-        <h3><a href="index.html" style="text-decoration: none;"><span style="color:#fff;">Na </span><span style="color: blue;">Rede</span><span style="color:#fff;">Store</span></a></h3>
+        <h3><a href="index.html" style="text-decoration: none;"><span style="color:#fff;">Na </span><span style="color: #422BFF;">Rede</span><span style="color:#fff;">Store</span></a></h3>
         <p>A NaRede Store é a sua loja online de camisetas de futebol oficiais. Fundada em 2025, nossa missão é oferecer produtos de alta qualidade para torcedores apaixonados.</p>
         <p>Nosso compromisso é com você, oferecendo frete grátis, parcelamento em até 10x sem juros e um atendimento especializado.</p>
       </div>
@@ -348,5 +363,7 @@
       });
     });
   </script>
+  <script src="theme-toggle.js"></script>
+  <script src="accessibility.js"></script>
 </body>
 </html>
