@@ -164,10 +164,8 @@ a.logotipo:hover {
 .user-bar {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
   position: right;
-
-
 }
 
 /* Link do usuário */
@@ -180,9 +178,9 @@ a.logotipo:hover {
   font-size: 16px;
   position: relative;
   transition: color 0.2s;
-  border: 10px;
-  padding: 6px 10px;
-  
+  padding: 0;
+  height: 44px;
+}
 }
 
 .user-link:hover .label {
@@ -201,9 +199,15 @@ a.logotipo:hover {
   font-size: 14px;
   font-weight: bold;
   border-radius: 50%;
-  padding: 2px 10px;
-  margin-left: 6px;
-  display: inline-block;
+  width: 44px;
+  height: 44px;
+  margin-left: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  flex-shrink: 0;
 }
 
 /* Navegação */
@@ -332,6 +336,18 @@ body {
     color: #00cc33; /* Verde mais escuro no hover */
     text-decoration: none;
     text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+}
+
+.preco-antigo {
+    color: #888;
+    font-size: 14px;
+    margin-top: 5px;
+    text-decoration: line-through;
+    font-weight: normal;
+}
+
+body.light-mode .preco-antigo {
+    color: #999;
 }
 
 /* Área de produtos */
@@ -624,10 +640,16 @@ body {
   justify-content: center;
   align-items: center;
   gap: 60px;
-  background: #422bff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 60px 0;
   min-height: 500px;
+  transition: background 0.3s ease;
 }
+
+body.light-mode .hero-section {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
 /* Conteúdo do hero */
 .hero-content { /* Container para o texto e botões */
   max-width: 500px;
@@ -635,15 +657,31 @@ body {
   flex-direction: column;
   gap: 30px;
 }
+
 .hero-badge {/* Badge de destaque */
-  background: #fff;
-  color: #422bff;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
   font-weight: bold;
-  border-radius: 8px;
-  padding: 0px 0px;
-  font-size: 15px;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 14px;
   margin-bottom: 8px;
+  display: inline-block;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
+
+body.light-mode .hero-badge {
+  background: rgba(255, 255, 255, 0.9);
+  color: #f5576c;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 20px rgba(245, 87, 108, 0.2);
+}
+
 /* Título do hero */
 .hero-title {
   font-size: 2.8rem;
@@ -705,12 +743,18 @@ body {
   display: flex;
   justify-content: space-around;
   align-items: flex-start;
-  background: #fafbfc;
+  background: #0d1117;
   padding: 40px 0 30px 0;
   margin: 30px auto;
   gap: 10px;
   flex-wrap: wrap;
+  transition: background 0.3s ease;
 }
+
+body.light-mode .benefits {
+  background: #fafbfc;
+}
+
 /* Estilo individual dos benefícios */
 .benefit {
   display: flex;
@@ -727,14 +771,25 @@ body {
 /* Título dos benefícios */
 .benefit-title {
   font-weight: 600;
-  color: #222;
+  color: #f0f6fc;
   font-size: 15px;
   margin-bottom: 2px;
+  transition: color 0.3s ease;
 }
+
+body.light-mode .benefit-title {
+  color: #222;
+}
+
 /* Descrição dos benefícios */
 .benefit-desc {
-  color: #444;
+  color: #8b949e;
   font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+body.light-mode .benefit-desc {
+  color: #444;
 }
 /* Responsividade dos benefícios */
 @media (max-width: 900px) {
