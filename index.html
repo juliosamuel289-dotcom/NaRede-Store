@@ -48,12 +48,8 @@
   </style>
 </head>
 <body>
-    <!-- EmailJS (opcional) CDN: registre-se em https://www.emailjs.com/ e substitua os placeholders no script do formulário -->
-    <!-- Usar CDN oficial e versão compatível -->
-    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
-    <script>
-      try { if (window.emailjs) emailjs.init('37LiR2nyDN0oljgS0'); } catch(e) { /* ignore */ }
-    </script>
+    <!-- Envio de e-mail: usaremos a API REST do EmailJS diretamente (fetch) em vez da SDK para evitar conflitos -->
+    <!-- Public Key (user_id) mantida como constante no script de submissão -->
   <div class="top-bar">
     <div class="top-bar-left">
       <span>Frete grátis para todo território Brasileiro</span>
@@ -323,11 +319,17 @@
         <label for="contactMessage">Mensagem</label>
         <textarea id="contactMessage" name="message" rows="5" required placeholder="Descreva sua dúvida ou problema"></textarea>
 
-        <div class="contact-actions">
-          <button type="submit" class="btn-send">Enviar Mensagem</button>
-          <button type="button" class="btn-secondary" id="contactCancel">Cancelar</button>
+        <div class="contact-actions" style="display:flex; justify-content:center; gap:12px; align-items:center;">
+          <div style="display:flex; gap:8px;">
+            <button type="submit" class="btn-send" id="btnSend" style="min-width:160px;">Enviar Mensagem</button>
+            <button type="button" id="btnSendDebug" class="btn-send" style="background:#422BFF; color:#fff; min-width:160px; font-weight:700;">Enviar (teste debug)</button>
+          </div>
+          <button type="button" class="btn-secondary" id="contactCancel" style="min-width:90px;">Cancelar</button>
         </div>
         <p class="contact-feedback" id="contactFeedback" aria-live="polite"></p>
+        <p id="contactInstr" style="margin:8px 0 4px 0; font-size:13px; color:#bfc3ca;">Para teste: clique em "Enviar (teste debug)" — o log aparecerá abaixo e será copiado automaticamente.</p>
+        <pre id="contactDebug" style="display:block; background:#0b0b0b; color:#0f0; padding:8px; border-radius:6px; max-height:200px; overflow:auto; font-size:12px;">Aguardando envio de teste...</pre>
+        <button id="contactCopyLogs" style="display:inline-block; margin-top:8px; background:#222; color:#fff; border:1px solid #444; padding:6px 10px; border-radius:6px; cursor:pointer;">Copiar logs</button>
       </form>
     </div>
   </div>
@@ -676,14 +678,12 @@
 
             const ownerEmail = 'juliosamuel589@gmail.com'; // destinatário final
 
-            // --- CONFIGURAÇÕES: substitua pelos seus valores reais ---
-            // EmailJS: preencha se for usar EmailJS (opcional)
+            // --- CONFIGURAÇÕES: valores reais para EmailJS (REST API) ---
             const emailJSConfig = {
               serviceId: 'service_d7ocb6z',
               templateId: 'template_w65jm77',
-        // publicKey já não é mais necessário com a SDK v3
+              userId: '37LiR2nyDN0oljgS0' // public key (user_id) para API REST
             };
-            // ------------------------------------------------------
 
             const payload = {
               from_name: form.name.value.trim(),
@@ -695,82 +695,151 @@
             };
 
             if (feedback) feedback.textContent = 'Enviando...';
+            // desativa botões para evitar duplicação
+            const sendBtn = document.getElementById('btnSend');
+            const debugBtn = document.getElementById('btnSendDebug');
+            if (sendBtn) sendBtn.disabled = true;
+            if (debugBtn) debugBtn.disabled = true;
 
-            // Se EmailJS estiver configurado (substitua os placeholders), usa EmailJS para enviar automaticamente
-            if (window.emailjs && emailJSConfig.serviceId !== 'YOUR_SERVICE_ID') {
-              try {
-                // Timeout fallback: se em X segundos não houver resposta, usar mailto como fallback
-                const sendTimeout = 8000; // ms
-                let timedOut = false;
-                const timeoutHandle = setTimeout(() => {
-                  timedOut = true;
-                  console.warn('EmailJS timeout — acionando fallback mailto');
-                  if (feedback) feedback.textContent = 'Não foi possível enviar automaticamente. Abrindo seu cliente de e‑mail...';
-                  const subject = encodeURIComponent(payload.subject);
-                  const body = encodeURIComponent(`Nome: ${payload.from_name}\nE-mail: ${payload.from_email}\nTelefone: ${payload.phone}\n\n${payload.message}`);
-                  window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
-                }, sendTimeout);
+            // Envio via API REST do EmailJS (fetch) com timeout e fallback para mailto
+            const sendBody = {
+              service_id: emailJSConfig.serviceId,
+              template_id: emailJSConfig.templateId,
+              user_id: emailJSConfig.userId,
+              template_params: payload
+            };
 
-                // Debug: mostrar payload no console
-                console.log('EmailJS payload:', payload);
-                if (feedback) {
-                  // mostrar temporariamente o payload no feedback para diagnóstico
-                  try { feedback.textContent = 'Enviando (payload mostrado no console)...'; } catch(e) {}
+            console.log('EmailJS REST payload:', sendBody);
+
+            const controller = ('AbortController' in window) ? new AbortController() : null;
+            const timeoutMs = 15000; // 15s
+            let timeoutHandle = null;
+            if (controller) timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
+
+            fetch('https://api.emailjs.com/api/v1.0/email/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(sendBody),
+              signal: controller ? controller.signal : undefined
+            }).then(async function(res) {
+              if (timeoutHandle) clearTimeout(timeoutHandle);
+              const text = await res.text();
+              console.log('EmailJS REST status:', res.status, 'body:', text);
+              try { feedback.style.color = ''; } catch(e) {}
+              // mostra debug bruto no modal se existir
+              const dbg = document.getElementById('contactDebug');
+              if (dbg) {
+                dbg.style.display = 'block';
+                dbg.textContent = 'Status: ' + res.status + '\n' + text;
+                // tenta copiar automaticamente para a área de transferência
+                try {
+                  if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(dbg.textContent).then(function() {
+                      if (feedback) feedback.textContent = 'Mensagem enviada com sucesso! (EmailJS) — log copiado para a área de transferência.';
+                    }).catch(function(e) {
+                      // se falhar, mostra botão para copiar manualmente
+                      const copyBtn = document.getElementById('contactCopyLogs');
+                      if (copyBtn) copyBtn.style.display = 'inline-block';
+                      console.warn('Não foi possível copiar automaticamente os logs:', e);
+                    });
+                  } else {
+                    const copyBtn = document.getElementById('contactCopyLogs');
+                    if (copyBtn) copyBtn.style.display = 'inline-block';
+                  }
+                } catch (e) {
+                  const copyBtn = document.getElementById('contactCopyLogs');
+                  if (copyBtn) copyBtn.style.display = 'inline-block';
                 }
-                emailjs.send(emailJSConfig.serviceId, emailJSConfig.templateId, payload)
-                  .then(function(response) {
-                    if (timedOut) return; // já acionado fallback
-                    clearTimeout(timeoutHandle);
-                    console.log('EmailJS response:', response);
-                    if (feedback) {
-                      feedback.textContent = 'Mensagem enviada com sucesso! Resposta: ' + JSON.stringify(response);
-                      feedback.style.color = '';
-                    }
-                    form.reset();
-                    setTimeout(closeModal, 1200);
-                  }).catch(function(error) {
-                    clearTimeout(timeoutHandle);
-                    console.error('Erro EmailJS:', error);
-                    // Mostrar detalhes do erro no feedback para facilitar debug
-                    if (feedback) {
-                      try {
-                        const errText = (error && error.text) ? error.text : (error && error.message) ? error.message : JSON.stringify(error);
-                        feedback.textContent = 'Erro ao enviar automaticamente: ' + errText + ' — abrindo cliente de e‑mail...';
-                        feedback.style.color = '#f55';
-                      } catch (e) {
-                        feedback.textContent = 'Erro ao enviar automaticamente. Abrindo seu cliente de e‑mail...';
-                        feedback.style.color = '#f55';
-                      }
-                    }
-                    // Mostrar detalhes do erro no feedback para facilitar debug
-                    if (feedback) {
-                      try {
-                        const errText = (error && error.text) ? error.text : (error && error.message) ? error.message : JSON.stringify(error);
-                        feedback.textContent = 'Erro ao enviar automaticamente: ' + errText + ' — abrindo cliente de e‑mail...';
-                        feedback.style.color = '#f55';
-                      } catch (e) {
-                        feedback.textContent = 'Erro ao enviar automaticamente. Abrindo seu cliente de e‑mail...';
-                        feedback.style.color = '#f55';
-                      }
-                    }
-                    const subject = encodeURIComponent(payload.subject);
-                    const body = encodeURIComponent(`Nome: ${payload.from_name}\nE-mail: ${payload.from_email}\nTelefone: ${payload.phone}\n\n${payload.message}`);
-                    window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
-                  });
-              } catch (err) {
-                console.error('Erro ao usar EmailJS:', err);
-                if (feedback) feedback.textContent = 'Erro ao enviar automaticamente. Abrindo seu cliente de e‑mail...';
+              }
+              if (sendBtn) sendBtn.disabled = false;
+              if (debugBtn) debugBtn.disabled = false;
+              if (res.ok) {
+                if (feedback) feedback.textContent = 'Mensagem enviada com sucesso! (EmailJS)';
+                form.reset();
+                setTimeout(closeModal, 1200);
+              } else {
+                if (feedback) feedback.textContent = 'Erro ao enviar automaticamente: ' + (text || res.status) + ' — abrindo cliente de e‑mail...';
+                // fallback mailto
                 const subject = encodeURIComponent(payload.subject);
                 const body = encodeURIComponent(`Nome: ${payload.from_name}\nE-mail: ${payload.from_email}\nTelefone: ${payload.phone}\n\n${payload.message}`);
                 window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
               }
-            } else {
-              // Fallback simples: abre o cliente de e-mail do usuário com os campos preenchidos
+            }).catch(function(err) {
+              if (timeoutHandle) clearTimeout(timeoutHandle);
+              console.error('Erro envio EmailJS REST:', err);
+              if (err.name === 'AbortError') {
+                if (feedback) feedback.textContent = 'Tempo esgotado ao enviar automaticamente. Abrindo cliente de e‑mail...';
+              } else {
+                if (feedback) feedback.textContent = 'Erro ao enviar automaticamente. Abrindo cliente de e‑mail...';
+              }
+              const dbg = document.getElementById('contactDebug');
+              if (dbg) {
+                dbg.style.display = 'block';
+                dbg.textContent = 'Fetch error: ' + (err && err.message ? err.message : String(err));
+                try {
+                  if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(dbg.textContent).then(function() {
+                      if (feedback) feedback.textContent = 'Erro no envio — log copiado para a área de transferência.';
+                    }).catch(function(e) {
+                      const copyBtn = document.getElementById('contactCopyLogs');
+                      if (copyBtn) copyBtn.style.display = 'inline-block';
+                      console.warn('Não foi possível copiar automaticamente os logs:', e);
+                    });
+                  } else {
+                    const copyBtn = document.getElementById('contactCopyLogs');
+                    if (copyBtn) copyBtn.style.display = 'inline-block';
+                  }
+                } catch (e) {
+                  const copyBtn = document.getElementById('contactCopyLogs');
+                  if (copyBtn) copyBtn.style.display = 'inline-block';
+                }
+              }
+              if (sendBtn) sendBtn.disabled = false;
+              if (debugBtn) debugBtn.disabled = false;
               const subject = encodeURIComponent(payload.subject);
               const body = encodeURIComponent(`Nome: ${payload.from_name}\nE-mail: ${payload.from_email}\nTelefone: ${payload.phone}\n\n${payload.message}`);
               window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
-            }
+            });
           });
+      }
+    });
+    // Handler para botão de debug (envio manual que mostra resposta)
+    document.addEventListener('DOMContentLoaded', function() {
+      const debugBtn = document.getElementById('btnSendDebug');
+      const sendBtn = document.getElementById('btnSend');
+      const formEl = document.getElementById('contactForm');
+      const copyBtn = document.getElementById('contactCopyLogs');
+      if (debugBtn && formEl) {
+        debugBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          // dispara a mesma submissão programaticamente para reutilizar lógica
+          // mas mostra pré-logs
+          try {
+            const evt = new Event('submit', { bubbles: true, cancelable: true });
+            formEl.dispatchEvent(evt);
+          } catch (err) {
+            console.error('Erro ao disparar submit debug:', err);
+          }
+        });
+      }
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+          const dbg = document.getElementById('contactDebug');
+          if (!dbg) return;
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(dbg.textContent).then(function() {
+                try { alert('Logs copiados para a área de transferência. Cole aqui (Ctrl+V).'); } catch(e) {}
+              }).catch(function(e) {
+                try { alert('Falha ao copiar automaticamente. Selecione o texto e pressione Ctrl+C.'); } catch(e) {}
+              });
+            } else {
+              try { alert('Seu navegador não permite cópia automática. Selecione o texto e pressione Ctrl+C.'); } catch(e) {}
+            }
+          } catch (e) {
+            try { alert('Erro ao copiar logs: ' + e.message); } catch(err) {}
+          }
+        });
       }
     });
     </script>
