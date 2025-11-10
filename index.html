@@ -9,16 +9,59 @@
   <link rel="stylesheet" href="theme-toggle.css">
   <link rel="stylesheet" href="accessibility.css">
   <link rel="stylesheet" href="responsive.css">
+  <style>
+    /* Ajustes do modo claro para o modal Central de Ajuda */
+    .light-mode #contactModal .modal-overlay {
+      background: rgba(0,0,0,0.15);
+      backdrop-filter: none;
+    }
+    .light-mode #contactModal .modal-content {
+      background: rgba(255,255,255,0.96);
+      color: #0b1220;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .light-mode #contactModal .modal-close {
+      color: #0b1220;
+    }
+    .light-mode #contactModal label,
+    .light-mode #contactModal .contact-form input,
+    .light-mode #contactModal .contact-form textarea {
+      color: #0b1220;
+    }
+    .light-mode #contactModal .contact-form input,
+    .light-mode #contactModal .contact-form textarea {
+      background: #fff;
+      border: 1px solid #d1d5db;
+    }
+    .light-mode #contactModal .btn-send {
+      background: #422BFF; /* mantém destaque roxo */
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(66,43,255,0.12);
+    }
+    .light-mode #contactModal .btn-secondary {
+      background: transparent;
+      color: #0b1220;
+      border: 1px solid #cbd5e1;
+    }
+    
+  </style>
 </head>
 <body>
+    <!-- EmailJS (opcional) CDN: registre-se em https://www.emailjs.com/ e substitua os placeholders no script do formulário -->
+    <!-- Usar CDN oficial e versão compatível -->
+    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
+    <script>
+      try { if (window.emailjs) emailjs.init('37LiR2nyDN0oljgS0'); } catch(e) { /* ignore */ }
+    </script>
   <div class="top-bar">
     <div class="top-bar-left">
       <span>Frete grátis para todo território Brasileiro</span>
       <span class="dot">•</span>
       <span>Parcelamento em até 10x sem juros</span>
     </div>
-    <div class="top-bar-right">
-      <a href="https://chat.whatsapp.com/ItoES41rn7OCJEWNGhpMrN" target="_blank">Central de Ajuda</a>
+      <div class="top-bar-right">
+      <a href="#" id="centralAjuda">Central de Ajuda</a>
       <span class="dot">•</span>
       <a href="#">Rastrear Pedido</a>
     </div>
@@ -257,6 +300,37 @@
       </div>
     </div>
   </footer>
+
+  <!-- Modal de Contato (aberto ao clicar em Central de Ajuda) -->
+  <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="contactModalTitle">
+    <div class="modal-overlay" id="contactOverlay"></div>
+    <div class="modal-content" role="document">
+      <button class="modal-close" id="contactClose" aria-label="Fechar formulário">×</button>
+      <h2 id="contactModalTitle">Central de Ajuda — Fale Conosco</h2>
+      <form id="contactForm" class="contact-form" novalidate>
+        <label for="contactName">Nome</label>
+        <input type="text" id="contactName" name="name" required placeholder="Seu nome">
+
+        <label for="contactEmail">E‑mail</label>
+        <input type="email" id="contactEmail" name="email" required placeholder="seu@exemplo.com">
+
+  <label for="contactPhone">Telefone</label>
+  <input type="tel" id="contactPhone" name="phone" placeholder="(xx) 9xxxx-xxxx">
+
+        <label for="contactSubject">Assunto</label>
+        <input type="text" id="contactSubject" name="subject" placeholder="Assunto (ex: Pedido, Troca)">
+
+        <label for="contactMessage">Mensagem</label>
+        <textarea id="contactMessage" name="message" rows="5" required placeholder="Descreva sua dúvida ou problema"></textarea>
+
+        <div class="contact-actions">
+          <button type="submit" class="btn-send">Enviar Mensagem</button>
+          <button type="button" class="btn-secondary" id="contactCancel">Cancelar</button>
+        </div>
+        <p class="contact-feedback" id="contactFeedback" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
 
   <script>
         // Base de dados de todos os produtos do site
@@ -554,6 +628,151 @@
                 }
             }
         });
+    </script>
+    <script>
+    // Modal de contato: abrir/fechar e submissão simulada
+    document.addEventListener('DOMContentLoaded', function() {
+      const openBtn = document.getElementById('centralAjuda');
+      const modal = document.getElementById('contactModal');
+      const overlay = document.getElementById('contactOverlay');
+      const closeBtn = document.getElementById('contactClose');
+      const cancelBtn = document.getElementById('contactCancel');
+      const form = document.getElementById('contactForm');
+      const feedback = document.getElementById('contactFeedback');
+      const firstInput = document.getElementById('contactName');
+
+      function showModal() {
+        if (!modal) return;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (firstInput) firstInput.focus();
+      }
+
+      function closeModal() {
+        if (!modal) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (feedback) feedback.textContent = '';
+      }
+
+      if (openBtn) openBtn.addEventListener('click', function(e) { e.preventDefault(); showModal(); });
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+      if (overlay) overlay.addEventListener('click', closeModal);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeModal();
+      });
+
+      if (form) {
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!form.name.value.trim() || !form.email.value.trim() || !form.message.value.trim()) {
+              if (feedback) feedback.textContent = 'Por favor preencha os campos obrigatórios.';
+              return;
+            }
+
+            const ownerEmail = 'juliosamuel589@gmail.com'; // destinatário final
+
+            // --- CONFIGURAÇÕES: substitua pelos seus valores reais ---
+            // EmailJS: preencha se for usar EmailJS (opcional)
+            const emailJSConfig = {
+              serviceId: 'service_d7ocb6z',
+              templateId: 'template_w65jm77',
+        // publicKey já não é mais necessário com a SDK v3
+            };
+            // ------------------------------------------------------
+
+            const payload = {
+              from_name: form.name.value.trim(),
+              from_email: form.email.value.trim(),
+              phone: (form.phone && form.phone.value) ? form.phone.value.trim() : document.getElementById('contactPhone')?.value.trim() || '',
+              subject: form.subject.value.trim() || 'Contato via Central de Ajuda',
+              message: form.message.value.trim(),
+              to_email: ownerEmail
+            };
+
+            if (feedback) feedback.textContent = 'Enviando...';
+
+            // Se EmailJS estiver configurado (substitua os placeholders), usa EmailJS para enviar automaticamente
+            if (window.emailjs && emailJSConfig.serviceId !== 'YOUR_SERVICE_ID') {
+              try {
+                // Timeout fallback: se em X segundos não houver resposta, usar mailto como fallback
+                const sendTimeout = 8000; // ms
+                let timedOut = false;
+                const timeoutHandle = setTimeout(() => {
+                  timedOut = true;
+                  console.warn('EmailJS timeout — acionando fallback mailto');
+                  if (feedback) feedback.textContent = 'Não foi possível enviar automaticamente. Abrindo seu cliente de e‑mail...';
+                  const subject = encodeURIComponent(payload.subject);
+                  const body = encodeURIComponent(`Nome: ${payload.from_name}\nE-mail: ${payload.from_email}\nTelefone: ${payload.phone}\n\n${payload.message}`);
+                  window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
+                }, sendTimeout);
+
+                // Debug: mostrar payload no console
+                console.log('EmailJS payload:', payload);
+                if (feedback) {
+                  // mostrar temporariamente o payload no feedback para diagnóstico
+                  try { feedback.textContent = 'Enviando (payload mostrado no console)...'; } catch(e) {}
+                }
+                emailjs.send(emailJSConfig.serviceId, emailJSConfig.templateId, payload)
+                  .then(function(response) {
+                    if (timedOut) return; // já acionado fallback
+                    clearTimeout(timeoutHandle);
+                    console.log('EmailJS response:', response);
+                    if (feedback) {
+                      feedback.textContent = 'Mensagem enviada com sucesso! Resposta: ' + JSON.stringify(response);
+                      feedback.style.color = '';
+                    }
+                    form.reset();
+                    setTimeout(closeModal, 1200);
+                  }).catch(function(error) {
+                    clearTimeout(timeoutHandle);
+                    console.error('Erro EmailJS:', error);
+                    // Mostrar detalhes do erro no feedback para facilitar debug
+                    if (feedback) {
+                      try {
+                        const errText = (error && error.text) ? error.text : (error && error.message) ? error.message : JSON.stringify(error);
+                        feedback.textContent = 'Erro ao enviar automaticamente: ' + errText + ' — abrindo cliente de e‑mail...';
+                        feedback.style.color = '#f55';
+                      } catch (e) {
+                        feedback.textContent = 'Erro ao enviar automaticamente. Abrindo seu cliente de e‑mail...';
+                        feedback.style.color = '#f55';
+                      }
+                    }
+                    // Mostrar detalhes do erro no feedback para facilitar debug
+                    if (feedback) {
+                      try {
+                        const errText = (error && error.text) ? error.text : (error && error.message) ? error.message : JSON.stringify(error);
+                        feedback.textContent = 'Erro ao enviar automaticamente: ' + errText + ' — abrindo cliente de e‑mail...';
+                        feedback.style.color = '#f55';
+                      } catch (e) {
+                        feedback.textContent = 'Erro ao enviar automaticamente. Abrindo seu cliente de e‑mail...';
+                        feedback.style.color = '#f55';
+                      }
+                    }
+                    const subject = encodeURIComponent(payload.subject);
+                    const body = encodeURIComponent(`Nome: ${payload.from_name}\nE-mail: ${payload.from_email}\nTelefone: ${payload.phone}\n\n${payload.message}`);
+                    window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
+                  });
+              } catch (err) {
+                console.error('Erro ao usar EmailJS:', err);
+                if (feedback) feedback.textContent = 'Erro ao enviar automaticamente. Abrindo seu cliente de e‑mail...';
+                const subject = encodeURIComponent(payload.subject);
+                const body = encodeURIComponent(`Nome: ${payload.from_name}\nE-mail: ${payload.from_email}\nTelefone: ${payload.phone}\n\n${payload.message}`);
+                window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
+              }
+            } else {
+              // Fallback simples: abre o cliente de e-mail do usuário com os campos preenchidos
+              const subject = encodeURIComponent(payload.subject);
+              const body = encodeURIComponent(`Nome: ${payload.from_name}\nE-mail: ${payload.from_email}\nTelefone: ${payload.phone}\n\n${payload.message}`);
+              window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
+            }
+          });
+      }
+    });
     </script>
     <script src="accessibility.js"></script>
     <script src="exit-popup.js"></script>

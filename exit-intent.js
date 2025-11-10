@@ -2,6 +2,15 @@
 let isInternalClick = false;
 let canShowPopup = true;
 
+// Checa se o usuário pediu para não mostrar o popup novamente
+function shouldShowExitPopup() {
+    try {
+        return localStorage.getItem('exitPopupDontShow') !== '1';
+    } catch (e) {
+        return true; // se localStorage não estiver disponível, continuar mostrando
+    }
+}
+
 // Detecta cliques em links internos
 document.addEventListener('click', function(e) {
     const link = e.target.closest('a');
@@ -19,6 +28,9 @@ function createExitModal() {
     // Remove modal antigo se existir
     const oldModal = document.getElementById('exit-intent-modal');
     if (oldModal) oldModal.remove();
+    
+    // Se o usuário escolheu não mostrar novamente, não cria o modal
+    if (!shouldShowExitPopup()) return;
     
     // Detecta se está no modo claro
     const isLightMode = document.body.classList.contains('light-mode');
@@ -42,6 +54,9 @@ function createExitModal() {
                         Fechar
                     </button>
                 </div>
+                <div style="margin-top:12px; text-align:center;">
+                    <button id="dont-show-again-btn" style="background: transparent; color: ${isLightMode ? '#222' : '#9aa5b1'}; border: none; font-size: 14px; cursor: pointer; text-decoration: underline;">Não mostrar novamente</button>
+                </div>
             </div>
         </div>
     `;
@@ -57,11 +72,25 @@ function createExitModal() {
         modal.remove();
         canShowPopup = true;
     });
+
+    // Botão "Não mostrar novamente"
+    const dontShowBtn = document.getElementById('dont-show-again-btn');
+    if (dontShowBtn) {
+        dontShowBtn.addEventListener('click', function() {
+            try {
+                localStorage.setItem('exitPopupDontShow', '1');
+            } catch (e) {
+                // ignore
+            }
+            modal.remove();
+            canShowPopup = true;
+        });
+    }
 }
 
 // Detecta quando o mouse sai da janela (tentativa de fechar)
 document.addEventListener('mouseleave', function(e) {
-    if (canShowPopup && !isInternalClick) {
+    if (canShowPopup && !isInternalClick && shouldShowExitPopup()) {
         canShowPopup = false;
         createExitModal();
         setTimeout(() => canShowPopup = true, 2000); // Permite mostrar novamente após 2 segundos
@@ -70,7 +99,7 @@ document.addEventListener('mouseleave', function(e) {
 
 // Detecta movimento do mouse para o topo
 document.addEventListener('mousemove', function(e) {
-    if (canShowPopup && !isInternalClick && e.clientY <= 10) {
+    if (canShowPopup && !isInternalClick && e.clientY <= 10 && shouldShowExitPopup()) {
         canShowPopup = false;
         createExitModal();
         setTimeout(() => canShowPopup = true, 2000); // Permite mostrar novamente após 2 segundos
@@ -79,7 +108,7 @@ document.addEventListener('mousemove', function(e) {
 
 // Também tenta com beforeunload (para compatibilidade)
 window.addEventListener('beforeunload', function(e) {
-    if (!isInternalClick) {
+    if (!isInternalClick && shouldShowExitPopup()) {
         const mensagem = 'Não deixe para depois suas compras, aproveite os preços especiais da loja NaRede Store';
         e.preventDefault();
         e.returnValue = mensagem;
