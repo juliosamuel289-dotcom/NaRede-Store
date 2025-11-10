@@ -2,6 +2,8 @@
 let isInternalClick = false;
 let canShowPopup = true;
 
+console.log('exit-intent.js loaded');
+
 // Checa se o usuário pediu para não mostrar o popup novamente
 function shouldShowExitPopup() {
     try {
@@ -55,7 +57,7 @@ function createExitModal() {
                     </button>
                 </div>
                 <div style="margin-top:12px; text-align:center;">
-                    <button id="dont-show-again-btn" style="background: transparent; color: ${isLightMode ? '#222' : '#9aa5b1'}; border: none; font-size: 14px; cursor: pointer; text-decoration: underline;">Não mostrar novamente</button>
+                    <button id="dont-show-again-btn" aria-label="Não mostrar novamente" style="background: ${isLightMode ? '#ffffff' : '#ffffff'}; color: ${isLightMode ? '#111' : '#161b22'}; border: 2px solid #422BFF; padding: 8px 12px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight:600;">Não mostrar novamente</button>
                 </div>
             </div>
         </div>
@@ -76,11 +78,13 @@ function createExitModal() {
     // Botão "Não mostrar novamente"
     const dontShowBtn = document.getElementById('dont-show-again-btn');
     if (dontShowBtn) {
+        console.log('exit-intent: found dont-show button');
         dontShowBtn.addEventListener('click', function() {
             try {
                 localStorage.setItem('exitPopupDontShow', '1');
+                console.log('exit-intent: user opted to not show again (storage saved)');
             } catch (e) {
-                // ignore
+                console.warn('exit-intent: failed to write localStorage', e);
             }
             modal.remove();
             canShowPopup = true;

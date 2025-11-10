@@ -2,6 +2,8 @@
 let isInternalClick = false;
 let canShowPopup = true;
 
+console.log('exit-popup.js loaded');
+
 // Detecta cliques em links internos
 document.addEventListener('click', function(e) {
     const link = e.target.closest('a');
@@ -53,7 +55,7 @@ function createExitModal() {
                     <button id="fechar-btn" style="background: transparent; color: #8b949e; border: 2px solid #30363d; padding: 15px 24px; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: bold;">
                         Fechar
                     </button>
-                    <button id="dontshow-exit" style="background: transparent; color: #cfcfcf; border: 1px dashed rgba(255,255,255,0.06); padding: 12px 18px; border-radius: 8px; font-size: 14px; cursor: pointer;">Não mostrar novamente</button>
+                    <button id="dont-show-again-btn" aria-label="Não mostrar novamente" style="background: #ffffff; color: #161b22; border: 2px solid #422BFF; padding: 12px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight:600;">Não mostrar novamente</button>
                 </div>
             </div>
         </div>
@@ -72,17 +74,21 @@ function createExitModal() {
     });
 
     // 'Não mostrar novamente' grava preferência em localStorage
-    const dontBtn = document.getElementById('dontshow-exit');
+    const dontBtn = document.getElementById('dont-show-again-btn');
     if (dontBtn) {
+        console.log('exit-popup: found dont-show button');
         dontBtn.addEventListener('click', function() {
             try {
                 localStorage.setItem(STORAGE_KEY, '1');
+                console.log('exit-popup: user opted to not show again (storage saved)');
             } catch (e) {
-                // falha silenciosa
+                console.warn('exit-popup: failed to write localStorage', e);
             }
             modal.remove();
             canShowPopup = true;
         });
+    } else {
+        console.warn('exit-popup: dont-show button not found in DOM');
     }
 }
 
