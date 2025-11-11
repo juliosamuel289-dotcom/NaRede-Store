@@ -48,8 +48,12 @@
   </style>
 </head>
 <body>
-    <!-- Envio de e-mail: usaremos a API REST do EmailJS diretamente (fetch) em vez da SDK para evitar conflitos -->
-    <!-- Public Key (user_id) mantida como constante no script de submissão -->
+    <!-- EmailJS (opcional) CDN: registre-se em https://www.emailjs.com/ e substitua os placeholders no script do formulário -->
+    <!-- Usar CDN oficial e versão compatível -->
+    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
+    <script>
+      try { if (window.emailjs) emailjs.init('37LiR2nyDN0oljgS0'); } catch(e) { /* ignore */ }
+    </script>
   <div class="top-bar">
     <div class="top-bar-left">
       <span>Frete grátis para todo território Brasileiro</span>
@@ -297,7 +301,7 @@
     </div>
   </footer>
 
-  <!-- Modal de Contato (aberto ao clicar em Central de Ajuda) -->
+  <!-- Modal de Contato (UI-only) -->
   <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="contactModalTitle">
     <div class="modal-overlay" id="contactOverlay"></div>
     <div class="modal-content" role="document">
@@ -306,334 +310,41 @@
       <form id="contactForm" class="contact-form" novalidate>
         <label for="contactName">Nome</label>
         <input type="text" id="contactName" name="name" required placeholder="Seu nome">
-
         <label for="contactEmail">E‑mail</label>
         <input type="email" id="contactEmail" name="email" required placeholder="seu@exemplo.com">
-
-  <label for="contactPhone">Telefone</label>
-  <input type="tel" id="contactPhone" name="phone" placeholder="(xx) 9xxxx-xxxx">
-
+        <label for="contactPhone">Telefone</label>
+        <input type="tel" id="contactPhone" name="phone" placeholder="(xx) 9xxxx-xxxx">
         <label for="contactSubject">Assunto</label>
         <input type="text" id="contactSubject" name="subject" placeholder="Assunto (ex: Pedido, Troca)">
-
         <label for="contactMessage">Mensagem</label>
         <textarea id="contactMessage" name="message" rows="5" required placeholder="Descreva sua dúvida ou problema"></textarea>
-
-        <div class="contact-actions" style="display:flex; justify-content:center; gap:12px; align-items:center;">
-          <div style="display:flex; gap:8px;">
-            <button type="submit" class="btn-send" id="btnSend" style="min-width:160px;">Enviar Mensagem</button>
-            <button type="button" id="btnSendDebug" class="btn-send" style="background:#422BFF; color:#fff; min-width:160px; font-weight:700;">Enviar (teste debug)</button>
-          </div>
-          <button type="button" class="btn-secondary" id="contactCancel" style="min-width:90px;">Cancelar</button>
+        <div class="contact-actions" style="display:flex;gap:8px;justify-content:center">
+          <button type="submit" class="btn-send" id="btnSend">Enviar Mensagem</button>
+          <button type="button" class="btn-secondary" id="contactCancel">Cancelar</button>
         </div>
         <p class="contact-feedback" id="contactFeedback" aria-live="polite"></p>
-        <p id="contactInstr" style="margin:8px 0 4px 0; font-size:13px; color:#bfc3ca;">Para teste: clique em "Enviar (teste debug)" — o log aparecerá abaixo e será copiado automaticamente.</p>
-        <pre id="contactDebug" style="display:block; background:#0b0b0b; color:#0f0; padding:8px; border-radius:6px; max-height:200px; overflow:auto; font-size:12px;">Aguardando envio de teste...</pre>
-        <button id="contactCopyLogs" style="display:inline-block; margin-top:8px; background:#222; color:#fff; border:1px solid #444; padding:6px 10px; border-radius:6px; cursor:pointer;">Copiar logs</button>
       </form>
     </div>
   </div>
 
   <script>
-        // Base de dados de todos os produtos do site
-        const todosProdutos = {
-            'flamengo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'vasco': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'santos': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'palmeiras': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'são paulo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'sao paulo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'corinthians': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'fluminense': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'gremio': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'grêmio': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'atletico mineiro': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'atlético mineiro': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'botafogo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'bahia': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'cruzeiro': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
-            'brasil': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'argentina': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'alemanha': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'frança': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'franca': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'inglaterra': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'holanda': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'itália': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'italia': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'portugal': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'méxico': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'mexico': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'japão': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'japao': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'chile': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'suíça': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'suica': { arquivo: 'Seleções.html', categoria: 'Seleções' },
-            'real madrid': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'bayern': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'bayern de munique': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'barcelona': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'manchester united': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'manchester': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'united': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'paris saint-germain': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'psg': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'paris': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'liverpool': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'arsenal': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'chelsea': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'manchester city': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'city': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'juventus': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'ac milan': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'milan': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'milão': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'atletico madrid': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
-            'atlético madrid': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' }
-        };
+    // dados de pesquisa simplificados
+    const todosProdutos = { 'flamengo': { arquivo: 'Camisas Brasileiras.html' }, 'brasil': { arquivo: 'Seleções.html' }, 'real madrid': { arquivo: 'Camisas Internacional.html' } };
 
-        function mostrarSugestoes() {
-            const termo = document.getElementById('pesquisa').value.toLowerCase().trim();
-            const sugestoesContainer = document.getElementById('sugestoes');
-            
-            if (termo === '') {
-                sugestoesContainer.style.display = 'none';
-                pesquisarProduto(); // Mostra todos os produtos se campo vazio
-                return;
-            }
-            
-            // Encontra sugestões que começam com o termo
-            const sugestoes = Object.keys(todosProdutos).filter(produto => 
-                produto.toLowerCase().includes(termo)
-            ).slice(0, 5); // Limita a 5 sugestões
-            
-            if (sugestoes.length > 0) {
-                const html = sugestoes.map(sugestao => 
-                    `<div class="sugestao-item" onclick="selecionarSugestao('${sugestao}')">${sugestao}</div>`
-                ).join('');
-                
-                sugestoesContainer.innerHTML = html;
-                sugestoesContainer.style.display = 'block';
-            } else {
-                sugestoesContainer.style.display = 'none';
-            }
-            
-            // Executa a pesquisa conforme digita
-            pesquisarProduto();
-        }
-        
-        function selecionarSugestao(produto) {
-            document.getElementById('pesquisa').value = produto;
-            document.getElementById('sugestoes').style.display = 'none';
-            pesquisarProduto();
-        }
+    function mostrarSugestoes() {
+      const termo = document.getElementById('pesquisa').value.toLowerCase().trim();
+      const sugestoesContainer = document.getElementById('sugestoes');
+      if (!sugestoesContainer) return;
+      if (termo === '') { sugestoesContainer.style.display = 'none'; return; }
+      const sugestoes = Object.keys(todosProdutos).filter(p => p.includes(termo)).slice(0,5);
+      if (sugestoes.length) { sugestoesContainer.innerHTML = sugestoes.map(s => `<div class="sugestao-item" onclick="selecionarSugestao('${s}')">${s}</div>`).join(''); sugestoesContainer.style.display = 'block'; } else { sugestoesContainer.style.display='none'; }
+    }
+    function selecionarSugestao(produto) { document.getElementById('pesquisa').value = produto; document.getElementById('sugestoes').style.display='none'; window.location.href = (todosProdutos[produto]||{}).arquivo || '#'; }
 
-        function pesquisarProduto() {
-            const termo = document.getElementById('pesquisa').value.toLowerCase().trim();
-            const produtos = document.querySelectorAll('.produto');
-            
-            // Se o campo está vazio, mostra todos os produtos da página atual
-            if (termo === '') {
-                produtos.forEach(produto => {
-                    produto.style.display = 'flex';
-                });
-                return;
-            }
-            
-            // Procura produtos na página atual primeiro
-            let encontrouNaPagina = false;
-            produtos.forEach(produto => {
-                const nome = produto.querySelector('p').textContent.toLowerCase();
-                if (nome.includes(termo)) {
-                    produto.style.display = 'flex';
-                    encontrouNaPagina = true;
-                } else {
-                    produto.style.display = 'none';
-                }
-            });
-            
-            // Se não encontrou na página atual, procura em outros arquivos
-            if (!encontrouNaPagina) {
-                for (const [produto, info] of Object.entries(todosProdutos)) {
-                    if (produto.includes(termo)) {
-                        // Redireciona automaticamente sem confirmação
-                        window.location.href = info.arquivo;
-                        return;
-                    }
-                }
-            }
-        }
+    function showImage(thumbnail, mainImageId){ const main = document.getElementById(mainImageId); if(main) main.src = thumbnail.src; }
 
-        // Fecha sugestões quando clicar fora
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.search-bar')) {
-                document.getElementById('sugestoes').style.display = 'none';
-            }
-        });
-
-        // Adiciona funcionalidade de pesquisa ao pressionar Enter
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputPesquisa = document.getElementById('pesquisa');
-            inputPesquisa.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    document.getElementById('sugestoes').style.display = 'none';
-                    pesquisarProduto();
-                }
-            });
-        });
-
-        // Função existente para o carrossel de imagens
-        function showImage(thumbnail, mainImageId) {
-            const mainImage = document.getElementById(mainImageId);
-            mainImage.src = thumbnail.src;
-            
-            // Remove a classe 'selected' de todas as miniaturas do mesmo carrossel
-            const thumbnails = thumbnail.parentElement.querySelectorAll('img');
-            thumbnails.forEach(img => img.classList.remove('selected'));
-            
-            // Adiciona a classe 'selected' à miniatura clicada
-            thumbnail.classList.add('selected');
-        }
-
-        // Sistema de Alternância de Tema
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Sistema de tema iniciado');
-            
-            const themeToggle = document.getElementById('themeToggle');
-            const themeIcon = document.getElementById('themeIcon');
-            const body = document.body;
-            
-            console.log('Botão encontrado:', themeToggle);
-            console.log('Ícone encontrado:', themeIcon);
-            
-            // Verifica se há preferência salva no localStorage
-            const savedTheme = localStorage.getItem('theme');
-            console.log('Tema salvo:', savedTheme);
-            
-            if (savedTheme === 'light') {
-                body.classList.add('light-mode');
-                updateIcon(true);
-                applyFooterStyles(true);
-            }
-            
-            // Adiciona evento de clique no botão
-            if (themeToggle) {
-                themeToggle.addEventListener('click', function() {
-                    console.log('Botão clicado!');
-                    body.classList.toggle('light-mode');
-                    const isLight = body.classList.contains('light-mode');
-                    console.log('Modo claro ativo:', isLight);
-                    
-                    // Salva a preferência no localStorage
-                    localStorage.setItem('theme', isLight ? 'light' : 'dark');
-                    
-                    // Atualiza o ícone
-                    updateIcon(isLight);
-                    
-                    // Aplica estilos no footer
-                    applyFooterStyles(isLight);
-                });
-            } else {
-                console.error('Botão de tema não encontrado!');
-            }
-            
-            // Função para aplicar estilos no footer
-            function applyFooterStyles(isLight) {
-                const footer = document.querySelector('footer');
-                console.log('Footer encontrado:', footer);
-                console.log('Aplicando modo claro:', isLight);
-                
-                if (isLight) {
-                    console.log('Aplicando estilos claros em TODOS os elementos');
-                    
-                    // Aplica no footer
-                    if (footer) {
-                        footer.style.setProperty('background-color', '#f6f8fa', 'important');
-                        footer.style.setProperty('background', '#f6f8fa', 'important');
-                        footer.style.setProperty('color', '#000000', 'important');
-                        
-                        const footerElements = footer.querySelectorAll('*');
-                        footerElements.forEach(el => {
-                            el.style.setProperty('color', '#000000', 'important');
-                        });
-                        
-                        const topBar = footer.querySelector('.top-bar');
-                        if (topBar) {
-                            topBar.style.setProperty('background-color', '#e1e4e8', 'important');
-                            topBar.style.setProperty('background', '#e1e4e8', 'important');
-                        }
-                    }
-                    
-                    // Aplica em TODAS as seções (EXCETO hero-section)
-                    const sections = document.querySelectorAll('section:not(.hero-section), .newsletter, .newsletter-header, div[style*="background"]:not(.hero-section *)');
-                    sections.forEach(section => {
-                        section.style.setProperty('background-color', '#f6f8fa', 'important');
-                        section.style.setProperty('background', '#f6f8fa', 'important');
-                    });
-                    
-                    // FORÇA o hero-section a manter o roxo no modo claro
-                    const heroSection = document.querySelector('.hero-section');
-                    if (heroSection) {
-                        heroSection.style.setProperty('background', 'linear-gradient(135deg, #600871 0%, #8B1A9C 100%)', 'important');
-                    }
-                    
-                    // Aplica em todos os elementos com background preto ou escuro (EXCETO hero-section)
-                    const allElements = document.querySelectorAll('*:not(.hero-section):not(.hero-section *)');
-                    allElements.forEach(el => {
-                        const bgColor = window.getComputedStyle(el).backgroundColor;
-                        if (bgColor === 'rgb(0, 0, 0)' || bgColor === 'rgb(13, 17, 23)' || bgColor === 'rgb(22, 27, 34)') {
-                            el.style.setProperty('background-color', '#f6f8fa', 'important');
-                            el.style.setProperty('background', '#f6f8fa', 'important');
-                        }
-                    });
-                    
-                } else {
-                    console.log('Removendo estilos claros');
-                    
-                    if (footer) {
-                        footer.style.removeProperty('background-color');
-                        footer.style.removeProperty('background');
-                        footer.style.removeProperty('color');
-                        
-                        const footerElements = footer.querySelectorAll('*');
-                        footerElements.forEach(el => {
-                            el.style.removeProperty('color');
-                        });
-                        
-                        const topBar = footer.querySelector('.top-bar');
-                        if (topBar) {
-                            topBar.style.removeProperty('background-color');
-                            topBar.style.removeProperty('background');
-                        }
-                    }
-                    
-                    // Remove de todas as seções
-                    const allElements = document.querySelectorAll('*');
-                    allElements.forEach(el => {
-                        el.style.removeProperty('background-color');
-                        el.style.removeProperty('background');
-                    });
-                }
-            }
-            
-            // Função para atualizar o ícone
-            function updateIcon(isLight) {
-                if (!themeIcon) return;
-                
-                if (isLight) {
-                    // Ícone de sol (modo claro ativo)
-                    themeIcon.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-                } else {
-                    // Ícone de lua (modo escuro ativo)
-                    themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>';
-                }
-            }
-        });
-    </script>
-    <script>
-    // Modal de contato: abrir/fechar e submissão simulada
-    document.addEventListener('DOMContentLoaded', function() {
+    // Modal UI-only
+    document.addEventListener('DOMContentLoaded', function(){
       const openBtn = document.getElementById('centralAjuda');
       const modal = document.getElementById('contactModal');
       const overlay = document.getElementById('contactOverlay');
@@ -642,209 +353,17 @@
       const form = document.getElementById('contactForm');
       const feedback = document.getElementById('contactFeedback');
       const firstInput = document.getElementById('contactName');
-
-      function showModal() {
-        if (!modal) return;
-        modal.classList.add('open');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        if (firstInput) firstInput.focus();
-      }
-
-      function closeModal() {
-        if (!modal) return;
-        modal.classList.remove('open');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        if (feedback) feedback.textContent = '';
-      }
-
-      if (openBtn) openBtn.addEventListener('click', function(e) { e.preventDefault(); showModal(); });
-      if (closeBtn) closeBtn.addEventListener('click', closeModal);
-      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-      if (overlay) overlay.addEventListener('click', closeModal);
-
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeModal();
-      });
-
-      if (form) {
-          form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (!form.name.value.trim() || !form.email.value.trim() || !form.message.value.trim()) {
-              if (feedback) feedback.textContent = 'Por favor preencha os campos obrigatórios.';
-              return;
-            }
-
-            const ownerEmail = 'juliosamuel589@gmail.com'; // destinatário final
-
-            // --- CONFIGURAÇÕES: valores reais para EmailJS (REST API) ---
-            const emailJSConfig = {
-              serviceId: 'service_d7ocb6z',
-              templateId: 'template_w65jm77',
-              userId: '37LiR2nyDN0oljgS0' // public key (user_id) para API REST
-            };
-
-            const payload = {
-              from_name: form.name.value.trim(),
-              from_email: form.email.value.trim(),
-              phone: (form.phone && form.phone.value) ? form.phone.value.trim() : document.getElementById('contactPhone')?.value.trim() || '',
-              subject: form.subject.value.trim() || 'Contato via Central de Ajuda',
-              message: form.message.value.trim(),
-              to_email: ownerEmail
-            };
-
-            if (feedback) feedback.textContent = 'Enviando...';
-            // desativa botões para evitar duplicação
-            const sendBtn = document.getElementById('btnSend');
-            const debugBtn = document.getElementById('btnSendDebug');
-            if (sendBtn) sendBtn.disabled = true;
-            if (debugBtn) debugBtn.disabled = true;
-
-            // Envio via API REST do EmailJS (fetch) com timeout e fallback para mailto
-            const sendBody = {
-              service_id: emailJSConfig.serviceId,
-              template_id: emailJSConfig.templateId,
-              user_id: emailJSConfig.userId,
-              template_params: payload
-            };
-
-            console.log('EmailJS REST payload:', sendBody);
-
-            const controller = ('AbortController' in window) ? new AbortController() : null;
-            const timeoutMs = 15000; // 15s
-            let timeoutHandle = null;
-            if (controller) timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
-
-            fetch('https://api.emailjs.com/api/v1.0/email/send', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(sendBody),
-              signal: controller ? controller.signal : undefined
-            }).then(async function(res) {
-              if (timeoutHandle) clearTimeout(timeoutHandle);
-              const text = await res.text();
-              console.log('EmailJS REST status:', res.status, 'body:', text);
-              try { feedback.style.color = ''; } catch(e) {}
-              // mostra debug bruto no modal se existir
-              const dbg = document.getElementById('contactDebug');
-              if (dbg) {
-                dbg.style.display = 'block';
-                dbg.textContent = 'Status: ' + res.status + '\n' + text;
-                // tenta copiar automaticamente para a área de transferência
-                try {
-                  if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(dbg.textContent).then(function() {
-                      if (feedback) feedback.textContent = 'Mensagem enviada com sucesso! (EmailJS) — log copiado para a área de transferência.';
-                    }).catch(function(e) {
-                      // se falhar, mostra botão para copiar manualmente
-                      const copyBtn = document.getElementById('contactCopyLogs');
-                      if (copyBtn) copyBtn.style.display = 'inline-block';
-                      console.warn('Não foi possível copiar automaticamente os logs:', e);
-                    });
-                  } else {
-                    const copyBtn = document.getElementById('contactCopyLogs');
-                    if (copyBtn) copyBtn.style.display = 'inline-block';
-                  }
-                } catch (e) {
-                  const copyBtn = document.getElementById('contactCopyLogs');
-                  if (copyBtn) copyBtn.style.display = 'inline-block';
-                }
-              }
-              if (sendBtn) sendBtn.disabled = false;
-              if (debugBtn) debugBtn.disabled = false;
-              if (res.ok) {
-                if (feedback) feedback.textContent = 'Mensagem enviada com sucesso! (EmailJS)';
-                form.reset();
-                setTimeout(closeModal, 1200);
-              } else {
-                if (feedback) feedback.textContent = 'Erro ao enviar automaticamente: ' + (text || res.status) + ' — abrindo cliente de e‑mail...';
-                // fallback mailto
-                const subject = encodeURIComponent(payload.subject);
-                const body = encodeURIComponent(`Nome: ${payload.from_name}\nE-mail: ${payload.from_email}\nTelefone: ${payload.phone}\n\n${payload.message}`);
-                window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
-              }
-            }).catch(function(err) {
-              if (timeoutHandle) clearTimeout(timeoutHandle);
-              console.error('Erro envio EmailJS REST:', err);
-              if (err.name === 'AbortError') {
-                if (feedback) feedback.textContent = 'Tempo esgotado ao enviar automaticamente. Abrindo cliente de e‑mail...';
-              } else {
-                if (feedback) feedback.textContent = 'Erro ao enviar automaticamente. Abrindo cliente de e‑mail...';
-              }
-              const dbg = document.getElementById('contactDebug');
-              if (dbg) {
-                dbg.style.display = 'block';
-                dbg.textContent = 'Fetch error: ' + (err && err.message ? err.message : String(err));
-                try {
-                  if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(dbg.textContent).then(function() {
-                      if (feedback) feedback.textContent = 'Erro no envio — log copiado para a área de transferência.';
-                    }).catch(function(e) {
-                      const copyBtn = document.getElementById('contactCopyLogs');
-                      if (copyBtn) copyBtn.style.display = 'inline-block';
-                      console.warn('Não foi possível copiar automaticamente os logs:', e);
-                    });
-                  } else {
-                    const copyBtn = document.getElementById('contactCopyLogs');
-                    if (copyBtn) copyBtn.style.display = 'inline-block';
-                  }
-                } catch (e) {
-                  const copyBtn = document.getElementById('contactCopyLogs');
-                  if (copyBtn) copyBtn.style.display = 'inline-block';
-                }
-              }
-              if (sendBtn) sendBtn.disabled = false;
-              if (debugBtn) debugBtn.disabled = false;
-              const subject = encodeURIComponent(payload.subject);
-              const body = encodeURIComponent(`Nome: ${payload.from_name}\nE-mail: ${payload.from_email}\nTelefone: ${payload.phone}\n\n${payload.message}`);
-              window.location.href = `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
-            });
-          });
-      }
+      function showModal(){ if(!modal) return; modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; if(firstInput) firstInput.focus(); }
+      function closeModal(){ if(!modal) return; modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; if(feedback) feedback.textContent=''; }
+      if(openBtn) openBtn.addEventListener('click', e => { e.preventDefault(); showModal(); });
+      if(closeBtn) closeBtn.addEventListener('click', closeModal);
+      if(cancelBtn) cancelBtn.addEventListener('click', closeModal);
+      if(overlay) overlay.addEventListener('click', closeModal);
+      document.addEventListener('keydown', e => { if(e.key==='Escape' && modal && modal.classList.contains('open')) closeModal(); });
+      if(form){ form.addEventListener('submit', e => { e.preventDefault(); if(!form.name.value.trim()||!form.email.value.trim()||!form.message.value.trim()){ if(feedback) feedback.textContent='Por favor preencha os campos obrigatórios.'; return; } if(feedback) feedback.textContent='Formulário pronto (sem envio automático).'; form.reset(); setTimeout(closeModal,800); }); }
     });
-    // Handler para botão de debug (envio manual que mostra resposta)
-    document.addEventListener('DOMContentLoaded', function() {
-      const debugBtn = document.getElementById('btnSendDebug');
-      const sendBtn = document.getElementById('btnSend');
-      const formEl = document.getElementById('contactForm');
-      const copyBtn = document.getElementById('contactCopyLogs');
-      if (debugBtn && formEl) {
-        debugBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          // dispara a mesma submissão programaticamente para reutilizar lógica
-          // mas mostra pré-logs
-          try {
-            const evt = new Event('submit', { bubbles: true, cancelable: true });
-            formEl.dispatchEvent(evt);
-          } catch (err) {
-            console.error('Erro ao disparar submit debug:', err);
-          }
-        });
-      }
-      if (copyBtn) {
-        copyBtn.addEventListener('click', function() {
-          const dbg = document.getElementById('contactDebug');
-          if (!dbg) return;
-          try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-              navigator.clipboard.writeText(dbg.textContent).then(function() {
-                try { alert('Logs copiados para a área de transferência. Cole aqui (Ctrl+V).'); } catch(e) {}
-              }).catch(function(e) {
-                try { alert('Falha ao copiar automaticamente. Selecione o texto e pressione Ctrl+C.'); } catch(e) {}
-              });
-            } else {
-              try { alert('Seu navegador não permite cópia automática. Selecione o texto e pressione Ctrl+C.'); } catch(e) {}
-            }
-          } catch (e) {
-            try { alert('Erro ao copiar logs: ' + e.message); } catch(err) {}
-          }
-        });
-      }
-    });
-    </script>
-    <script src="accessibility.js"></script>
-    <script src="exit-popup.js"></script>
+  </script>
 
-</body>
-</html>
+  <script src="theme-toggle.js"></script>
+  <script src="accessibility.js"></script>
+  <script src="exit-popup.js"></script>

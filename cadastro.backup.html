@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login | NaRede Store</title>
+  <title>Cadastro | NaRede Store</title>
   <link rel="stylesheet" href="theme-toggle.css">
   <link rel="stylesheet" href="accessibility.css">
   <link rel="stylesheet" href="responsive.css">
   <style>
-
     * {
       margin: 0;
       padding: 0;
@@ -29,9 +28,9 @@
       background: #ffffff;
     }
 
-    .login-container {
+    .register-container {
       background: #161b22;
-      width: 360px;
+      width: 380px;
       padding: 2rem 2.5rem;
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -39,36 +38,36 @@
       transition: all 0.3s ease;
     }
 
-    body.light-mode .login-container {
+    body.light-mode .register-container {
       background: white;
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
 
-    .login-container h2 {
+    .register-container h2 {
       font-size: 1.8rem;
       color: #f0f6fc;
       margin-bottom: 1rem;
     }
 
-    body.light-mode .login-container h2 {
+    body.light-mode .register-container h2 {
       color: #222;
     }
 
-    .login-container h2 span {
+    .register-container h2 span {
       color: #422BFF;
       font-weight: 600;
     }
 
-    .login-container p {
+    .register-container p {
       color: #8b949e;
       margin-bottom: 1.5rem;
     }
 
-    body.light-mode .login-container p {
+    body.light-mode .register-container p {
       color: #666;
     }
 
-    .login-container input {
+    .register-container input {
       width: 100%;
       padding: 12px 15px;
       margin-bottom: 15px;
@@ -80,19 +79,19 @@
       color: #f0f6fc;
     }
 
-    body.light-mode .login-container input {
+    body.light-mode .register-container input {
       border: 1.5px solid #ddd;
       background-color: #ffffff;
       color: #222;
     }
 
-    .login-container input:focus {
+    .register-container input:focus {
       border-color: #422BFF;
       box-shadow: 0 0 0 3px rgba(122,63,255,0.1);
       outline: none;
     }
 
-    .login-container button {
+    .register-container button {
       width: 100%;
       background-color: #422BFF;
       color: white;
@@ -105,12 +104,11 @@
       font-weight: 600;
     }
 
-    .login-container button:hover {
-      background-color: #422BFF;
+    .register-container button:hover {
+      background-color: #351ECC;
     }
 
-
-    .login-container a {
+    .register-container a {
       display: inline-block;
       margin-top: 12px;
       color: #422BFF;
@@ -118,10 +116,9 @@
       font-size: 0.9rem;
     }
 
-    .login-container a:hover {
+    .register-container a:hover {
       text-decoration: underline;
     }
-
 
     .back-link {
       margin-top: 20px;
@@ -133,21 +130,6 @@
     .back-link:hover {
       color: #422BFF;
     }
-    /* ===== Modal (Central de Ajuda) ===== */
-    .modal{display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:100000}
-    .modal.open{display:flex}
-    .modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(2px)}
-    .modal-content{position:relative;background:#0d1117;color:#f0f6fc;width:min(720px,95%);max-width:720px;border-radius:12px;padding:1.25rem 1.5rem;box-shadow:0 10px 40px rgba(0,0,0,0.6);}
-    body.light-mode .modal-content{background:#ffffff;color:#222}
-    .modal-close{position:absolute;right:12px;top:8px;background:#422BFF;border:none;color:#fff;width:36px;height:36px;border-radius:8px;cursor:pointer}
-    .contact-form label{display:block;margin-top:8px;margin-bottom:6px;color:inherit;font-size:0.95rem}
-    .contact-form input,.contact-form textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #30363d;background:#0d1117;color:#f0f6fc}
-    body.light-mode .contact-form input,body.light-mode .contact-form textarea{background:#fff;color:#222;border:1px solid #ddd}
-    .contact-actions{margin-top:12px;display:flex;gap:12px;justify-content:center}
-    .btn-send,.btn-secondary{padding:10px 18px;border-radius:10px;border:none;cursor:pointer}
-    .btn-send{background:#422BFF;color:#fff}
-    .btn-secondary{background:#ffffff;color:#111;border:1px solid #ccc}
-    @media (max-width:720px){.modal-content{width:95%;padding:1rem}.contact-form .contact-actions{flex-direction:column}.btn-send,.btn-secondary{width:100%}}
   </style>
 </head>
 <body>
@@ -168,149 +150,22 @@
   <!-- Menu de Acessibilidade -->
   <div class="accessibility-menu" id="accessibilityMenu">
     <h3>Acessibilidade</h3>
-    
-    <div class="accessibility-option">
-      <label for="fontSize">Tamanho da Fonte</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="fontSize">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="highContrast">Alto Contraste</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="highContrast">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="grayscale">Escala de Cinza</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="grayscale">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="highlightLinks">Destacar Links</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="highlightLinks">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="largeCursor">Cursor Grande</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="largeCursor">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="lineSpacing">Espaçamento de Linha</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="lineSpacing">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="hideImages">Ocultar Imagens</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="hideImages">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="readingMode">Modo Leitura</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="readingMode">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="reducedMotion">Reduzir Movimento</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="reducedMotion">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="audioDescription">Áudio Descrição</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="audioDescription">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="textToSpeech">Texto para Fala</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="textToSpeech">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="readingGuide">Guia de Leitura</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="readingGuide">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="focusMode">Modo Foco</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="focusMode">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="dyslexiaFont">Fonte para Dislexia</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="dyslexiaFont">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="visualIndicators">Indicadores Visuais</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="visualIndicators">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="monochrome">Monocromático</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="monochrome">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <button class="reset-btn" id="resetAccessibility">Resetar Tudo</button>
+    ... (backup content truncated) ...
   </div>
 
-  <div class="login-container">
+  <div class="register-container">
     <h2>Na<span>Rede</span> Store</h2>
-    <p>Entrar na sua conta</p>
+    <p>Crie sua conta</p>
     <form>
+      <input type="text" placeholder="Nome completo" required />
       <input type="email" placeholder="E-mail" required />
       <input type="password" placeholder="Senha" required />
-      <button type="submit">Entrar</button>
+      <input type="password" placeholder="Confirmar senha" required />
+      <button type="submit">Cadastrar</button>
     </form>
-    <a href="#">Esqueceu a senha?</a><br>
-    <a href="cadastro.html">Não tem conta? Cadastre-se</a>
-    <a class="back-link" href="index.html">← Voltar à loja</a>
+    <a href="login.html">Já tem uma conta? Entrar</a>
+    <a class="back-link" href="index.html">
+     ← Voltar à loja</a>
   </div>
   <!-- Floating help button (abre a Central de Ajuda) -->
   <button id="centralAjuda" aria-label="Central de Ajuda" style="position:fixed;right:20px;bottom:20px;z-index:10000;background:#422BFF;color:#fff;border-radius:50%;width:56px;height:56px;border:none;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(66,43,255,0.18);">?</button>
@@ -402,3 +257,4 @@
   <script src="theme-toggle.js"></script>
   <script src="accessibility.js"></script>
 </body>
+</html>

@@ -17,7 +17,7 @@
       <span>Parcelamento em até 10x sem juros</span>
     </div>
     <div class="top-bar-right">
-      <a href="https://chat.whatsapp.com/ItoES41rn7OCJEWNGhpMrN" target="_blank">Central de Ajuda</a>
+  <a href="#" id="centralAjuda">Central de Ajuda</a>
       <span class="dot">•</span>
       <a href="#">Rastrear Pedido</a>
     </div>
@@ -362,7 +362,89 @@
         }
       });
     });
+    
+    // Modal de contato: apenas comportamento de UI (abir/fechar). Sem lógica de envio.
+    document.addEventListener('DOMContentLoaded', function() {
+      const openBtn = document.getElementById('centralAjuda');
+      const modal = document.getElementById('contactModal');
+      const overlay = document.getElementById('contactOverlay');
+      const closeBtn = document.getElementById('contactClose');
+      const cancelBtn = document.getElementById('contactCancel');
+      const form = document.getElementById('contactForm');
+      const feedback = document.getElementById('contactFeedback');
+      const firstInput = document.getElementById('contactName');
+
+      function showModal() {
+        if (!modal) return;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (firstInput) firstInput.focus();
+      }
+
+      function closeModal() {
+        if (!modal) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (feedback) feedback.textContent = '';
+      }
+
+      if (openBtn) openBtn.addEventListener('click', function(e) { e.preventDefault(); showModal(); });
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+      if (overlay) overlay.addEventListener('click', closeModal);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeModal();
+      });
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          if (!form.name.value.trim() || !form.email.value.trim() || !form.message.value.trim()) {
+            if (feedback) feedback.textContent = 'Por favor preencha os campos obrigatórios.';
+            return;
+          }
+          if (feedback) feedback.textContent = 'Formulário pronto (sem envio automático).';
+          setTimeout(closeModal, 800);
+        });
+      }
+    });
   </script>
+  
+  <!-- Modal de Contato (aberto ao clicar em Central de Ajuda) -->
+  <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="contactModalTitle">
+    <div class="modal-overlay" id="contactOverlay"></div>
+    <div class="modal-content" role="document">
+      <button class="modal-close" id="contactClose" aria-label="Fechar formulário">×</button>
+      <h2 id="contactModalTitle">Central de Ajuda — Fale Conosco</h2>
+      <form id="contactForm" class="contact-form" novalidate>
+        <label for="contactName">Nome</label>
+        <input type="text" id="contactName" name="name" required placeholder="Seu nome">
+
+        <label for="contactEmail">E‑mail</label>
+        <input type="email" id="contactEmail" name="email" required placeholder="seu@exemplo.com">
+
+        <label for="contactPhone">Telefone</label>
+        <input type="tel" id="contactPhone" name="phone" placeholder="(xx) 9xxxx-xxxx">
+
+        <label for="contactSubject">Assunto</label>
+        <input type="text" id="contactSubject" name="subject" placeholder="Assunto (ex: Pedido, Troca)">
+
+        <label for="contactMessage">Mensagem</label>
+        <textarea id="contactMessage" name="message" rows="5" required placeholder="Descreva sua dúvida ou problema"></textarea>
+
+        <div class="contact-actions" style="display:flex; justify-content:center; gap:12px; align-items:center;">
+          <div style="display:flex; gap:8px;">
+            <button type="submit" class="btn-send" id="btnSend" style="min-width:160px;">Enviar Mensagem</button>
+          </div>
+          <button type="button" class="btn-secondary" id="contactCancel" style="min-width:90px;">Cancelar</button>
+        </div>
+        <p class="contact-feedback" id="contactFeedback" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
   <script src="theme-toggle.js"></script>
   <script src="accessibility.js"></script>
   <script src="exit-intent.js"></script>
