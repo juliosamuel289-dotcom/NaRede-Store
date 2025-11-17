@@ -2,10 +2,12 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
+  <meta name="theme-color" content="#0d1117">
   <meta name="description" content="Na Rede Store - Camisetas oficiais de times brasileiros e internacionais. Produtos originais, frete grátis e até 10x sem juros.">
   <title>Na RedeStore</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive-pro.css">
   <link rel="stylesheet" href="theme-toggle.css">
   <link rel="stylesheet" href="accessibility.css">
   <link rel="stylesheet" href="responsive.css">
@@ -71,7 +73,17 @@
       <a href="index.html" class="logotipo">
         <span style="color:#fff;">Na</span><span style="color:#422BFF;">Rede</span> <span style="color:#fff;">Store</span>
       </a>
+      <!-- Hamburger for small screens -->
+      <button id="navToggle" class="nav-toggle" aria-label="Abrir menu" aria-expanded="false" style="margin-left:12px">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
       <div class="user-bar">
+<!-- Botão de Alternância de Tema -->
+<button class="theme-toggle-btn user-link" id="themeToggle" aria-label="Alternar tema" style="border: none; background: var(--accent-color);">
+  <svg id="themeIcon" viewBox="0 0 24 24">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+</button>
 <a href="login.html" class="user-link">
   <span class="icon">
     <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -81,18 +93,6 @@
   </span>
   <span class="label"><b>Entrar</b></span>
 </a>
-<!-- Botão de Alternância de Tema -->
-<button class="theme-toggle-btn user-link" id="themeToggle" aria-label="Alternar tema" style="border: none; background: var(--accent-color);">
-  <svg id="themeIcon" viewBox="0 0 24 24">
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-  </svg>
-</button>
-<!-- Botão de Acessibilidade -->
-<button class="accessibility-btn user-link" id="accessibilityToggle" aria-label="Menu de Acessibilidade">
-  <svg viewBox="0 0 24 24">
-    <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M21 9H15V22H13V16H11V22H9V9H3V7H21V9Z"/>
-  </svg>
-</button>
 <a href="checkout.html" class="user-link">
   <span class="icon">
     <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -118,7 +118,7 @@
     </form>
     <nav>
       <ul class="nav-links">
-        <li><span class="menu-btn active">Início</span></li>
+        <li><span class="menu-btn active">Ínicio</span></li>
         <li><a class="menu-btn" href="Destaques.html">Destaques</a></li>
         <li><a class="menu-btn" href="Camisas Brasileiras.html">Times Brasileiros</a></li>
         <li><a class="menu-btn" href="Seleções.html">Seleções</a></li>
@@ -139,34 +139,34 @@
       </div>
     </div>
     <div class="hero-image">
-      <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/crvg.png?raw=true" alt="Camiseta destaque" width="400" height="400">
+      <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/crvg.png?raw=true" alt="Camiseta destaque" width="400" height="400" loading="eager" decoding="async">
     </div>
   </section>
 <section class="benefits">
   <div class="benefit">
     <div class="benefit-icon">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/caminhao.png?raw=true" alt="Frete Grátis" width="30" height="30">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/caminhao.png?raw=true" alt="Frete Grátis" width="30" height="30" loading="lazy" decoding="async">
     </div>
     <div class="benefit-title">Frete Grátis</div>
     <div class="benefit-desc">Para todo o Brasil acima de R$ 199</div>
   </div>
   <div class="benefit">
     <div class="benefit-icon">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/escudo.png?raw=true" alt="Produtos Originais" width="30" height="30">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/escudo.png?raw=true" alt="Produtos Originais" width="30" height="30" loading="lazy" decoding="async">
     </div>
     <div class="benefit-title">Produtos Originais</div>
     <div class="benefit-desc">100% licenciados e oficiais</div>
   </div>
   <div class="benefit">
     <div class="benefit-icon">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/cartao.png?raw=true" alt="Parcelamento" width="30" height="30">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/cartao.png?raw=true" alt="Parcelamento" width="30" height="30" loading="lazy" decoding="async">
     </div>
     <div class="benefit-title">Parcelamento</div>
     <div class="benefit-desc">Até 10x sem juros no cartão</div>
   </div>
   <div class="benefit">
     <div class="benefit-icon">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/fone.png?raw=true" alt="Atendimento" width="30" height="30">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/fone.png?raw=true" alt="Atendimento" width="30" height="30" loading="lazy" decoding="async">
     </div>
     <div class="benefit-title">Atendimento</div>
     <div class="benefit-desc">Suporte especializado</div>
@@ -187,14 +187,14 @@
     <div class="product-horizontal">
       <div class="product-gallery">
         <div class="thumbnails">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-1.png?raw=true" alt="Miniatura 1" onclick="showImage(this, 'mainProductImage1')">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-2.png?raw=true" alt="Miniatura 2" onclick="showImage(this, 'mainProductImage1')">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-3.png?raw=true" alt="Miniatura 3" onclick="showImage(this, 'mainProductImage1')">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-4.png?raw=true" alt="Miniatura 4" onclick="showImage(this, 'mainProductImage1')">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-5.png?raw=true" alt="Miniatura 5" onclick="showImage(this, 'mainProductImage1')">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-1.png?raw=true" alt="Miniatura 1" onclick="showImage(this, 'mainProductImage1')" loading="lazy" decoding="async" width="50" height="50">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-2.png?raw=true" alt="Miniatura 2" onclick="showImage(this, 'mainProductImage1')" loading="lazy" decoding="async" width="50" height="50">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-3.png?raw=true" alt="Miniatura 3" onclick="showImage(this, 'mainProductImage1')" loading="lazy" decoding="async" width="50" height="50">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-4.png?raw=true" alt="Miniatura 4" onclick="showImage(this, 'mainProductImage1')" loading="lazy" decoding="async" width="50" height="50">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-5.png?raw=true" alt="Miniatura 5" onclick="showImage(this, 'mainProductImage1')" loading="lazy" decoding="async" width="50" height="50">
         </div>
         <div class="main-image">
-          <img id="mainProductImage1" src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-1.png?raw=true" alt="Imagem principal do produto">
+          <img id="mainProductImage1" src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto1-1.png?raw=true" alt="Imagem principal do produto" loading="lazy" decoding="async" width="350" height="350">
           <div class="discount-label">-28% OFF</div>
         </div>
       </div>
@@ -211,14 +211,14 @@
     <div class="product-horizontal">
       <div class="product-gallery">
         <div class="thumbnails">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-1.png?raw=true" alt="Miniatura 1" onclick="showImage(this, 'mainProductImage2')">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-2.png?raw=true" alt="Miniatura 2" onclick="showImage(this, 'mainProductImage2')">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-3.png?raw=true" alt="Miniatura 3" onclick="showImage(this, 'mainProductImage2')">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-4.png?raw=true" alt="Miniatura 4" onclick="showImage(this, 'mainProductImage2')">
-          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-5.png?raw=true" alt="Miniatura 5" onclick="showImage(this, 'mainProductImage2')">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-1.png?raw=true" alt="Miniatura 1" onclick="showImage(this, 'mainProductImage2')" loading="lazy" decoding="async" width="50" height="50">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-2.png?raw=true" alt="Miniatura 2" onclick="showImage(this, 'mainProductImage2')" loading="lazy" decoding="async" width="50" height="50">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-3.png?raw=true" alt="Miniatura 3" onclick="showImage(this, 'mainProductImage2')" loading="lazy" decoding="async" width="50" height="50">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-4.png?raw=true" alt="Miniatura 4" onclick="showImage(this, 'mainProductImage2')" loading="lazy" decoding="async" width="50" height="50">
+          <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-5.png?raw=true" alt="Miniatura 5" onclick="showImage(this, 'mainProductImage2')" loading="lazy" decoding="async" width="50" height="50">
         </div>
         <div class="main-image">
-          <img id="mainProductImage2" src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-1.png?raw=true" alt="Imagem principal do produto">
+          <img id="mainProductImage2" src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/produto2-1.png?raw=true" alt="Imagem principal do produto" loading="lazy" decoding="async" width="350" height="350">
           <div class="discount-label">-60% OFF</div>
         </div>
       </div>
@@ -367,3 +367,4 @@
   <script src="theme-toggle.js"></script>
   <script src="accessibility.js"></script>
   <script src="exit-popup.js"></script>
+  <script src="nav-toggle.js"></script>

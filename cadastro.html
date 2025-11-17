@@ -2,8 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+  <meta name="description" content="Cadastro - NaRede Store" />
   <title>Cadastro | NaRede Store</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive-pro.css">
+  <link rel="stylesheet" href="theme-toggle.css">
+  <link rel="stylesheet" href="accessibility.css">
+  <link rel="stylesheet" href="responsive.css">
   <style>
     * {
       margin: 0;
@@ -13,37 +19,48 @@
     }
 
     body {
-      background: linear-gradient(135deg, #422BFF, #422BFF);
+      background: #0d1117;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: background 0.3s ease;
       padding: 20px;
+      position: relative;
+    }
+
+    body.light-mode {
+      background: #ffffff;
     }
 
     .register-container {
-      background: white;
-      width: 360px;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 1.5rem 2rem;
-      border-radius: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      background: #161b22;
+      width: 100%;
+      max-width: 460px;
+      padding: 2.5rem 3rem;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
       text-align: center;
+      transition: all 0.3s ease;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
 
-    .register-container::-webkit-scrollbar {
-      width: 6px;
-    }
-    .register-container::-webkit-scrollbar-thumb {
-      background: #422BFF;
-      border-radius: 6px;
+    body.light-mode .register-container {
+      background: white;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
     }
 
     .register-container h2 {
-      font-size: 1.6rem;
-      color: #222;
+      font-size: 2rem;
+      color: #f0f6fc;
       margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    body.light-mode .register-container h2 {
+      color: #222;
     }
 
     .register-container h2 span {
@@ -52,103 +69,365 @@
     }
 
     .register-container p {
+      color: #8b949e;
+      margin-bottom: 1.5rem;
+    }
+
+    body.light-mode .register-container p {
       color: #666;
-      margin-bottom: 1rem;
-      font-size: 0.95rem;
     }
 
-    form {
-      text-align: left;
-    }
-
-    label {
-      display: block;
-      font-weight: 500;
-      margin-bottom: 4px;
-      color: #333;
-      font-size: 0.9rem;
-    }
-
-    input, select {
+    .register-container input {
       width: 100%;
-      padding: 10px 12px;
-      margin-bottom: 12px;
-      border: 1.5px solid #ddd;
-      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border: 1.5px solid #30363d;
+      border-radius: 10px;
       transition: 0.2s;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      background-color: #0d1117;
+      color: #f0f6fc;
     }
 
-    input:focus, select:focus {
+    body.light-mode .register-container input {
+      border: 1.5px solid #ddd;
+      background-color: #ffffff;
+      color: #222;
+    }
+
+    .register-container input:focus {
       border-color: #422BFF;
-      box-shadow: 0 0 0 2px rgba(122,63,255,0.1);
+      box-shadow: 0 0 0 3px rgba(122,63,255,0.1);
       outline: none;
     }
 
-    button {
+    .register-container button {
       width: 100%;
       background-color: #422BFF;
       color: white;
-      padding: 10px;
+      padding: 12px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 1rem;
       cursor: pointer;
       transition: 0.2s;
       font-weight: 600;
-      margin-top: 5px;
     }
 
-    button:hover {
+    .register-container button:hover {
       background-color: #351ECC;
     }
 
-    a {
+    .register-container a {
       display: inline-block;
-      margin-top: 10px;
+      margin-top: 12px;
       color: #422BFF;
       text-decoration: none;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
 
-    a:hover {
+    .register-container a:hover {
       text-decoration: underline;
     }
 
     .back-link {
-      margin-top: 10px;
+      margin-top: 20px;
       display: block;
       color: #666;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
     }
 
     .back-link:hover {
       color: #422BFF;
     }
-
-    .error {
-      color: red;
-      font-size: 0.8rem;
-      margin-top: -8px;
-      margin-bottom: 8px;
-      display: none;
+    
+    /* Sistema de responsividade profissional */
+    
+    @media (max-width: 1024px) {
+      .register-container {
+        max-width: 440px;
+        padding: 2.3rem 2.8rem;
+      }
     }
-
-    #statusCEP {
-      font-size: 0.8rem;
-      color: #666;
-      display: none;
-      margin-top: -8px;
-      margin-bottom: 8px;
+    
+    @media (max-width: 960px) {
+      .user-bar {
+        position: fixed !important;
+        top: 16px !important;
+        right: 16px !important;
+        left: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        flex-direction: row !important;
+        gap: 14px !important;
+        padding: 12px 18px !important;
+        border-radius: 50px !important;
+        background: rgba(11, 11, 13, 0.9) !important;
+        backdrop-filter: blur(12px) !important;
+      }
+      
+      .user-bar .user-link,
+      .user-bar .theme-toggle-btn {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+      }
+      
+      body {
+        padding: 100px 20px 40px 20px;
+      }
+      
+      .register-container {
+        max-width: 420px;
+        padding: 2.2rem 2.5rem;
+      }
     }
+    
+    @media (max-width: 600px) {
+      .user-bar {
+        top: 12px !important;
+        right: 12px !important;
+        gap: 12px !important;
+        padding: 10px 14px !important;
+      }
+      
+      .user-bar .user-link,
+      .user-bar .theme-toggle-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+      }
+      
+      .user-bar .icon svg,
+      .user-bar svg {
+        width: 18px !important;
+        height: 18px !important;
+      }
+      
+      body {
+        padding: 80px 16px 30px 16px;
+      }
+      
+      .register-container {
+        max-width: 100%;
+        padding: 2rem 1.8rem;
+        border-radius: 20px;
+      }
+      
+      .register-container h2 {
+        font-size: 1.75rem;
+      }
+    }
+    
+    @media (max-width: 400px) {
+      .user-bar {
+        top: 8px !important;
+        right: 8px !important;
+        gap: 10px !important;
+        padding: 8px 12px !important;
+      }
+      
+      .user-bar .user-link,
+      .user-bar .theme-toggle-btn {
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        min-height: 38px !important;
+      }
+      
+      .user-bar .icon svg,
+      .user-bar svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
+      
+      body {
+        padding: 70px 12px 20px 12px;
+      }
+      
+      .register-container {
+        padding: 1.8rem 1.5rem;
+        border-radius: 18px;
+      }
+      
+      .register-container h2 {
+        font-size: 1.5rem;
+      }
+    }
+    
+    @media (max-width: 320px) {
+      .register-container {
+        padding: 1.5rem 1.2rem;
+      }
+      
+      .register-container h2 {
+        font-size: 1.3rem;
+      }
+    }
+    
+    /* modal styles moved to style.css (centralized) */
   </style>
 </head>
 <body>
+  <!-- Barra lateral de botões -->
+  <div class="user-bar">
+    <button class="theme-toggle-btn user-link" id="themeToggle" aria-label="Alternar tema" style="border: none; background: var(--accent-color);">
+      <svg id="themeIcon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+    <a href="cadastro.html" class="user-link">
+      <span class="icon">
+        <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="7" r="4"/>
+          <path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>
+        </svg>
+      </span>
+    </a>
+  </div>
+
+  <!-- Menu de Acessibilidade -->
+  <div class="accessibility-menu" id="accessibilityMenu">
+    <h3>Acessibilidade</h3>
+    
+    <div class="accessibility-option">
+      <label for="fontSize">Tamanho da Fonte</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="fontSize">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="highContrast">Alto Contraste</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="highContrast">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="grayscale">Escala de Cinza</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="grayscale">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="highlightLinks">Destacar Links</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="highlightLinks">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="largeCursor">Cursor Grande</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="largeCursor">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="lineSpacing">Espaçamento de Linha</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="lineSpacing">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="hideImages">Ocultar Imagens</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="hideImages">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="readingMode">Modo Leitura</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="readingMode">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="reducedMotion">Reduzir Movimento</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="reducedMotion">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="audioDescription">Áudio Descrição</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="audioDescription">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="textToSpeech">Texto para Fala</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="textToSpeech">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="readingGuide">Guia de Leitura</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="readingGuide">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="focusMode">Modo Foco</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="focusMode">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="dyslexiaFont">Fonte para Dislexia</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="dyslexiaFont">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="visualIndicators">Indicadores Visuais</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="visualIndicators">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="monochrome">Monocromático</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="monochrome">
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <button class="reset-btn" id="resetAccessibility">Resetar Tudo</button>
+  </div>
+
   <div class="register-container">
     <h2>Na<span>Rede</span> Store</h2>
     <p>Crie sua conta</p>
 
-    <form id="cadastroForm">
+    <form id="cadastroForm" novalidate>
       <label for="nome">Nome</label>
       <input type="text" id="nome" placeholder="Digite seu nome" required />
 
@@ -201,85 +480,186 @@
     <a href="login.html">Já tem uma conta? Entrar</a>
     <a class="back-link" href="index.html">← Voltar à loja</a>
   </div>
+  <!-- Floating help button (abre a Central de Ajuda) -->
+  <button id="centralAjuda" aria-label="Central de Ajuda" style="position:fixed;right:20px;bottom:20px;z-index:10000;background:#422BFF;color:#fff;border-radius:50%;width:56px;height:56px;border:none;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(66,43,255,0.18);">?</button>
+
+  <!-- Modal de Contato (aberto ao clicar em Central de Ajuda) -->
+  <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="contactModalTitle">
+    <div class="modal-overlay" id="contactOverlay"></div>
+    <div class="modal-content" role="document">
+      <button class="modal-close" id="contactClose" aria-label="Fechar formulário">×</button>
+      <h2 id="contactModalTitle">Central de Ajuda — Fale Conosco</h2>
+      <form id="contactForm" class="contact-form" novalidate>
+        <label for="contactName">Nome</label>
+        <input type="text" id="contactName" name="name" required placeholder="Seu nome">
+
+        <label for="contactEmail">E‑mail</label>
+        <input type="email" id="contactEmail" name="email" required placeholder="seu@exemplo.com">
+
+        <label for="contactPhone">Telefone</label>
+        <input type="tel" id="contactPhone" name="phone" placeholder="(xx) 9xxxx-xxxx">
+
+        <label for="contactSubject">Assunto</label>
+        <input type="text" id="contactSubject" name="subject" placeholder="Assunto (ex: Pedido, Troca)">
+
+        <label for="contactMessage">Mensagem</label>
+        <textarea id="contactMessage" name="message" rows="5" required placeholder="Descreva sua dúvida ou problema"></textarea>
+
+        <div class="contact-actions" style="display:flex; justify-content:center; gap:12px; align-items:center;">
+          <div style="display:flex; gap:8px;">
+            <button type="submit" class="btn-send" id="btnSend" style="min-width:160px;">Enviar Mensagem</button>
+          </div>
+          <button type="button" class="btn-secondary" id="contactCancel" style="min-width:90px;">Cancelar</button>
+        </div>
+        <p class="contact-feedback" id="contactFeedback" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
 
   <script>
-    // === Máscaras ===
-    const cpfInput = document.getElementById("cpf");
-    const celularInput = document.getElementById("celular");
-    const cepInput = document.getElementById("cep");
-    const statusCEP = document.getElementById("statusCEP");
+    // Modal de contato: apenas comportamento de UI (abrir/fechar). Sem lógica de envio.
+    document.addEventListener('DOMContentLoaded', function() {
+      const openBtn = document.getElementById('centralAjuda');
+      const modal = document.getElementById('contactModal');
+      const overlay = document.getElementById('contactOverlay');
+      const closeBtn = document.getElementById('contactClose');
+      const cancelBtn = document.getElementById('contactCancel');
+      const form = document.getElementById('contactForm');
+      const feedback = document.getElementById('contactFeedback');
+      const firstInput = document.getElementById('contactName');
 
-    cpfInput.addEventListener("input", () => {
-      let v = cpfInput.value.replace(/\D/g, "").slice(0, 11);
-      v = v.replace(/(\d{3})(\d)/, "$1.$2");
-      v = v.replace(/(\d{3})(\d)/, "$1.$2");
-      v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-      cpfInput.value = v;
-    });
-
-    celularInput.addEventListener("input", () => {
-      let v = celularInput.value.replace(/\D/g, "").slice(0, 11);
-      v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
-      v = v.replace(/(\d{5})(\d)/, "$1-$2");
-      celularInput.value = v;
-    });
-
-    // === CEP Automático com delay ===
-    let timeoutCEP;
-    cepInput.addEventListener("input", () => {
-      clearTimeout(timeoutCEP);
-      let v = cepInput.value.replace(/\D/g, "").slice(0, 8);
-      if (v.length > 5) v = v.replace(/(\d{5})(\d{1,3})/, "$1-$2");
-      cepInput.value = v;
-
-      if (v.replace("-", "").length === 8) {
-        timeoutCEP = setTimeout(() => buscarCEP(v.replace("-", "")), 500);
+      function showModal() {
+        if (!modal) return;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (firstInput) firstInput.focus();
       }
-    });
-function buscarCEP(cep) {
-  statusCEP.style.display = "block";
-  statusCEP.textContent = "Buscando endereço...";
 
-  fetch(`https://viacep.com.br/ws/${cep}/json/`)
-    .then(res => {
-      if (!res.ok) throw new Error("Erro ao consultar o CEP");
-      return res.json();
-    })
-    .then(data => {
-      statusCEP.style.display = "none";
-      if (!data.erro) {
-        document.getElementById("endereco").value = data.logradouro || "";
-        document.getElementById("bairro").value = data.bairro || "";
-        document.getElementById("cidade").value = data.localidade || "";
-        document.getElementById("estado").value = data.uf || "";
-      } else {
-        alert("CEP não encontrado!");
+      function closeModal() {
+        if (!modal) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (feedback) feedback.textContent = '';
       }
-    })
-    .catch(() => {
-      statusCEP.style.display = "none";
-      alert("Erro ao buscar o CEP!");
-    });
-}
-    // === Verificação de senha ===
-    const form = document.getElementById("cadastroForm");
-    const senha = document.getElementById("senha");
-    const confirmar = document.getElementById("confirmar");
-    const erroSenha = document.getElementById("erroSenha");
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (senha.value !== confirmar.value) {
-        erroSenha.style.display = "block";
-        confirmar.focus();
-      } else {
-        erroSenha.style.display = "none";
-        alert("Cadastro realizado com sucesso!");
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 1500);
+      if (openBtn) openBtn.addEventListener('click', function(e) { e.preventDefault(); showModal(); });
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+      if (overlay) overlay.addEventListener('click', closeModal);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeModal();
+      });
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          if (!form.name.value.trim() || !form.email.value.trim() || !form.message.value.trim()) {
+            if (feedback) feedback.textContent = 'Por favor preencha os campos obrigatórios.';
+            return;
+          }
+          if (feedback) feedback.textContent = 'Formulário pronto (sem envio automático).';
+          setTimeout(closeModal, 800);
+        });
       }
     });
   </script>
+
+  <script>
+    // Script do formulário de cadastro: máscaras, CEP (via ViaCEP) com debounce e validação de senhas
+    (function(){
+      const cpfInput = document.getElementById('cpf');
+      const celularInput = document.getElementById('celular');
+      const cepInput = document.getElementById('cep');
+      const statusCEP = document.getElementById('statusCEP');
+      const form = document.getElementById('cadastroForm');
+      const senha = document.getElementById('senha');
+      const confirmar = document.getElementById('confirmar');
+      const erroSenha = document.getElementById('erroSenha');
+
+      // máscara CPF
+      if(cpfInput){
+        cpfInput.addEventListener('input', () => {
+          let v = cpfInput.value.replace(/\D/g,'').slice(0,11);
+          v = v.replace(/(\d{3})(\d)/,'$1.$2');
+          v = v.replace(/(\d{3})(\d)/,'$1.$2');
+          v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+          cpfInput.value = v;
+        });
+      }
+
+      // máscara celular
+      if(celularInput){
+        celularInput.addEventListener('input', () => {
+          let v = celularInput.value.replace(/\D/g,'').slice(0,11);
+          v = v.replace(/^(\d{2})(\d)/g,'($1) $2');
+          v = v.replace(/(\d{5})(\d)/,'$1-$2');
+          celularInput.value = v;
+        });
+      }
+
+      // debounce util
+      function debounce(fn, wait){ let t; return function(...args){ clearTimeout(t); t = setTimeout(()=> fn.apply(this,args), wait); }; }
+
+      // buscar CEP async
+      async function buscarCEP(cep){
+        if(!cep) return;
+        try{
+          statusCEP.style.display = 'block';
+          statusCEP.textContent = 'Buscando endereço...';
+          const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+          if(!res.ok) throw new Error('Erro ao consultar o CEP');
+          const data = await res.json();
+          statusCEP.style.display = 'none';
+          if(!data.erro){
+            document.getElementById('endereco').value = data.logradouro || '';
+            document.getElementById('bairro').value = data.bairro || '';
+            document.getElementById('cidade').value = data.localidade || '';
+            document.getElementById('estado').value = data.uf || '';
+          } else {
+            statusCEP.style.display = 'block';
+            statusCEP.textContent = 'CEP não encontrado';
+            setTimeout(()=> statusCEP.style.display = 'none', 2500);
+          }
+        }catch(err){
+          statusCEP.style.display = 'none';
+          console.error(err);
+          alert('Erro ao buscar o CEP!');
+        }
+      }
+
+      if(cepInput){
+        const deb = debounce((val)=>{ const clean = val.replace(/\D/g,''); if(clean.length === 8) buscarCEP(clean); }, 500);
+        cepInput.addEventListener('input', () =>{
+          let v = cepInput.value.replace(/\D/g,'').slice(0,8);
+          if(v.length > 5) v = v.replace(/(\d{5})(\d{1,3})/,'$1-$2');
+          cepInput.value = v;
+          deb(v);
+        });
+      }
+
+      // validação de senhas em tempo real
+      function checkPassword(){ if(!senha||!confirmar) return; if(confirmar.value === '') { erroSenha.style.display='none'; return; } erroSenha.style.display = (senha.value !== confirmar.value) ? 'block' : 'none'; }
+      if(senha) senha.addEventListener('input', checkPassword);
+      if(confirmar) confirmar.addEventListener('input', checkPassword);
+
+      // submit
+      if(form){
+        form.addEventListener('submit', (e)=>{
+          e.preventDefault();
+          if(senha && confirmar && senha.value !== confirmar.value){ erroSenha.style.display='block'; confirmar.focus(); return; }
+          // comportamento atual: apenas UI (sem envio)
+          alert('Cadastro realizado com sucesso!');
+          setTimeout(()=> window.location.href = 'login.html', 1100);
+        });
+      }
+
+    })();
+  </script>
+
+  <script src="theme-toggle.js"></script>
+  <script src="accessibility.js"></script>
 </body>
 </html>

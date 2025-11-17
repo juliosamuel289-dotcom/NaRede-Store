@@ -1,0 +1,365 @@
+/* ========================================
+   SISTEMA DE RESPONSIVIDADE PROFISSIONAL
+   Nível: Google, Facebook, Amazon
+   ======================================== */
+
+/* Reset e Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Container responsivo universal */
+.container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 5vw, 80px);
+}
+
+/* User Bar - Botões laterais/topo */
+@media (max-width: 960px) {
+  .user-bar {
+    position: fixed !important;
+    top: 16px !important;
+    right: 16px !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 12px 18px !important;
+    border-radius: 50px !important;
+    background: rgba(11, 11, 13, 0.95) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(66, 43, 255, 0.2) !important;
+    z-index: 9999 !important;
+  }
+  
+  .user-bar .user-link,
+  .user-bar .theme-toggle-btn,
+  .user-bar .accessibility-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    position: relative !important;
+  }
+  
+  .user-bar .user-link .label {
+    display: none !important;
+  }
+  
+  .user-bar .icon svg,
+  .user-bar svg {
+    width: 20px !important;
+    height: 20px !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+  
+  .user-bar .cart-badge {
+    position: absolute !important;
+    top: 2px !important;
+    right: 2px !important;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: #422BFF !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(66, 43, 255, 0.6) !important;
+    border: 2px solid rgba(11, 11, 13, 0.9) !important;
+  }
+  
+  @media (hover: hover) and (pointer: fine) {
+    .user-bar .user-link:hover,
+    .user-bar .theme-toggle-btn:hover,
+    .user-bar .accessibility-btn:hover {
+      background: rgba(66, 43, 255, 0.15) !important;
+      transform: scale(1.08) !important;
+    }
+  }
+}
+
+/* Tablets portrait - 600px */
+@media (max-width: 600px) {
+  .user-bar {
+    top: 12px !important;
+    right: 12px !important;
+    gap: 12px !important;
+    padding: 10px 14px !important;
+  }
+  
+  .user-bar .user-link,
+  .user-bar .theme-toggle-btn,
+  .user-bar .accessibility-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+  }
+  
+  .user-bar .icon svg,
+  .user-bar svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  
+  .user-bar .cart-badge {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    font-size: 9px !important;
+  }
+}
+
+/* Mobile - 400px */
+@media (max-width: 400px) {
+  .user-bar {
+    top: 8px !important;
+    right: 8px !important;
+    gap: 10px !important;
+    padding: 8px 12px !important;
+  }
+  
+  .user-bar .user-link,
+  .user-bar .theme-toggle-btn,
+  .user-bar .accessibility-btn {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    max-width: 38px !important;
+    max-height: 38px !important;
+  }
+  
+  .user-bar .icon svg,
+  .user-bar svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  .user-bar .cart-badge {
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+    min-height: 14px !important;
+    font-size: 8px !important;
+  }
+}
+
+/* Formulários e Containers */
+.form-container,
+.login-container,
+.register-container,
+.checkout-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 5vw, 3rem) clamp(1.2rem, 5vw, 3.5rem);
+  border-radius: clamp(18px, 3vw, 24px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tipografia fluida */
+h1 {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+  line-height: 1.4;
+}
+
+p {
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  line-height: 1.6;
+}
+
+/* Inputs e Buttons responsivos */
+input,
+select,
+textarea,
+button {
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  padding: clamp(10px, 2vw, 14px) clamp(12px, 3vw, 16px);
+  border-radius: clamp(8px, 2vw, 12px);
+}
+
+/* Grid responsivo */
+.grid {
+  display: grid;
+  gap: clamp(16px, 3vw, 32px);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+/* Breakpoint Desktop XL - 1440px+ */
+@media (min-width: 1441px) {
+  .container {
+    max-width: 1600px;
+  }
+}
+
+/* Breakpoint Desktop - 1024px-1440px */
+@media (max-width: 1440px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+/* Breakpoint Tablet Landscape - 768px-1024px */
+@media (max-width: 1024px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .form-container,
+  .login-container,
+  .register-container,
+  .checkout-container {
+    max-width: 440px;
+  }
+}
+
+/* Breakpoint Tablet Portrait - 600px-768px */
+@media (max-width: 768px) {
+  body {
+    padding-top: 80px;
+  }
+  
+  .form-container,
+  .login-container,
+  .register-container,
+  .checkout-container {
+    max-width: 400px;
+  }
+}
+
+/* Breakpoint Mobile Large - 480px-600px */
+@media (max-width: 600px) {
+  body {
+    padding-top: 70px;
+  }
+  
+  .form-container,
+  .login-container,
+  .register-container,
+  .checkout-container {
+    max-width: 100%;
+    padding: clamp(1.5rem, 4vw, 2rem) clamp(1.2rem, 4vw, 1.8rem);
+  }
+}
+
+/* Breakpoint Mobile Medium - 375px-480px */
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
+  
+  body {
+    padding-top: 65px;
+  }
+}
+
+/* Breakpoint Mobile Small - 320px-375px */
+@media (max-width: 375px) {
+  html {
+    font-size: 12px;
+  }
+  
+  body {
+    padding-top: 60px;
+  }
+  
+  .form-container,
+  .login-container,
+  .register-container,
+  .checkout-container {
+    padding: clamp(1.2rem, 4vw, 1.8rem) clamp(1rem, 4vw, 1.5rem);
+  }
+}
+
+/* Breakpoint Mobile XSmall - <320px */
+@media (max-width: 320px) {
+  html {
+    font-size: 11px;
+  }
+}
+
+/* Performance: Reduce animations on slow devices */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+  * {
+    border-width: 2px !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .user-bar,
+  button,
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}

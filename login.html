@@ -2,8 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+  <meta name="theme-color" content="#0d1117" />
   <title>Login | NaRede Store</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive-pro.css">
   <link rel="stylesheet" href="theme-toggle.css">
   <link rel="stylesheet" href="accessibility.css">
   <link rel="stylesheet" href="responsive.css">
@@ -18,11 +21,13 @@
 
     body {
       background: #0d1117;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       transition: background 0.3s ease;
+      padding: 20px;
+      position: relative;
     }
 
     body.light-mode {
@@ -31,23 +36,28 @@
 
     .login-container {
       background: #161b22;
-      width: 360px;
-      padding: 2rem 2.5rem;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 440px;
+      padding: 3rem 3.5rem;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
       text-align: center;
       transition: all 0.3s ease;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
 
     body.light-mode .login-container {
       background: white;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
     }
 
     .login-container h2 {
-      font-size: 1.8rem;
+      font-size: 2.2rem;
       color: #f0f6fc;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
     }
 
     body.light-mode .login-container h2 {
@@ -56,16 +66,165 @@
 
     .login-container h2 span {
       color: #422BFF;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .login-container p {
       color: #8b949e;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2.5rem;
+      font-size: 1rem;
+      line-height: 1.5;
     }
 
     body.light-mode .login-container p {
       color: #666;
+    }
+    
+    /* Sistema de responsividade profissional */
+    
+    /* Desktop grande (padrão) - sem media query necessária */
+    
+    /* Desktop médio e tablets landscape */
+    @media (max-width: 1024px) {
+      .login-container {
+        max-width: 420px;
+        padding: 2.8rem 3rem;
+      }
+    }
+    
+    /* Tablets e mobile landscape */
+    @media (max-width: 960px) {
+      .user-bar {
+        position: fixed !important;
+        top: 16px !important;
+        right: 16px !important;
+        left: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        flex-direction: row !important;
+        gap: 14px !important;
+        padding: 12px 18px !important;
+        border-radius: 50px !important;
+        background: rgba(11, 11, 13, 0.9) !important;
+        backdrop-filter: blur(12px) !important;
+      }
+      
+      .user-bar .user-link,
+      .user-bar .theme-toggle-btn {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+      }
+      
+      body {
+        padding: 100px 20px 40px 20px;
+      }
+      
+      .login-container {
+        max-width: 400px;
+        padding: 2.5rem 2.5rem;
+      }
+      
+      .login-container h2 {
+        font-size: 2rem;
+      }
+    }
+    
+    /* Mobile portrait */
+    @media (max-width: 600px) {
+      .user-bar {
+        top: 12px !important;
+        right: 12px !important;
+        gap: 12px !important;
+        padding: 10px 14px !important;
+      }
+      
+      .user-bar .user-link,
+      .user-bar .theme-toggle-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+      }
+      
+      .user-bar .icon svg,
+      .user-bar svg {
+        width: 18px !important;
+        height: 18px !important;
+      }
+      
+      body {
+        padding: 80px 16px 30px 16px;
+      }
+      
+      .login-container {
+        max-width: 100%;
+        padding: 2rem 1.8rem;
+        border-radius: 20px;
+      }
+      
+      .login-container h2 {
+        font-size: 1.75rem;
+      }
+      
+      .login-container p {
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+      }
+    }
+    
+    /* Mobile pequeno */
+    @media (max-width: 400px) {
+      .user-bar {
+        top: 8px !important;
+        right: 8px !important;
+        gap: 10px !important;
+        padding: 8px 12px !important;
+      }
+      
+      .user-bar .user-link,
+      .user-bar .theme-toggle-btn {
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        min-height: 38px !important;
+      }
+      
+      .user-bar .icon svg,
+      .user-bar svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
+      
+      body {
+        padding: 70px 12px 20px 12px;
+      }
+      
+      .login-container {
+        padding: 1.8rem 1.5rem;
+        border-radius: 18px;
+      }
+      
+      .login-container h2 {
+        font-size: 1.5rem;
+      }
+      
+      .login-container p {
+        font-size: 0.85rem;
+        margin-bottom: 1.8rem;
+      }
+    }
+    
+    /* Mobile extra pequeno */
+    @media (max-width: 320px) {
+      .login-container {
+        padding: 1.5rem 1.2rem;
+      }
+      
+      .login-container h2 {
+        font-size: 1.3rem;
+      }
     }
 
     .login-container input {
@@ -133,37 +292,26 @@
     .back-link:hover {
       color: #422BFF;
     }
-    /* ===== Modal (Central de Ajuda) ===== */
-    .modal{display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:100000}
-    .modal.open{display:flex}
-    .modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(2px)}
-    .modal-content{position:relative;background:#0d1117;color:#f0f6fc;width:min(720px,95%);max-width:720px;border-radius:12px;padding:1.25rem 1.5rem;box-shadow:0 10px 40px rgba(0,0,0,0.6);}
-    body.light-mode .modal-content{background:#ffffff;color:#222}
-    .modal-close{position:absolute;right:12px;top:8px;background:#422BFF;border:none;color:#fff;width:36px;height:36px;border-radius:8px;cursor:pointer}
-    .contact-form label{display:block;margin-top:8px;margin-bottom:6px;color:inherit;font-size:0.95rem}
-    .contact-form input,.contact-form textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #30363d;background:#0d1117;color:#f0f6fc}
-    body.light-mode .contact-form input,body.light-mode .contact-form textarea{background:#fff;color:#222;border:1px solid #ddd}
-    .contact-actions{margin-top:12px;display:flex;gap:12px;justify-content:center}
-    .btn-send,.btn-secondary{padding:10px 18px;border-radius:10px;border:none;cursor:pointer}
-    .btn-send{background:#422BFF;color:#fff}
-    .btn-secondary{background:#ffffff;color:#111;border:1px solid #ccc}
-    @media (max-width:720px){.modal-content{width:95%;padding:1rem}.contact-form .contact-actions{flex-direction:column}.btn-send,.btn-secondary{width:100%}}
+    /* modal styles moved to style.css (centralized) */
   </style>
 </head>
 <body>
-  <!-- Botão de Alternância de Tema -->
-  <button class="theme-toggle-btn" id="themeToggle" aria-label="Alternar tema" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
-    <svg id="themeIcon" viewBox="0 0 24 24">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-    </svg>
-  </button>
-
-  <!-- Botão de Acessibilidade -->
-  <button class="accessibility-btn" id="accessibilityToggle" aria-label="Menu de Acessibilidade" style="position: fixed; top: 20px; right: 90px; z-index: 10000;">
-    <svg viewBox="0 0 24 24">
-      <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M21 9H15V22H13V16H11V22H9V9H3V7H21V9Z"/>
-    </svg>
-  </button>
+  <!-- Barra lateral de botões -->
+  <div class="user-bar">
+    <button class="theme-toggle-btn user-link" id="themeToggle" aria-label="Alternar tema" style="border: none; background: var(--accent-color);">
+      <svg id="themeIcon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+    <a href="login.html" class="user-link">
+      <span class="icon">
+        <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="7" r="4"/>
+          <path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>
+        </svg>
+      </span>
+    </a>
+  </div>
 
   <!-- Menu de Acessibilidade -->
   <div class="accessibility-menu" id="accessibilityMenu">
