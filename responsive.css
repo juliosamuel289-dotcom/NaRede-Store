@@ -170,6 +170,8 @@ body {
     gap: 20px;
     width: 100% !important;
     box-sizing: border-box !important;
+  }
+  
   .logotipo {
     font-size: 1.5rem !important;
     text-align: center;
@@ -215,30 +217,67 @@ body {
   /* Navegação */
   nav {
     overflow-x: auto;
-    padding: 18px 20px !important;
-    margin: 10px 0;
+    overflow-y: hidden;
+    padding: 0 !important;
+    margin: 0 !important;
     -webkit-overflow-scrolling: touch;
-    width: 100% !important;
+    width: 100vw !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
+    scroll-behavior: smooth;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw !important;
+    margin-right: -50vw !important;
   }
 
   nav ul {
-    flex-wrap: nowrap;
-    gap: 15px;
-    padding: 8px 0;
+    flex-wrap: nowrap !important;
+    gap: 12px;
+    padding: 20px 25px;
+    width: auto !important;
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
+    justify-content: center;
+    max-width: 100%;
   }
 
-  nav a {
-    font-size: 15px;
-    padding: 12px 22px !important;
+  nav a,
+  nav .menu-btn,
+  nav span.menu-btn {
+    font-size: 14px;
+    padding: 12px 18px !important;
     white-space: nowrap;
     border-radius: 10px;
-    margin: 0 2px;
-  } font-size: 15px;
-    padding: 14px 25px !important;
-    white-space: nowrap;
+    margin: 0 4px !important;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 110px;
+    max-width: 160px;
+  }
+  
+  /* Scrollbar personalizada para navegação */
+  nav::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  nav::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
     border-radius: 10px;
-    margin: 0 5px;
+  }
+
+  nav::-webkit-scrollbar-thumb {
+    background: rgba(66, 43, 255, 0.6);
+    border-radius: 10px;
+  }
+  
+  nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(66, 43, 255, 0.8);
   }
 
   /* Hero Section */
@@ -375,11 +414,14 @@ body {
     font-size: 14px !important;
     margin: 15px 0 !important;
     padding: 5px 0;
+    color: #ffffff !important;
   }
 
   .preco,
   .preco-pix {
     font-size: 19px !important;
+  }
+  
   /* Product Horizontal (Cards de Destaque) */
   .product-horizontal {
     flex-direction: column !important;
@@ -789,13 +831,11 @@ body {
   .benefits {
     grid-template-columns: repeat(2, 1fr) !important;
   }
-}
-
+  
   .benefit {
     padding: 20px 15px !important;
   }
-}
-
+  
   .benefit-title {
     font-size: 18px !important;
   }
@@ -803,3 +843,4 @@ body {
   .benefit-desc {
     font-size: 14px !important;
   }
+}

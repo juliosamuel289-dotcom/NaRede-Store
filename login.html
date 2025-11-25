@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
   <meta name="theme-color" content="#0d1117" />
+  <meta name="description" content="Na Rede Store - Camisetas oficiais de times brasileiros e internacionais. Produtos originais, frete grátis e até 10x sem juros.">
   <title>Login | NaRede Store</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="responsive-pro.css">
   <link rel="stylesheet" href="theme-toggle.css">
-  <link rel="stylesheet" href="accessibility.css">
   <link rel="stylesheet" href="responsive.css">
   <style>
 
@@ -292,7 +292,46 @@
     .back-link:hover {
       color: #422BFF;
     }
-    /* modal styles moved to style.css (centralized) */
+    
+    /* Ícone preto no modo claro, branco no modo escuro */
+    body.light-mode .theme-toggle-btn svg {
+      fill: #000000 !important;
+    }
+    
+    /* Ajustes do modo claro para o modal Central de Ajuda */
+    .light-mode #contactModal .modal-overlay {
+      background: rgba(0,0,0,0.15);
+      backdrop-filter: none;
+    }
+    .light-mode #contactModal .modal-content {
+      background: rgba(255,255,255,0.96);
+      color: #0b1220;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .light-mode #contactModal .modal-close {
+      color: #0b1220;
+    }
+    .light-mode #contactModal label,
+    .light-mode #contactModal .contact-form input,
+    .light-mode #contactModal .contact-form textarea {
+      color: #0b1220;
+    }
+    .light-mode #contactModal .contact-form input,
+    .light-mode #contactModal .contact-form textarea {
+      background: #fff;
+      border: 1px solid #d1d5db;
+    }
+    .light-mode #contactModal .btn-send {
+      background: #422BFF;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(66,43,255,0.12);
+    }
+    .light-mode #contactModal .btn-secondary {
+      background: transparent;
+      color: #0b1220;
+      border: 1px solid #cbd5e1;
+    }
   </style>
 </head>
 <body>
@@ -303,149 +342,6 @@
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </svg>
     </button>
-    <a href="login.html" class="user-link">
-      <span class="icon">
-        <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="10" cy="7" r="4"/>
-          <path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>
-        </svg>
-      </span>
-    </a>
-  </div>
-
-  <!-- Menu de Acessibilidade -->
-  <div class="accessibility-menu" id="accessibilityMenu">
-    <h3>Acessibilidade</h3>
-    
-    <div class="accessibility-option">
-      <label for="fontSize">Tamanho da Fonte</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="fontSize">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="highContrast">Alto Contraste</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="highContrast">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="grayscale">Escala de Cinza</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="grayscale">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="highlightLinks">Destacar Links</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="highlightLinks">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="largeCursor">Cursor Grande</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="largeCursor">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="lineSpacing">Espaçamento de Linha</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="lineSpacing">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="hideImages">Ocultar Imagens</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="hideImages">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="readingMode">Modo Leitura</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="readingMode">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="reducedMotion">Reduzir Movimento</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="reducedMotion">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="audioDescription">Áudio Descrição</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="audioDescription">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="textToSpeech">Texto para Fala</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="textToSpeech">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="readingGuide">Guia de Leitura</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="readingGuide">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="focusMode">Modo Foco</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="focusMode">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="dyslexiaFont">Fonte para Dislexia</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="dyslexiaFont">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="visualIndicators">Indicadores Visuais</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="visualIndicators">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <div class="accessibility-option">
-      <label for="monochrome">Monocromático</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="monochrome">
-        <span class="slider"></span>
-      </div>
-    </div>
-
-    <button class="reset-btn" id="resetAccessibility">Resetar Tudo</button>
   </div>
 
   <div class="login-container">
@@ -548,6 +444,5 @@
   </script>
 
   <script src="theme-toggle.js"></script>
-  <script src="accessibility.js"></script>
 </body>
 </html>

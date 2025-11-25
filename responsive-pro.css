@@ -3,6 +3,40 @@
    Nível: Google, Facebook, Amazon
    ======================================== */
 
+/* ===== REGRA SUPREMA - ALINHAMENTO HORIZONTAL ===== */
+/* Esta regra tem prioridade MÁXIMA sobre todas as outras */
+body .header-top .user-bar,
+body .user-bar,
+.header-top .user-bar,
+.user-bar,
+div.user-bar,
+[class*="user-bar"] {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 15px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  z-index: 100 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
 /* Reset e Base */
 * {
   margin: 0;
@@ -30,32 +64,108 @@ body {
   padding: 0 clamp(16px, 5vw, 80px);
 }
 
+/* ===== FORÇAR ALINHAMENTO HORIZONTAL DOS BOTÕES ===== */
+/* Máxima prioridade - sobrescreve tudo */
+.header-top .user-bar,
+.user-bar,
+div.user-bar {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 15px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  z-index: 100 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: auto !important;
+  max-width: none !important;
+}
+
 /* User Bar - Botões laterais/topo */
 @media (max-width: 960px) {
-  .user-bar {
-    position: fixed !important;
-    top: 16px !important;
-    right: 16px !important;
-    left: auto !important;
-    bottom: auto !important;
-    transform: none !important;
-    display: flex !important;
+  .header-top .user-bar,
+  .user-bar,
+  div.user-bar {
     flex-direction: row !important;
-    align-items: center !important;
-    gap: 14px !important;
-    padding: 12px 18px !important;
-    border-radius: 50px !important;
+    gap: 12px !important;
+    padding: 8px 12px !important;
     background: rgba(11, 11, 13, 0.95) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
-    border: 1px solid rgba(66, 43, 255, 0.2) !important;
-    z-index: 9999 !important;
+    border-radius: 30px !important;
+  }
+  
+  .user-link .label {
+    display: none !important;
+  }
+  
+  .user-link {
+    width: 40px !important;
+    height: 40px !important;
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .header-top .user-bar,
+  .user-bar,
+  div.user-bar {
+    gap: 8px !important;
+    padding: 6px 10px !important;
+  }
+  
+  .user-link {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  .user-link svg,
+  .user-link .icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .header-top .user-bar,
+  .user-bar,
+  div.user-bar {
+    gap: 6px !important;
+    padding: 5px 8px !important;
+  }
+  
+  .user-link {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .user-link svg,
+  .user-link .icon svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+}
+
+/* Responsividade adicional para tablets e mobile */
+@media (max-width: 768px) {
+  .header-top {
+    flex-wrap: wrap;
+    gap: 12px;
   }
   
   .user-bar .user-link,
-  .user-bar .theme-toggle-btn,
-  .user-bar .accessibility-btn {
+  .user-bar .theme-toggle-btn {
     width: 44px !important;
     height: 44px !important;
     min-width: 44px !important;
@@ -86,6 +196,7 @@ body {
     height: 20px !important;
     display: block !important;
     margin: 0 auto !important;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)) !important;
   }
   
   .user-bar .cart-badge {
@@ -112,10 +223,10 @@ body {
   
   @media (hover: hover) and (pointer: fine) {
     .user-bar .user-link:hover,
-    .user-bar .theme-toggle-btn:hover,
-    .user-bar .accessibility-btn:hover {
-      background: rgba(66, 43, 255, 0.15) !important;
-      transform: scale(1.08) !important;
+    .user-bar .theme-toggle-btn:hover {
+      background: rgba(66, 43, 255, 0.25) !important;
+      transform: scale(1.1) !important;
+      box-shadow: 0 0 20px rgba(66, 43, 255, 0.4) !important;
     }
   }
 }
@@ -130,8 +241,7 @@ body {
   }
   
   .user-bar .user-link,
-  .user-bar .theme-toggle-btn,
-  .user-bar .accessibility-btn {
+  .user-bar .theme-toggle-btn {
     width: 40px !important;
     height: 40px !important;
     min-width: 40px !important;
@@ -165,8 +275,7 @@ body {
   }
   
   .user-bar .user-link,
-  .user-bar .theme-toggle-btn,
-  .user-bar .accessibility-btn {
+  .user-bar .theme-toggle-btn {
     width: 38px !important;
     height: 38px !important;
     min-width: 38px !important;
@@ -272,7 +381,7 @@ button {
 /* Breakpoint Tablet Portrait - 600px-768px */
 @media (max-width: 768px) {
   body {
-    padding-top: 80px;
+    padding-top: 100px;
   }
   
   .form-container,
@@ -286,7 +395,7 @@ button {
 /* Breakpoint Mobile Large - 480px-600px */
 @media (max-width: 600px) {
   body {
-    padding-top: 70px;
+    padding-top: 90px;
   }
   
   .form-container,
@@ -305,7 +414,7 @@ button {
   }
   
   body {
-    padding-top: 65px;
+    padding-top: 85px;
   }
 }
 
@@ -316,7 +425,7 @@ button {
   }
   
   body {
-    padding-top: 60px;
+    padding-top: 80px;
   }
   
   .form-container,

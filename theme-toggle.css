@@ -23,6 +23,62 @@ body {
   transition: all 0.3s ease;
 }
 
+/* Botões user-bar - Fundo azul no sol */
+.user-bar .user-link {
+  background: transparent !important;
+  border: none !important;
+}
+
+.user-bar .theme-toggle-btn {
+  background: #422BFF !important;
+  border: none !important;
+}
+
+/* Ícones adaptados ao modo - Desktop */
+.user-bar .user-link svg,
+.user-bar .theme-toggle-btn svg {
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
+body.light-mode .user-bar .user-link svg {
+  stroke: #000000 !important;
+  fill: none !important;
+}
+
+/* Sol branco sobre fundo azul em todos os tamanhos */
+.user-bar .theme-toggle-btn svg {
+  stroke: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+body.light-mode .user-bar .theme-toggle-btn svg {
+  stroke: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Mobile - Fundo azul em todos os botões para visibilidade */
+@media (max-width: 960px) {
+  .user-bar .user-link,
+  .user-bar .theme-toggle-btn {
+    background: #422BFF !important;
+  }
+
+  .user-bar .user-link svg,
+  .user-bar .theme-toggle-btn svg,
+  body.light-mode .user-bar .user-link svg,
+  body.light-mode .user-bar .theme-toggle-btn svg {
+    stroke: #ffffff !important;
+    fill: #ffffff !important;
+  }
+}
+
+/* Badge do carrinho sempre visível */
+.cart-badge {
+  background: #ff0000 !important;
+  color: #ffffff !important;
+}
+
 /* Botão de alternância de tema */
 .theme-toggle-btn {
   background: var(--accent-color);
@@ -48,6 +104,13 @@ body {
   width: 20px;
   height: 20px;
   fill: #ffffff;
+  stroke: #ffffff !important;
+}
+
+/* Ícone preto no modo claro, branco no modo escuro */
+body.light-mode .theme-toggle-btn svg {
+  fill: #000000 !important;
+  stroke: #000000 !important;
 }
 
 /* Aplica cores do tema - Modo Claro */
@@ -97,10 +160,19 @@ body.light-mode .cart-badge {
   color: #ffffff !important;
 }
 
+body.light-mode .search-bar {
+  background-color: #ffffff !important;
+  border: 2px solid #422BFF !important;
+  box-shadow: 0 2px 8px rgba(66, 43, 255, 0.15) !important;
+}
+
 body.light-mode .search-bar input {
-  background-color: #f6f8fa !important;
+  background-color: transparent !important;
   color: #000000 !important;
-  border-color: #d0d7de !important;
+}
+
+body.light-mode .search-bar .search-icon svg {
+  stroke: #422BFF !important;
 }
 
 body.light-mode .search-bar button {
@@ -108,13 +180,25 @@ body.light-mode .search-bar button {
   color: #ffffff !important;
 }
 
-/* Cards de produtos - texto preto em AMBOS os modos */
+/* Cards de produtos - texto adaptativo */
 .produto-card,
 .produto-card h3,
 .produto-card p,
 .produto-card strong,
 .produto-card a {
   color: #000000 !important;
+}
+
+/* Texto dos produtos - BRANCO em AMBOS os modos */
+.produto p,
+.produto .tamanhos,
+.tamanhos,
+div.produto p,
+body.light-mode .produto p,
+body.light-mode .produto .tamanhos,
+body.light-mode .tamanhos,
+body.light-mode div.produto p {
+  color: #ffffff !important;
 }
 
 /* Preços PIX - Verde fluorescente em AMBOS os modos */

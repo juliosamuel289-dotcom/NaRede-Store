@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="responsive-pro.css">
   <link rel="stylesheet" href="theme-toggle.css">
-  <link rel="stylesheet" href="accessibility.css">
   <link rel="stylesheet" href="responsive.css">
   <style>
     /* Ajustes do modo claro para o modal Central de Ajuda */
@@ -47,6 +46,68 @@
       border: 1px solid #cbd5e1;
     }
     
+    /* Ajustes extras para visibilidade dos botões no modo responsivo */
+    @media (max-width: 960px) {
+      .user-bar {
+        position: fixed !important;
+        z-index: 999999 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      
+      body.light-mode .user-bar {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      
+      body.light-mode .user-bar .icon svg,
+      body.light-mode .user-bar svg {
+        fill: #0b1220 !important;
+        stroke: #0b1220 !important;
+      }
+      
+      /* Garantir que o conteúdo não sobreponha os botões */
+      .hero-section,
+      .benefits,
+      .products-row,
+      header {
+        position: relative;
+        z-index: 1;
+      }
+      
+      /* Garantir z-index alto no header */
+      header,
+      .top-bar {
+        position: relative;
+        z-index: 100000 !important;
+      }
+      
+      /* Ocultar hamburger e manter navegação sempre visível */
+      .nav-toggle,
+      #navToggle {
+        display: none !important;
+      }
+      
+      nav {
+        display: block !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+      }
+      
+      .nav-links {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+      }
+    }
+    
+    /* Ícone preto no modo claro, branco no modo escuro */
+    body.light-mode .theme-toggle-btn svg {
+      fill: #000000 !important;
+      stroke: #000000 !important;
+    }
   </style>
 </head>
 <body>
@@ -73,37 +134,77 @@
       <a href="index.html" class="logotipo">
         <span style="color:#fff;">Na</span><span style="color:#422BFF;">Rede</span> <span style="color:#fff;">Store</span>
       </a>
-      <!-- Hamburger for small screens -->
-      <button id="navToggle" class="nav-toggle" aria-label="Abrir menu" aria-expanded="false" style="margin-left:12px">
-        <span class="hamburger" aria-hidden="true"></span>
-      </button>
+      
+      <!-- Menu Lateral -->
+      <div id="sidebarMenu" class="sidebar-menu">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <div class="sidebar-content">
+          <button class="sidebar-close" id="sidebarClose" aria-label="Fechar menu">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          
+          <div class="sidebar-header">
+            <h3>Menu</h3>
+          </div>
+          
+          <nav class="sidebar-nav">
+            <button class="sidebar-btn" id="sidebarThemeToggle">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+              <span>Modo Escuro</span>
+            </button>
+            
+            <a href="login.html" class="sidebar-btn">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="10" cy="7" r="4"/>
+                <path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>
+              </svg>
+              <span>Entrar</span>
+            </a>
+            
+            <a href="checkout.html" class="sidebar-btn">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="17" r="1"/>
+                <circle cx="16" cy="17" r="1"/>
+                <path d="M2 2h2l3.6 7.59a1 1 0 0 0 .92.61h7.72a1 1 0 0 0 .98-.8l1.38-6.59H6"/>
+              </svg>
+              <span>Carrinho</span>
+              <span class="sidebar-badge">0</span>
+            </a>
+          </nav>
+        </div>
+      </div>
       <div class="user-bar">
-<!-- Botão de Alternância de Tema -->
-<button class="theme-toggle-btn user-link" id="themeToggle" aria-label="Alternar tema" style="border: none; background: var(--accent-color);">
-  <svg id="themeIcon" viewBox="0 0 24 24">
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-  </svg>
-</button>
-<a href="login.html" class="user-link">
-  <span class="icon">
-    <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="10" cy="7" r="4"/>
-      <path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>
-    </svg>
-  </span>
-  <span class="label"><b>Entrar</b></span>
-</a>
-<a href="checkout.html" class="user-link">
-  <span class="icon">
-    <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="8" cy="17" r="1"/>
-      <circle cx="16" cy="17" r="1"/>
-      <path d="M2 2h2l3.6 7.59a1 1 0 0 0 .92.61h7.72a1 1 0 0 0 .98-.8l1.38-6.59H6"/>
-    </svg>
-  </span>
-  <span class="label"><b>Carrinho</b></span>
-  <span class="cart-badge">0</span>
-</a>
+        <a href="login.html" class="user-link">
+          <span class="icon">
+            <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="10" cy="7" r="4"/>
+              <path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>
+            </svg>
+          </span>
+          <span class="label"><b>Entrar</b></span>
+        </a>
+        <!-- Botão de Alternância de Tema -->
+        <button class="theme-toggle-btn user-link" id="themeToggle" aria-label="Alternar tema" style="border: 2px solid #422BFF !important; background: rgba(66, 43, 255, 0.2) !important; box-shadow: 0 0 20px rgba(66, 43, 255, 0.6), 0 0 40px rgba(66, 43, 255, 0.3) !important; z-index: 999999 !important; position: relative !important;">
+          <svg id="themeIcon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+        <a href="checkout.html" class="user-link">
+          <span class="icon">
+            <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="8" cy="17" r="1"/>
+              <circle cx="16" cy="17" r="1"/>
+              <path d="M2 2h2l3.6 7.59a1 1 0 0 0 .92.61h7.72a1 1 0 0 0 .98-.8l1.38-6.59H6"/>
+            </svg>
+          </span>
+          <span class="label"><b>Carrinho</b></span>
+          <span class="cart-badge">0</span>
+        </a>
       </div>
     </div>
     <form class="search-bar">
@@ -365,8 +466,60 @@
   </script>
 
   <script src="theme-toggle.js"></script>
-  <script src="accessibility.js"></script>
   <script src="exit-popup.js"></script>
   <script src="nav-toggle.js"></script>
+  
+  <script>
+    // Controle do menu lateral
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const sidebarMenu = document.getElementById('sidebarMenu');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarClose = document.getElementById('sidebarClose');
+      const sidebarThemeToggle = document.getElementById('sidebarThemeToggle');
+      const mainThemeToggle = document.getElementById('themeToggle');
+      
+      function openSidebar() {
+        sidebarMenu.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        sidebarToggle.setAttribute('aria-expanded', 'true');
+      }
+      
+      function closeSidebar() {
+        sidebarMenu.classList.remove('open');
+        document.body.style.overflow = '';
+        sidebarToggle.setAttribute('aria-expanded', 'false');
+      }
+      
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', openSidebar);
+      }
+      
+      if (sidebarClose) {
+        sidebarClose.addEventListener('click', closeSidebar);
+      }
+      
+      if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebar);
+      }
+      
+      // Toggle do tema através do sidebar
+      if (sidebarThemeToggle && mainThemeToggle) {
+        sidebarThemeToggle.addEventListener('click', function() {
+          mainThemeToggle.click();
+          // Atualizar texto do botão
+          const isDark = document.body.classList.contains('light-mode');
+          sidebarThemeToggle.querySelector('span').textContent = isDark ? 'Modo Escuro' : 'Modo Claro';
+        });
+      }
+      
+      // Fechar com ESC
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebarMenu.classList.contains('open')) {
+          closeSidebar();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
