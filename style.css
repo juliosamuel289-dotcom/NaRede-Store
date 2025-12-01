@@ -62,6 +62,14 @@
   padding: 0;
 }
 
+html {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 /* ==== MENU LATERAL (SIDEBAR) ==== */
 .sidebar-menu {
   position: fixed;
@@ -297,7 +305,7 @@ html{
 
 /* Tablet portrait (600px+) */
 @media (min-width: 600px) {
-  .top-bar { padding: 8px var(--spacing-lg); font-size: 13px; }
+  .top-bar { padding: 4px var(--spacing-lg); font-size: 8px; }
   .search-bar { width: 85%; max-width: 600px; padding: 10px 18px; }
   .nav-links { gap: 12px; }
   .menu-btn { padding: 10px 18px; font-size: 15px; }
@@ -350,9 +358,9 @@ html{
   .hero-title { font-size: var(--font-size-xl); line-height: 1.2; }
   
   /* Header compacto */
-  .header-top { padding: 10px var(--spacing-sm); flex-wrap: wrap; gap: var(--spacing-sm); }
-  .logotipo { font-size: 20px; }
-  header { padding-bottom: var(--spacing-sm); }
+  .header-top { padding: 5px var(--spacing-sm); flex-wrap: wrap; gap: var(--spacing-sm); }
+  .logotipo { font-size: 26px; }
+  header { padding-bottom: 5px; }
   
   /* Search bar full-width em mobile */
   .search-bar { 
@@ -573,29 +581,29 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   align-items: center;
   background: #111;
   color: #cfcfcf;
-  font-size: clamp(0.7rem, 1.5vw, 0.85rem);
-  padding: clamp(0.5rem, 2vw, 1rem) clamp(0.75rem, 3vw, 2rem);
+  font-size: clamp(0.45rem, 0.9vw, 0.6rem);
+  padding: clamp(0.25rem, 0.8vw, 0.5rem) clamp(0.5rem, 2vw, 1.5rem);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 @media (max-width: 640px) {
   .top-bar {
-    font-size: 0.7rem;
-    padding: 0.5rem;
+    font-size: 0.4rem;
+    padding: 0.25rem;
   }
   .top-bar-left, .top-bar-right {
-    font-size: 0.7rem;
-    gap: 4px;
+    font-size: 0.4rem;
+    gap: 2px;
   }
 }
 /* Alinhamento dos itens da barra superior */
 .top-bar-left, .top-bar-right {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 12px;
+  gap: 5px;
+  font-size: 8px;
 }
 /* Links da barra superior */
 .top-bar a {
@@ -609,8 +617,8 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 /* Pontos separadores */
 .top-bar .dot {
-  margin: 0 3px;
-  font-size: 12px;
+  margin: 0 2px;
+  font-size: 7px;
   color: #888;
 }
 /* Barra de pesquisa world-class */
@@ -618,11 +626,12 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   display: flex;
   align-items: center;
   background: #f3f3f3;
-  border-radius: clamp(8px, 2vw, 12px);
-  padding: clamp(8px, 1.5vw, 12px) clamp(12px, 3vw, 20px);
-  width: min(90%, 650px);
-  border: 2px solid transparent;
-  margin: clamp(12px, 3vw, 24px) auto 0 auto;
+  border-radius: 24px;
+  padding: 12px 24px;
+  width: 60%;
+  max-width: 800px;
+  border: none;
+  margin: 0 auto;
   box-sizing: border-box;
   position: relative;
   transition: all var(--transition-base);
@@ -636,7 +645,8 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 
 @media (max-width: 960px) {
   .search-bar {
-    width: calc(100% - clamp(70px, 15vw, 120px));
+    width: 100%;
+    margin: 0;
   }
 }
 /* Ícone de pesquisa */
@@ -700,31 +710,21 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   color: #422BFF;
 }
 
-/* Posicionamento relativo da search-bar para sugestões */
-.search-bar {
-  display: flex;
-  align-items: center;
-  background: #f3f3f3;
-  border-radius: 10px;
-  padding: 3px 16px;
-  width: 550px;
-  border: none;
-  margin: 20px auto 0 auto;
-  box-sizing: border-box;
-  position: relative;
-}
-
 /* Cabeçalho principal */
 header {
   display: flex;
   flex-direction: column;
   background: #000;
-  padding: 0 0 clamp(1rem, 3vw, 2rem) 0;
+  padding: 0;
   position: sticky;
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
   transition: all var(--transition-base);
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 @media (max-width: 960px) {
@@ -737,19 +737,20 @@ header {
 .header-top {
   display: flex;
   justify-content: space-between;
-  align-items: left;
+  align-items: center;
   width: 100%;
-  padding: 10px 5px 0 12px;
+  padding: 16px 40px;
   box-sizing: border-box;
   background: transparent !important;
   box-shadow: none !important;
   border: none !important;
   outline: none !important;
+  max-width: 100%;
 }
 
 /* Logotipo */
 .logotipo {
-  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 700;
   font-family: "Poppins", sans-serif;
   text-decoration: none;
@@ -777,7 +778,7 @@ a.logotipo:hover {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
   border: none !important;
   outline: none !important;
   background: transparent !important;
@@ -798,14 +799,21 @@ a.logotipo:hover {
 .user-link {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   color: #ffffff;
   text-decoration: none;
-  font-size: 16px;
+  font-size: 14px;
   position: relative;
   transition: color 0.2s;
-  padding: 0;
-  height: 44px;
+  padding: 8px 12px;
+  width: auto;
+  height: auto;
+  border-radius: 8px;
+}
+
+.user-link .label {
+  display: inline;
 }
 .user-link:hover .label {
   color: #422BFF;
@@ -837,10 +845,13 @@ a.logotipo:hover {
 /* Navegação */
 nav {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
-  margin-top: clamp(0.75rem, 2vw, 1.5rem);
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #000;
   transition: all var(--transition-base);
 }
 
@@ -853,9 +864,9 @@ nav {
 .nav-links {
   display: flex;
   flex-direction: row;
-  gap: 16px;
-  margin: 0 auto;
-  padding: 20px 60px;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 16px;
   flex-wrap: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
@@ -864,10 +875,12 @@ nav {
   scrollbar-color: rgba(66, 43, 255, 0.5) rgba(255,255,255,0.1);
   width: 100%;
   max-width: 100%;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  scroll-padding: 0 60px;
+  scroll-padding: 0;
   scroll-snap-type: x proximity;
+  box-sizing: border-box;
+  list-style: none;
 }
 /* Itens da lista de navegação */
 .nav-links li {
@@ -882,18 +895,18 @@ nav {
   justify-content: center;
   background: #422BFF;
   color: #fff;
-  font-size: clamp(0.8rem, 1.5vw, 0.95rem);
-  padding: clamp(0.6rem, 1.8vw, 0.9rem) clamp(1rem, 2.2vw, 1.3rem);
+  font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+  padding: clamp(0.5rem, 1.5vw, 0.85rem) clamp(0.8rem, 2vw, 1.2rem);
   border: none;
   border-radius: 10px;
   text-decoration: none;
   transition: all var(--transition-base);
   cursor: pointer;
   white-space: nowrap;
-  min-height: 44px;
+  min-height: 40px;
   flex: 0 0 auto;
-  min-width: 120px;
-  max-width: 180px;
+  min-width: clamp(100px, 15vw, 140px);
+  max-width: clamp(140px, 20vw, 180px);
   scroll-snap-align: start;
 }
 
@@ -927,10 +940,14 @@ button:hover {
 
 /* Estilo geral */
 body {
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   background: #000; /* Fundo preto */
   font-family: "Poppins", sans-serif;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
 }
 
 /* Estilos adicionais dos arquivos HTML originais */
@@ -1004,7 +1021,7 @@ body.light-mode .tamanhos {
 
 .produto img {
     width: 100%;
-    max-width: 200px;
+    max-width: 280px;
     height: auto;
     aspect-ratio: 1 / 1;
     object-fit: cover;
@@ -1099,6 +1116,13 @@ body.light-mode .preco-antigo {
 }
 
 /* Estilos do footer completo */
+footer {
+    background: #000;
+    color: #fff;
+    padding: 0;
+    margin: 0;
+}
+
 .footer-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -1224,6 +1248,16 @@ body.light-mode .preco-antigo {
     font-size: 1rem;
 }
 
+footer .top-bar {
+    background: #000 !important;
+    color: #fff !important;
+}
+
+footer .top-bar span,
+footer .top-bar a {
+    color: #fff !important;
+}
+
 .footer-bar-content {
     max-width: 1400px;
     margin: 0 auto;
@@ -1283,9 +1317,14 @@ body.light-mode .preco-antigo {
 
 /* Seção sobre a loja */
 .sobre-loja {
-    background: #000;
-    color: #fff;
+    background: var(--sobre-bg, #000);
+    color: var(--sobre-text, #fff);
     padding: 20px 0;
+}
+
+body.light-mode .sobre-loja {
+    --sobre-bg: #f6f8fa;
+    --sobre-text: #000;
 }
 
 .contato-container {
@@ -1477,10 +1516,11 @@ body.light-mode .hero-section {
 
 /* Conteúdo do hero */
 .hero-content { /* Container para o texto e botões */
-  max-width: 500px;
+  max-width: 400px;
   color: #fff;
   flex-direction: column;
   gap: 30px;
+  flex-shrink: 1;
 }
 
 .hero-badge {/* Badge de destaque */
@@ -1559,19 +1599,20 @@ body.light-mode .hero-badge {
 /* Imagem do hero */
 .hero-image img {
   width: 100%;
-  max-width: clamp(400px, 50vw, 700px);
+  max-width: 100%;
   height: auto;
-  aspect-ratio: 7 / 6;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
-  border-radius: clamp(12px, 2vw, 24px);
-  box-shadow: var(--shadow-xl);
+  border-radius: clamp(20px, 3vw, 40px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   background: #ffffff;
   transition: transform var(--transition-base);
+  transform: scale(1.1);
 }
 
 @media (hover: hover) {
   .hero-image img:hover {
-    transform: scale(1.02);
+    transform: scale(1.12);
   }
 }
 /* Benefícios */
@@ -2135,7 +2176,8 @@ button{
     }
     
     .search-bar {
-      width: calc(100% - 70px) !important;
+      width: 100% !important;
+      max-width: 100% !important;
     }
   }
   
@@ -2171,4 +2213,170 @@ button{
       font-size: 9px !important;
     }
   }
+}
+
+/* ===== REGRAS FINAIS SUPREMAS - SEARCH BAR E NAV 100% ===== */
+/* Estas regras têm prioridade máxima sobre todas as outras */
+
+/* Top bar ocupar 100% */
+div.top-bar,
+.top-bar {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin: 0 !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* Header ocupar 100% da viewport */
+header {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: sticky !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* Search bar ocupar 100% */
+header form.search-bar,
+header .search-bar,
+form.search-bar,
+.search-bar {
+  width: 60% !important;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  border-radius: 24px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+}
+
+/* Nav ocupar 100% */
+header nav,
+nav {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* Nav links ocupar 100% */
+header nav ul.nav-links,
+header nav .nav-links,
+header .nav-links,
+nav ul.nav-links,
+nav .nav-links,
+ul.nav-links,
+.nav-links {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  padding-top: 16px !important;
+  padding-bottom: 16px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== REGRAS FINAIS MODO LIGHT ===== */
+body.light-mode {
+  background: #ffffff !important;
+}
+
+body.light-mode footer,
+body.light-mode .footer-container {
+  background: #f6f8fa !important;
+  color: #000000 !important;
+}
+
+body.light-mode .sobre-loja {
+  background: #f6f8fa !important;
+  color: #000000 !important;
+}
+
+body.light-mode .sobre-loja *,
+body.light-mode .sobre-container *,
+body.light-mode .contato-container *,
+body.light-mode .sobre-left a,
+body.light-mode .sobre-right *,
+body.light-mode .contato * {
+  color: #000000 !important;
+}
+
+body.light-mode .footer-col a,
+body.light-mode footer a {
+  color: #422BFF !important;
+}
+
+body.light-mode .footer-newsletter {
+  background: #e1e4e8 !important;
+}
+
+body.light-mode .newsletter,
+body.light-mode .newsletter-header {
+  background: #e1e4e8 !important;
+  color: #000000 !important;
+}
+
+body.light-mode .newsletter *,
+body.light-mode .newsletter-header * {
+  color: #000000 !important;
+}
+
+body.light-mode footer .top-bar {
+  background: #e1e4e8 !important;
+  color: #000000 !important;
+}
+
+body.light-mode footer .top-bar *,
+body.light-mode footer .top-bar span,
+body.light-mode footer .top-bar a {
+  color: #000000 !important;
+}
+
+body.light-mode .produtos-area,
+body.light-mode main {
+  background: #ffffff !important;
+}
+
+body.light-mode .produtos-area * {
+  background: transparent !important;
+}
+
+body.light-mode .produto {
+  background: #ffffff !important;
+  border: 1px solid #d0d7de !important;
+}
+
+body.light-mode .produto h3,
+body.light-mode .produto p {
+  color: #000000 !important;
+}
+
+body.light-mode .titulo-central {
+  color: #000000 !important;
+}
+
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode p:not(.preco):not(.preco-pix),
+body.light-mode span:not(.preco):not(.preco-pix) {
+  color: #000000 !important;
 }

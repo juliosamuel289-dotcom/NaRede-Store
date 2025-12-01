@@ -108,6 +108,137 @@
       fill: #000000 !important;
       stroke: #000000 !important;
     }
+    
+    /* Estilos para o card de produto */
+    .produto-card {
+      color: #000000 !important;
+    }
+    
+    .produto-card h3 {
+      color: #000000 !important;
+      font-weight: bold;
+    }
+    
+    .produto-card p {
+      color: #000000 !important;
+    }
+    
+    .produto-card .preco-pix strong {
+      color: #00AA00 !important;
+    }
+    
+    /* Modo escuro - descrição preta, preço verde */
+    body:not(.light-mode) .produto-card {
+      color: #000000 !important;
+    }
+    
+    body:not(.light-mode) .produto-card h3 {
+      color: #000000 !important;
+    }
+    
+    body:not(.light-mode) .produto-card p {
+      color: #000000 !important;
+    }
+    
+    body:not(.light-mode) .produto-card .preco-pix strong {
+      color: #00AA00 !important;
+    }
+    
+    /* Estilos do rodapé no modo claro */
+    body.light-mode .newsletter,
+    body.light-mode .sobre-loja,
+    body.light-mode footer {
+      background: #f5f5f5 !important;
+      color: #000000 !important;
+    }
+    
+    body.light-mode .newsletter h2,
+    body.light-mode .newsletter p,
+    body.light-mode .newsletter label {
+      color: #000000 !important;
+    }
+    
+    body.light-mode .newsletter-header h2,
+    body.light-mode .newsletter-header p {
+      color: #000000 !important;
+    }
+    
+    body.light-mode .sobre-loja h3,
+    body.light-mode .sobre-loja p,
+    body.light-mode .sobre-loja .bairro {
+      color: #000000 !important;
+    }
+    
+    body.light-mode .sobre-loja a {
+      color: #422BFF !important;
+    }
+    
+    body.light-mode .sobre-loja .sobre-right h3 a span {
+      color: #000000 !important;
+    }
+    
+    body.light-mode .sobre-loja .sobre-right h3 a span:nth-child(2) {
+      color: #422BFF !important;
+    }
+    
+    body.light-mode footer,
+    body.light-mode footer .top-bar {
+      background: #e5e5e5 !important;
+      color: #000000 !important;
+    }
+    
+    body.light-mode footer span,
+    body.light-mode footer a {
+      color: #000000 !important;
+    }
+    
+    body.light-mode .privacy-note,
+    body.light-mode .privacy-note a {
+      color: #000000 !important;
+    }
+    
+    /* Força fundo claro no container */
+    body.light-mode .sobre-container,
+    body.light-mode .sobre-left,
+    body.light-mode .sobre-right,
+    body.light-mode .contato-container {
+      background: #f5f5f5 !important;
+      color: #000000 !important;
+    }
+    
+    body.light-mode .sobre-left ul li a,
+    body.light-mode .contato {
+      color: #000000 !important;
+    }
+    
+    /* Força links e textos visíveis */
+    body.light-mode section.sobre-loja * {
+      color: #000000 !important;
+    }
+    
+    body.light-mode section.sobre-loja a {
+      color: #422BFF !important;
+    }
+    
+    /* Fundo azul nos cards de produto no modo escuro */
+    body:not(.light-mode) .produto,
+    body:not(.light-mode) .product-card,
+    body:not(.light-mode) .product-horizontal {
+      background: #422BFF !important;
+      border-radius: 12px;
+    }
+    
+    /* Centralizar botões de navegação em telas grandes */
+    @media (min-width: 1024px) {
+      nav {
+        display: flex;
+        justify-content: center;
+      }
+      
+      .nav-links {
+        justify-content: center !important;
+      }
+    }
   </style>
 </head>
 <body>
