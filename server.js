@@ -50,8 +50,17 @@ db.connect((err) => {
     CREATE TABLE IF NOT EXISTS usuarios (
       id INT AUTO_INCREMENT PRIMARY KEY,
       nome VARCHAR(100) NOT NULL,
+      sobrenome VARCHAR(100) NULL,
+      genero VARCHAR(50) NULL,
+      celular VARCHAR(20) NULL,
+      cpf VARCHAR(20) NULL,
+      cep VARCHAR(20) NULL,
+      rua VARCHAR(255) NULL,
+      bairro VARCHAR(100) NULL,
+      cidade VARCHAR(100) NULL,
+      estado VARCHAR(100) NULL,
       email VARCHAR(150) NOT NULL UNIQUE,
-      password VARCHAR(255) NULL,
+      senha VARCHAR(255) NOT NULL,
       criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;
   `;
@@ -80,15 +89,18 @@ app.get('/login', (req, res) => {
 
 // Rota para cadastrar um novo usuário
 app.post('/api/register', (req, res) => {
-  const { name, email, password } = req.body;
+  const { nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha } = req.body;
 
-  const sql = "INSERT INTO usuarios (nome, email) VALUES (?, ?)";
-  db.query(sql, [name, email], (err, result) => {
+  const query = `INSERT INTO usuarios 
+    (nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  db.query(query, [nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha], (err, result) => {
     if (err) {
-      console.error("Erro ao inserir:", err);
-      return res.status(500).send("Erro no servidor");
+      console.error('Erro no banco:', err);
+      return res.status(500).json({ error: 'Erro ao salvar no banco' });
     }
-    res.status(201).send("Usuário cadastrado com sucesso!");
+    res.json({ message: 'Cadastro realizado com sucesso!' });
   });
 });
 
