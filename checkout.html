@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+  <meta name="theme-color" content="#0d1117" />
+  <meta name="description" content="Na Rede Store - Camisetas oficiais de times brasileiros e internacionais. Produtos originais, frete grátis e até 10x sem juros.">
+  <title>Checkout | NaRede Store</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive-pro.css">
+  <link rel="stylesheet" href="theme-toggle.css">
+  <link rel="stylesheet" href="responsive.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body {
+      background: #0d1117;
+      display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px;
+      transition: background 0.3s ease;
+    }
+    body.light-mode {
+      background: #ffffff;
+    }
+    .checkout-container {
+      background: #161b22; width: 460px; padding: 2rem 2.5rem; border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: left; max-height: 95vh; overflow-y: auto;
+      transition: all 0.3s ease;
+    }
+    body.light-mode .checkout-container {
+      background: white;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    h2 { text-align: center; color: #f0f6fc; margin-bottom: 0.6rem; }
+    body.light-mode h2 { color: #222; }
+    h2 span { color: #422BFF; font-weight: 600; }
+    p.subtitle { text-align: center; color: #8b949e; margin-bottom: 1rem; }
+    body.light-mode p.subtitle { color: #666; }
+    label { display:block; margin-bottom: 6px; color:#8b949e; font-size:0.9rem; }
+    body.light-mode label { color:#444; }
+    .field { margin-bottom: 14px; }
+    input, select {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #30363d; border-radius: 10px;
+      transition: 0.15s; font-size: 0.95rem; background-color: #0d1117; color: #f0f6fc;
+    }
+    body.light-mode input, body.light-mode select {
+      border: 1.5px solid #ddd;
+      background-color: #ffffff;
+      color: #222;
+    }
+    input:focus, select:focus {
+      border-color: #422BFF; box-shadow: 0 0 0 3px rgba(122,63,255,0.08); outline: none;
+    }
+
+    .card-fields { display: none; margin-top: 6px; }
+    .row { display:flex; gap:10px; }
+    .col-2 { flex:1; }
+
+    button {
+      width: 100%; background-color: #422BFF; color: white; padding: 12px; border: none;
+      border-radius: 10px; font-size: 1rem; cursor: pointer; font-weight: 600; transition: .2s;
+      margin-top: 6px;
+    }
+    button:hover { background-color: #351ECC; }
+
+    .back-link { display:block; margin-top: 12px; color: #422BFF; text-decoration:none; text-align:center; font-size:0.9rem; }
+
+    .confirmation {
+      display: none; background: #e8f7e8; color: #1a801a; border: 1px solid #1a801a;
+      border-radius: 10px; padding: 1rem; margin-top: 1rem; font-weight: bold; text-align: center;
+      animation: fadeIn .4s ease;
+    }
+    @keyframes fadeIn { from {opacity:0; transform:scale(.98)} to {opacity:1; transform:scale(1)} }
+    .small { font-size:0.85rem; color:#8b949e; margin-top:6px; }
+    body.light-mode .small { color:#666; }
+    
+    /* Ajustes do modo claro para o modal Central de Ajuda */
+    .light-mode #contactModal .modal-overlay {
+      background: rgba(0,0,0,0.15);
+      backdrop-filter: none;
+    }
+    .light-mode #contactModal .modal-content {
+      background: rgba(255,255,255,0.96);
+      color: #0b1220;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .light-mode #contactModal .modal-close {
+      color: #0b1220;
+    }
+    .light-mode #contactModal label,
+    .light-mode #contactModal .contact-form input,
+    .light-mode #contactModal .contact-form textarea {
+      color: #0b1220;
+    }
+    .light-mode #contactModal .contact-form input,
+    .light-mode #contactModal .contact-form textarea {
+      background: #fff;
+      border: 1px solid #d1d5db;
+    }
+    .light-mode #contactModal .btn-send {
+      background: #422BFF;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(66,43,255,0.12);
+    }
+    .light-mode #contactModal .btn-secondary {
+      background: transparent;
+      color: #0b1220;
+      border: 1px solid #cbd5e1;
+    }
+    
+    /* Ícone preto no modo claro, branco no modo escuro */
+    body.light-mode .theme-toggle-btn svg {
+      fill: #000000 !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Botão de Alternância de Tema -->
+  <button class="theme-toggle-btn" id="themeToggle" aria-label="Alternar tema" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
+    <svg id="themeIcon" viewBox="0 0 24 24">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
+
+  <div class="checkout-container">
+    <h2>Finalizar <span>Compra</span></h2>
+    <p class="subtitle">Preencha seus dados para concluir o pedido</p>
+
+    <form id="checkoutForm" novalidate>
+      <div class="field">
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" placeholder="Nome completo" required>
+      </div>
+
+      <div class="field">
+        <label for="endereco">Endereço completo</label>
+        <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade - CEP" required>
+      </div>
+
+      <div class="field">
+        <label for="pagamento">Forma de pagamento</label>
+        <select id="pagamento" required>
+          <option value="">Selecione a forma de pagamento</option>
+          <option value="pix">Pix</option>
+          <option value="cartao">Cartão de crédito</option>
+          <option value="boleto">Boleto bancário</option>
+        </select>
+      </div>
+
+      <!-- Campos do cartão (aparecem somente se pagamento = cartao) -->
+      <div class="card-fields" id="cardFields">
+        <div class="field">
+          <label for="cardNumber">Número do cartão</label>
+          <!-- pattern simples: 13-19 dígitos (aceita espaços) -->
+          <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" inputmode="numeric" maxlength="19" autocomplete="cc-number" >
+        </div>
+
+        <div class="row">
+          <div class="field col-2">
+            <label for="cardName">Nome no cartão</label>
+            <input type="text" id="cardName" placeholder="Nome como no cartão" autocomplete="cc-name">
+          </div>
+
+          <div class="field col-2">
+            <label for="cardExp">Validade (MM/AA)</label>
+            <input type="text" id="cardExp" placeholder="MM/AA" maxlength="5" inputmode="numeric" autocomplete="cc-exp">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field col-2">
+            <label for="cardCvv">CVV</label>
+            <input type="password" id="cardCvv" placeholder="123" maxlength="4" inputmode="numeric" autocomplete="cc-csc">
+          </div>
+
+          <div class="field col-2">
+            <label for="installments">Parcelas (opcional)</label>
+            <select id="installments">
+              <option value="1">1x sem juros</option>
+              <option value="2">2x</option>
+              <option value="3">3x</option>
+              <option value="4">4x</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="small">Os dados do cartão são apenas de exemplo — para um fluxo real você precisará integrar um gateway de pagamentos (ex: PagSeguro, MercadoPago, Stripe).</p>
+      </div>
+
+      <button type="submit">Finalizar compra</button>
+      <a href="index.html" class="back-link">← Voltar à loja</a>
+    </form>
+
+    <div class="confirmation" id="confirmMsg">
+      ✅ Compra concluída com sucesso!<br>Obrigado por comprar na <strong>NaRede Store</strong> 💜
+    </div>
+  </div>
+
+  <script>
+    const pagamento = document.getElementById('pagamento');
+    const cardFields = document.getElementById('cardFields');
+    const form = document.getElementById('checkoutForm');
+    const confirmMsg = document.getElementById('confirmMsg');
+
+    // mostra/esconde campos do cartão conforme seleção
+    pagamento.addEventListener('change', () => {
+      if (pagamento.value === 'cartao') {
+        cardFields.style.display = 'block';
+      } else {
+        cardFields.style.display = 'none';
+      }
+    });
+
+    // máscara simples para número do cartão e validade (apenas para UX)
+    const cardNumber = document.getElementById('cardNumber');
+    cardNumber.addEventListener('input', (e) => {
+      // remove tudo que não é número
+      let v = e.target.value.replace(/\D/g, '').slice(0,16);
+      // insere espaços a cada 4 dígitos
+      v = v.replace(/(.{4})/g, '$1 ').trim();
+      e.target.value = v;
+    });
+
+    const cardExp = document.getElementById('cardExp');
+    cardExp.addEventListener('input', (e) => {
+      let v = e.target.value.replace(/\D/g, '').slice(0,4);
+      if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+      e.target.value = v;
+    });
+
+    // submissão simples: valida campos obrigatórios e mostra confirmação
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+
+      // validação básica
+      const nome = document.getElementById('nome').value.trim();
+      const endereco = document.getElementById('endereco').value.trim();
+      const forma = pagamento.value;
+
+      if (!nome || !endereco || !forma) {
+        alert('Preencha Nome, Endereço e escolha a forma de pagamento.');
+        return;
+      }
+
+      if (forma === 'cartao') {
+        const num = cardNumber.value.replace(/\s/g, '');
+        const name = document.getElementById('cardName').value.trim();
+        const exp = document.getElementById('cardExp').value.trim();
+        const cvv = document.getElementById('cardCvv').value.trim();
+
+        // validações simples (não substituem validação real no servidor)
+        if (num.length < 13 || num.length > 16) { alert('Número do cartão inválido.'); return; }
+        if (!name) { alert('Informe o nome do cartão.'); return; }
+        if (!/^\d{2}\/\d{2}$/.test(exp)) { alert('Validade inválida. Use MM/AA'); return; }
+        if (cvv.length < 3 || cvv.length > 4) { alert('CVV inválido.'); return; }
+      }
+
+      // se passou pelas validações
+      confirmMsg.style.display = 'block';
+      form.reset();
+      cardFields.style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+  <script src="theme-toggle.js"></script>
+  
+  <!-- Floating help button (abre a Central de Ajuda) -->
+  <button id="centralAjuda" aria-label="Central de Ajuda" style="position:fixed;right:20px;bottom:20px;z-index:10000;background:#422BFF;color:#fff;border-radius:50%;width:56px;height:56px;border:none;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(66,43,255,0.18);">?</button>
+
+  <!-- Modal de Contato (aberto ao clicar em Central de Ajuda) -->
+  <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="contactModalTitle">
+    <div class="modal-overlay" id="contactOverlay"></div>
+    <div class="modal-content" role="document">
+      <button class="modal-close" id="contactClose" aria-label="Fechar formulário">×</button>
+      <h2 id="contactModalTitle">Central de Ajuda — Fale Conosco</h2>
+      <form id="contactForm" class="contact-form" novalidate>
+        <label for="contactName">Nome</label>
+        <input type="text" id="contactName" name="name" required placeholder="Seu nome">
+
+        <label for="contactEmail">E‑mail</label>
+        <input type="email" id="contactEmail" name="email" required placeholder="seu@exemplo.com">
+
+        <label for="contactPhone">Telefone</label>
+        <input type="tel" id="contactPhone" name="phone" placeholder="(xx) 9xxxx-xxxx">
+
+        <label for="contactSubject">Assunto</label>
+        <input type="text" id="contactSubject" name="subject" placeholder="Assunto (ex: Pedido, Troca)">
+
+        <label for="contactMessage">Mensagem</label>
+        <textarea id="contactMessage" name="message" rows="5" required placeholder="Descreva sua dúvida ou problema"></textarea>
+
+        <div class="contact-actions" style="display:flex; justify-content:center; gap:12px; align-items:center;">
+          <div style="display:flex; gap:8px;">
+            <button type="submit" class="btn-send" id="btnSend" style="min-width:160px;">Enviar Mensagem</button>
+          </div>
+          <button type="button" class="btn-secondary" id="contactCancel" style="min-width:90px;">Cancelar</button>
+        </div>
+        <p class="contact-feedback" id="contactFeedback" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Modal de contato: apenas comportamento de UI (abrir/fechar). Sem lógica de envio.
+    document.addEventListener('DOMContentLoaded', function() {
+      const openBtn = document.getElementById('centralAjuda');
+      const modal = document.getElementById('contactModal');
+      const overlay = document.getElementById('contactOverlay');
+      const closeBtn = document.getElementById('contactClose');
+      const cancelBtn = document.getElementById('contactCancel');
+      const form = document.getElementById('contactForm');
+      const feedback = document.getElementById('contactFeedback');
+      const firstInput = document.getElementById('contactName');
+
+      function showModal() {
+        if (!modal) return;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (firstInput) firstInput.focus();
+      }
+
+      function closeModal() {
+        if (!modal) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (feedback) feedback.textContent = '';
+      }
+
+      if (openBtn) openBtn.addEventListener('click', function(e) { e.preventDefault(); showModal(); });
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+      if (overlay) overlay.addEventListener('click', closeModal);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeModal();
+      });
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          if (!form.name.value.trim() || !form.email.value.trim() || !form.message.value.trim()) {
+            if (feedback) feedback.textContent = 'Por favor preencha os campos obrigatórios.';
+            return;
+          }
+          if (feedback) feedback.textContent = 'Formulário pronto (sem envio automático).';
+          setTimeout(closeModal, 800);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

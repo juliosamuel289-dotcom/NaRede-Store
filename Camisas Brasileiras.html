@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="description" content="Na Rede Store - Camisetas oficiais de times brasileiros e internacionais. Produtos originais, frete grátis e até 10x sem juros.">
+  <title>Na RedeStore - Times Brasileiros</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive-pro.css">
+  <link rel="stylesheet" href="theme-toggle.css">
+  <link rel="stylesheet" href="responsive.css">
+  <style>
+    /* Ajustes extras para visibilidade dos botões no modo responsivo */
+    @media (max-width: 960px) {
+      .user-bar {
+        position: fixed !important;
+        z-index: 999999 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      
+      body.light-mode .user-bar {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      
+      body.light-mode .user-bar .icon svg,
+      body.light-mode .user-bar svg {
+        fill: #0b1220 !important;
+        stroke: #0b1220 !important;
+      }
+    }
+    
+    /* Ícone preto no modo claro, branco no modo escuro */
+    body.light-mode .theme-toggle-btn svg {
+      fill: #000000 !important;
+      stroke: #000000 !important;
+    }
+    
+    /* Estilos para o card de produto */
+    .produto-card {
+      color: #000000 !important;
+    }
+    
+    .produto-card h3 {
+      color: #000000 !important;
+      font-weight: bold;
+    }
+    
+    .produto-card p {
+      color: #000000 !important;
+    }
+    
+    .produto-card .preco-pix strong {
+      color: #00AA00 !important;
+    }
+    
+    /* Modo escuro - descrição preta, preço verde */
+    body:not(.light-mode) .produto-card {
+      color: #000000 !important;
+    }
+    
+    body:not(.light-mode) .produto-card h3 {
+      color: #000000 !important;
+    }
+    
+    body:not(.light-mode) .produto-card p {
+      color: #000000 !important;
+    }
+    
+    body:not(.light-mode) .produto-card .preco-pix strong {
+      color: #00AA00 !important;
+    }
+    
+    /* Estilos do rodapé no modo claro */
+    body.light-mode .newsletter,
+    body.light-mode .sobre-loja,
+    body.light-mode footer {
+      background: #f5f5f5 !important;
+      color: #000000 !important;
+    }
+    
+    body.light-mode .newsletter h2,
+    body.light-mode .newsletter p,
+    body.light-mode .newsletter label {
+      color: #000000 !important;
+    }
+    
+    body.light-mode .newsletter-header h2,
+    body.light-mode .newsletter-header p {
+      color: #000000 !important;
+    }
+    
+    body.light-mode .sobre-loja h3,
+    body.light-mode .sobre-loja p,
+    body.light-mode .sobre-loja .bairro {
+      color: #000000 !important;
+    }
+    
+    body.light-mode .sobre-loja a {
+      color: #422BFF !important;
+    }
+    
+    body.light-mode .sobre-loja .sobre-right h3 a span {
+      color: #000000 !important;
+    }
+    
+    body.light-mode .sobre-loja .sobre-right h3 a span:nth-child(2) {
+      color: #422BFF !important;
+    }
+    
+    body.light-mode footer,
+    body.light-mode footer .top-bar {
+      background: #e5e5e5 !important;
+      color: #000000 !important;
+    }
+    
+    body.light-mode footer span,
+    body.light-mode footer a {
+      color: #000000 !important;
+    }
+    
+    body.light-mode .privacy-note,
+    body.light-mode .privacy-note a {
+      color: #000000 !important;
+    }
+    
+    /* Força fundo claro no container */
+    body.light-mode .sobre-container,
+    body.light-mode .sobre-left,
+    body.light-mode .sobre-right,
+    body.light-mode .contato-container {
+      background: #f5f5f5 !important;
+      color: #000000 !important;
+    }
+    
+    body.light-mode .sobre-left ul li a,
+    body.light-mode .contato {
+      color: #000000 !important;
+    }
+    
+    /* Força links e textos visíveis */
+    body.light-mode section.sobre-loja * {
+      color: #000000 !important;
+    }
+    
+    body.light-mode section.sobre-loja a {
+      color: #422BFF !important;
+    }
+    
+    /* Fundo azul nos cards de produto no modo escuro */
+    body:not(.light-mode) .produto,
+    body:not(.light-mode) .product-card,
+    body:not(.light-mode) .product-horizontal {
+      background: #422BFF !important;
+      border-radius: 12px;
+    }
+    
+    /* Centralizar botões de navegação em telas grandes */
+    @media (min-width: 1024px) {
+      nav {
+        display: flex;
+        justify-content: center;
+      }
+      
+      .nav-links {
+        justify-content: center !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span>Frete grátis para todo território Brasileiro</span>
+      <span class="dot">•</span>
+      <span>Parcelamento em até 10x sem juros</span>
+    </div>
+    <div class="top-bar-right">
+  <a href="#" id="centralAjuda">Central de Ajuda</a>
+      <span class="dot">•</span>
+      <a href="#">Rastrear Pedido</a>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-top">
+      <a href="index.html" class="logotipo">
+        <span style="color:#fff;">Na</span><span style="color:#422BFF;">Rede</span> <span style="color:#fff;">Store</span>
+      </a>
+      <div class="user-bar">
+        <a href="login.html" class="user-link">
+          <span class="icon">
+            <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="10" cy="7" r="4"/>
+              <path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>
+            </svg>
+          </span>
+          <span class="label"><b>Entrar</b></span>
+        </a>
+        <button class="theme-toggle-btn user-link" id="themeToggle" aria-label="Alternar tema" style="border: none; background: var(--accent-color);">
+          <svg id="themeIcon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+        <a href="checkout.html" class="user-link">
+          <span class="icon">
+            <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="8" cy="17" r="1"/>
+              <circle cx="16" cy="17" r="1"/>
+              <path d="M2 2h2l3.6 7.59a1 1 0 0 0 .92.61h7.72a1 1 0 0 0 .98-.8l1.38-6.59H6"/>
+            </svg>
+          </span>
+          <span class="label"><b>Carrinho</b></span>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+    <form class="search-bar">
+      <span class="search-icon">
+        <svg width="20" height="20" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="9" r="7"/>
+          <line x1="15" y1="15" x2="19" y2="19"/>
+        </svg>
+      </span>
+      <input type="text" id="pesquisa" placeholder="Buscar camisetas, times, produtos..." oninput="mostrarSugestoes()" autocomplete="off">
+      <div id="sugestoes" class="sugestoes-container" style="display: none;"></div>
+    </form>
+    <nav>
+      <ul class="nav-links">
+        <li><a class="menu-btn" href="index.html">Início</a></li>
+        <li><a class="menu-btn" href="Destaques.html">Destaques</a></li>
+        <li><span class="menu-btn active">Times Brasileiros</span></li>
+        <li><a class="menu-btn" href="Seleções.html">Seleções</a></li>
+        <li><a class="menu-btn" href="Camisas Internacional.html">Times Internacionais</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="produtos-area">
+    <h2 class="titulo-central">Times Brasileiros</h2>
+    <div class="produtos-row" id="produtos-row">
+      <div class="produto">
+        <p>Flamengo</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Flamengo.webp?raw=true" alt="Camisa do Flamengo" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 279,90</a>
+      </div>
+      <div class="produto">
+        <p>Vasco</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Vasco.jpg?raw=true" alt="Camisa do Vasco" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 259,90</a>
+      </div>
+      <div class="produto">
+        <p>Santos</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Santos.jpeg?raw=true" alt="Camisa do Santos" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 269,90</a>
+      </div>
+      <div class="produto">
+        <p>Palmeiras</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Palmeiras.jpeg?raw=true" alt="Camisa do Palmeiras" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 289,90</a>
+      </div>
+      <div class="produto">
+        <p>São Paulo</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/S%C3%A3o%20Paulo.jpg?raw=true" alt="Camisa do São Paulo" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 279,90</a>
+      </div>
+      <div class="produto">
+        <p>Corinthians</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Corithians.jpg?raw=true" alt="Camisa do Corinthians" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 289,90</a>
+      </div>
+      <div class="produto">
+        <p>Fluminense</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Fluminense.jpeg?raw=true" alt="Camisa do Fluminense" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 269,90</a>
+      </div>
+      <div class="produto">
+        <p>Grêmio</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Gremio.jpeg?raw=true" alt="Camisa do Grêmio" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 259,90</a>
+      </div>
+      <div class="produto">
+        <p>Atlético Mineiro</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Atletico-Mineiro.jpeg?raw=true" alt="Camisa do Atlético Mineiro" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 279,90</a>
+      </div>
+      <div class="produto">
+        <p>Botafogo</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Botafogo.jpeg?raw=true" alt="Camisa do Botafogo" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 259,90</a>
+      </div>
+      <div class="produto">
+        <p>Bahia</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Bahia.jpeg?raw=true" alt="Camisa do Bahia" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 249,90</a>
+      </div>
+      <div class="produto">
+        <p>Cruzeiro</p>
+        <p class="tamanhos">Tamanhos: P | M | G | GG | XGG | XXG</p>
+        <img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/Cruzeiro.jpeg?raw=true" alt="Camisa do Cruzeiro" width="200" height="200" loading="lazy" decoding="async">
+        <a href="#" class="preco">R$ 249,90</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="newsletter-header">
+    <h2>Assine nossa Newsletter</h2>
+    <p>Receba ofertas exclusivas e novidades em primeira mão!</p>
+  </div>
+  <div class="newsletter">
+    <form action="/envio" method="post">
+      <label for="email">Seu-email</label>
+      <input type="email" id="email" name="email" placeholder="seu@exemplo.com" required autocomplete="email">
+      <button type="submit">Inscrever-se</button>
+    </form>
+    <p class="privacy-note">Nunca compartilharemos seu e-mail. Leia nossa <a href="#">Política de Privacidade</a>.</p>
+  </div>
+
+  <section class="sobre-loja">
+    <div class="sobre-container">
+      <div class="sobre-left">
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="Destaques.html">Destaques</a></li>
+          <li><a href="Camisas Brasileiras.html">Times Brasileiros</a></li>
+          <li><a href="Seleções.html">Seleções</a></li>
+          <li><a href="Camisas Internacional.html">Times Internacionais</a></li>
+        </ul>
+      </div>
+      <div class="sobre-right">
+        <h3><a href="index.html" style="text-decoration: none;"><span style="color:#fff;">Na </span><span style="color: #422BFF;">Rede</span><span style="color:#fff;">Store</span></a></h3>
+        <p>A NaRede Store é a sua loja online de camisetas de futebol oficiais. Fundada em 2025, nossa missão é oferecer produtos de alta qualidade para torcedores apaixonados.</p>
+        <p>Nosso compromisso é com você, oferecendo frete grátis, parcelamento em até 10x sem juros e um atendimento especializado.</p>
+      </div>
+      <div class="contato-container">
+        <h3 class="contato">Contato</h3>
+        <p class="bairro">
+          Rua São Januario, 3070 - São Cristóvão, CEP: 13846-220 - Rio de Janeiro - RJ<br>
+          Visite o nosso Blog!<br>
+          +55 (21)98281-6261<br>
+          contato@naredestore.com.br
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <span>© 2025 <a href="index.html" style="color: #cfcfcf; text-decoration: none;">NaRede Store</a>. Todos os direitos reservados.</span>
+      </div>
+      <div class="top-bar-right">
+        <span>Formas de Pagamento:</span>
+        <table>
+          <tr>
+            <td><img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/visa.png?raw=true" alt="Visa" width="70"></td>
+            <td><img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/mastercard.png?raw=true" alt="MasterCard" width="70"></td>
+            <td><img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/amex.png?raw=true" alt="American Express" width="70"></td>
+            <td><img src="https://github.com/juliosamuel289-dotcom/NaRede-Store/blob/main/paypal.png?raw=true" alt="PayPal" width="70"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Base de dados de todos os produtos do site
+    const todosProdutos = {
+      'flamengo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'vasco': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'santos': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'palmeiras': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'são paulo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'sao paulo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'corinthians': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'fluminense': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'gremio': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'grêmio': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'atletico mineiro': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'atlético mineiro': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'botafogo': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'bahia': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'cruzeiro': { arquivo: 'Camisas Brasileiras.html', categoria: 'Times Brasileiros' },
+      'brasil': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'argentina': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'alemanha': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'frança': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'franca': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'inglaterra': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'holanda': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'itália': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'italia': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'portugal': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'méxico': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'mexico': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'japão': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'japao': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'chile': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'suíça': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'suica': { arquivo: 'Seleções.html', categoria: 'Seleções' },
+      'real madrid': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'bayern': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'bayern de munique': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'barcelona': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'manchester united': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'manchester': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'united': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'paris saint-germain': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'psg': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'paris': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'liverpool': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'arsenal': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'chelsea': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'manchester city': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'city': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'juventus': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'ac milan': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'milan': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'milão': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'atletico madrid': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' },
+      'atlético madrid': { arquivo: 'Camisas Internacional.html', categoria: 'Times Internacionais' }
+    };
+
+    function mostrarSugestoes() {
+      const termo = document.getElementById('pesquisa').value.toLowerCase().trim();
+      const sugestoesContainer = document.getElementById('sugestoes');
+      
+      if (termo === '') {
+        sugestoesContainer.style.display = 'none';
+        pesquisarProduto();
+        return;
+      }
+      
+      const sugestoes = Object.keys(todosProdutos).filter(produto => 
+        produto.toLowerCase().includes(termo)
+      ).slice(0, 5);
+      
+      if (sugestoes.length > 0) {
+        const html = sugestoes.map(sugestao => 
+          `<div class="sugestao-item" onclick="selecionarSugestao('${sugestao}')">${sugestao}</div>`
+        ).join('');
+        
+        sugestoesContainer.innerHTML = html;
+        sugestoesContainer.style.display = 'block';
+      } else {
+        sugestoesContainer.style.display = 'none';
+      }
+      
+      pesquisarProduto();
+    }
+    
+    function selecionarSugestao(produto) {
+      document.getElementById('pesquisa').value = produto;
+      document.getElementById('sugestoes').style.display = 'none';
+      pesquisarProduto();
+    }
+
+    function pesquisarProduto() {
+      const termo = document.getElementById('pesquisa').value.toLowerCase().trim();
+      const produtos = document.querySelectorAll('.produto');
+      
+      if (termo === '') {
+        produtos.forEach(produto => {
+          produto.style.display = 'flex';
+        });
+        return;
+      }
+      
+      let encontrouNaPagina = false;
+      produtos.forEach(produto => {
+        const nome = produto.querySelector('p').textContent.toLowerCase();
+        if (nome.includes(termo)) {
+          produto.style.display = 'flex';
+          encontrouNaPagina = true;
+        } else {
+          produto.style.display = 'none';
+        }
+      });
+      
+      if (!encontrouNaPagina) {
+        for (const [produto, info] of Object.entries(todosProdutos)) {
+          if (produto.includes(termo)) {
+            window.location.href = info.arquivo;
+            return;
+          }
+        }
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.search-bar')) {
+        document.getElementById('sugestoes').style.display = 'none';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputPesquisa = document.getElementById('pesquisa');
+      inputPesquisa.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          document.getElementById('sugestoes').style.display = 'none';
+          pesquisarProduto();
+        }
+      });
+    });
+    
+    // Modal de contato: apenas comportamento de UI (abir/fechar). Sem lógica de envio.
+    document.addEventListener('DOMContentLoaded', function() {
+      const openBtn = document.getElementById('centralAjuda');
+      const modal = document.getElementById('contactModal');
+      const overlay = document.getElementById('contactOverlay');
+      const closeBtn = document.getElementById('contactClose');
+      const cancelBtn = document.getElementById('contactCancel');
+      const form = document.getElementById('contactForm');
+      const feedback = document.getElementById('contactFeedback');
+      const firstInput = document.getElementById('contactName');
+
+      function showModal() {
+        if (!modal) return;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (firstInput) firstInput.focus();
+      }
+
+      function closeModal() {
+        if (!modal) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (feedback) feedback.textContent = '';
+      }
+
+      if (openBtn) openBtn.addEventListener('click', function(e) { e.preventDefault(); showModal(); });
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+      if (overlay) overlay.addEventListener('click', closeModal);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeModal();
+      });
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          if (!form.name.value.trim() || !form.email.value.trim() || !form.message.value.trim()) {
+            if (feedback) feedback.textContent = 'Por favor preencha os campos obrigatórios.';
+            return;
+          }
+          if (feedback) feedback.textContent = 'Formulário pronto (sem envio automático).';
+          setTimeout(closeModal, 800);
+        });
+      }
+    });
+  </script>
+  
+  <!-- Modal de Contato (aberto ao clicar em Central de Ajuda) -->
+  <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="contactModalTitle">
+    <div class="modal-overlay" id="contactOverlay"></div>
+    <div class="modal-content" role="document">
+      <button class="modal-close" id="contactClose" aria-label="Fechar formulário">×</button>
+      <h2 id="contactModalTitle">Central de Ajuda — Fale Conosco</h2>
+      <form id="contactForm" class="contact-form" novalidate>
+        <label for="contactName">Nome</label>
+        <input type="text" id="contactName" name="name" required placeholder="Seu nome">
+
+        <label for="contactEmail">E‑mail</label>
+        <input type="email" id="contactEmail" name="email" required placeholder="seu@exemplo.com">
+
+        <label for="contactPhone">Telefone</label>
+        <input type="tel" id="contactPhone" name="phone" placeholder="(xx) 9xxxx-xxxx">
+
+        <label for="contactSubject">Assunto</label>
+        <input type="text" id="contactSubject" name="subject" placeholder="Assunto (ex: Pedido, Troca)">
+
+        <label for="contactMessage">Mensagem</label>
+        <textarea id="contactMessage" name="message" rows="5" required placeholder="Descreva sua dúvida ou problema"></textarea>
+
+        <div class="contact-actions" style="display:flex; justify-content:center; gap:12px; align-items:center;">
+          <div style="display:flex; gap:8px;">
+            <button type="submit" class="btn-send" id="btnSend" style="min-width:160px;">Enviar Mensagem</button>
+          </div>
+          <button type="button" class="btn-secondary" id="contactCancel" style="min-width:90px;">Cancelar</button>
+        </div>
+        <p class="contact-feedback" id="contactFeedback" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+  <script src="theme-toggle.js"></script>
+  <script src="exit-intent.js"></script>
+  <script src="nav-toggle.js"></script>
+</body>
+</html>

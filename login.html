@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+  <meta name="theme-color" content="#0d1117" />
+  <meta name="description" content="Na Rede Store - Camisetas oficiais de times brasileiros e internacionais. Produtos originais, frete grátis e até 10x sem juros.">
+  <title>Login | NaRede Store</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive-pro.css">
+  <link rel="stylesheet" href="theme-toggle.css">
+  <link rel="stylesheet" href="responsive.css">
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: #0d1117;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.3s ease;
+      padding: 20px;
+      position: relative;
+    }
+
+    body.light-mode {
+      background: #ffffff;
+    }
+
+    .login-container {
+      background: #161b22;
+      width: 100%;
+      max-width: 440px;
+      padding: 3rem 3.5rem;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      text-align: center;
+      transition: all 0.3s ease;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    body.light-mode .login-container {
+      background: white;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .login-container h2 {
+      font-size: 2.2rem;
+      color: #f0f6fc;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    body.light-mode .login-container h2 {
+      color: #222;
+    }
+
+    .login-container h2 span {
+      color: #422BFF;
+      font-weight: 700;
+    }
+
+    .login-container p {
+      color: #8b949e;
+      margin-bottom: 2.5rem;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    body.light-mode .login-container p {
+      color: #666;
+    }
+    
+    /* Sistema de responsividade profissional */
+    
+    /* Desktop grande (padrão) - sem media query necessária */
+    
+    /* Desktop médio e tablets landscape */
+    @media (max-width: 1024px) {
+      .login-container {
+        max-width: 420px;
+        padding: 2.8rem 3rem;
+      }
+    }
+    
+    /* Tablets e mobile landscape */
+    @media (max-width: 960px) {
+      .user-bar {
+        position: fixed !important;
+        top: 16px !important;
+        right: 16px !important;
+        left: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        flex-direction: row !important;
+        gap: 14px !important;
+        padding: 12px 18px !important;
+        border-radius: 50px !important;
+        background: rgba(11, 11, 13, 0.9) !important;
+        backdrop-filter: blur(12px) !important;
+      }
+      
+      .user-bar .user-link,
+      .user-bar .theme-toggle-btn {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+      }
+      
+      body {
+        padding: 100px 20px 40px 20px;
+      }
+      
+      .login-container {
+        max-width: 400px;
+        padding: 2.5rem 2.5rem;
+      }
+      
+      .login-container h2 {
+        font-size: 2rem;
+      }
+    }
+    
+    /* Mobile portrait */
+    @media (max-width: 600px) {
+      .user-bar {
+        top: 12px !important;
+        right: 12px !important;
+        gap: 12px !important;
+        padding: 10px 14px !important;
+      }
+      
+      .user-bar .user-link,
+      .user-bar .theme-toggle-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+      }
+      
+      .user-bar .icon svg,
+      .user-bar svg {
+        width: 18px !important;
+        height: 18px !important;
+      }
+      
+      body {
+        padding: 80px 16px 30px 16px;
+      }
+      
+      .login-container {
+        max-width: 100%;
+        padding: 2rem 1.8rem;
+        border-radius: 20px;
+      }
+      
+      .login-container h2 {
+        font-size: 1.75rem;
+      }
+      
+      .login-container p {
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+      }
+    }
+    
+    /* Mobile pequeno */
+    @media (max-width: 400px) {
+      .user-bar {
+        top: 8px !important;
+        right: 8px !important;
+        gap: 10px !important;
+        padding: 8px 12px !important;
+      }
+      
+      .user-bar .user-link,
+      .user-bar .theme-toggle-btn {
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        min-height: 38px !important;
+      }
+      
+      .user-bar .icon svg,
+      .user-bar svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
+      
+      body {
+        padding: 70px 12px 20px 12px;
+      }
+      
+      .login-container {
+        padding: 1.8rem 1.5rem;
+        border-radius: 18px;
+      }
+      
+      .login-container h2 {
+        font-size: 1.5rem;
+      }
+      
+      .login-container p {
+        font-size: 0.85rem;
+        margin-bottom: 1.8rem;
+      }
+    }
+    
+    /* Mobile extra pequeno */
+    @media (max-width: 320px) {
+      .login-container {
+        padding: 1.5rem 1.2rem;
+      }
+      
+      .login-container h2 {
+        font-size: 1.3rem;
+      }
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border: 1.5px solid #30363d;
+      border-radius: 10px;
+      transition: 0.2s;
+      font-size: 0.95rem;
+      background-color: #0d1117;
+      color: #f0f6fc;
+    }
+
+    body.light-mode .login-container input {
+      border: 1.5px solid #ddd;
+      background-color: #ffffff;
+      color: #222;
+    }
+
+    .login-container input:focus {
+      border-color: #422BFF;
+      box-shadow: 0 0 0 3px rgba(122,63,255,0.1);
+      outline: none;
+    }
+
+    .login-container button {
+      width: 100%;
+      background-color: #422BFF;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: 600;
+    }
+
+    .login-container button:hover {
+      background-color: #422BFF;
+    }
+
+
+    .login-container a {
+      display: inline-block;
+      margin-top: 12px;
+      color: #422BFF;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .login-container a:hover {
+      text-decoration: underline;
+    }
+
+
+    .back-link {
+      margin-top: 20px;
+      display: block;
+      color: #666;
+      font-size: 0.85rem;
+    }
+
+    .back-link:hover {
+      color: #422BFF;
+    }
+    
+    /* Ícone preto no modo claro, branco no modo escuro */
+    body.light-mode .theme-toggle-btn svg {
+      fill: #000000 !important;
+    }
+    
+    /* Ajustes do modo claro para o modal Central de Ajuda */
+    .light-mode #contactModal .modal-overlay {
+      background: rgba(0,0,0,0.15);
+      backdrop-filter: none;
+    }
+    .light-mode #contactModal .modal-content {
+      background: rgba(255,255,255,0.96);
+      color: #0b1220;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .light-mode #contactModal .modal-close {
+      color: #0b1220;
+    }
+    .light-mode #contactModal label,
+    .light-mode #contactModal .contact-form input,
+    .light-mode #contactModal .contact-form textarea {
+      color: #0b1220;
+    }
+    .light-mode #contactModal .contact-form input,
+    .light-mode #contactModal .contact-form textarea {
+      background: #fff;
+      border: 1px solid #d1d5db;
+    }
+    .light-mode #contactModal .btn-send {
+      background: #422BFF;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(66,43,255,0.12);
+    }
+    .light-mode #contactModal .btn-secondary {
+      background: transparent;
+      color: #0b1220;
+      border: 1px solid #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Barra lateral de botões -->
+  <div class="user-bar">
+    <button class="theme-toggle-btn user-link" id="themeToggle" aria-label="Alternar tema" style="border: none; background: var(--accent-color);">
+      <svg id="themeIcon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="login-container">
+    <h2>Na<span>Rede</span> Store</h2>
+    <p>Entrar na sua conta</p>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="E-mail" required />
+      <input type="password" id="senha" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+      <p class="error" id="loginError"></p>
+    </form>
+    <a href="#">Esqueceu a senha?</a><br>
+    <a href="cadastro.html">Não tem conta? Cadastre-se</a>
+    <a class="back-link" href="index.html">← Voltar à loja</a>
+  </div>
+  <!-- Floating help button (abre a Central de Ajuda) -->
+  <button id="centralAjuda" aria-label="Central de Ajuda" style="position:fixed;right:20px;bottom:20px;z-index:10000;background:#422BFF;color:#fff;border-radius:50%;width:56px;height:56px;border:none;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(66,43,255,0.18);">?</button>
+
+  <!-- Modal de Contato (aberto ao clicar em Central de Ajuda) -->
+  <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="contactModalTitle">
+    <div class="modal-overlay" id="contactOverlay"></div>
+    <div class="modal-content" role="document">
+      <button class="modal-close" id="contactClose" aria-label="Fechar formulário">×</button>
+      <h2 id="contactModalTitle">Central de Ajuda — Fale Conosco</h2>
+      <form id="contactForm" class="contact-form" novalidate>
+        <label for="contactName">Nome</label>
+        <input type="text" id="contactName" name="name" required placeholder="Seu nome">
+
+        <label for="contactEmail">E‑mail</label>
+        <input type="email" id="contactEmail" name="email" required placeholder="seu@exemplo.com">
+
+        <label for="contactPhone">Telefone</label>
+        <input type="tel" id="contactPhone" name="phone" placeholder="(xx) 9xxxx-xxxx">
+
+        <label for="contactSubject">Assunto</label>
+        <input type="text" id="contactSubject" name="subject" placeholder="Assunto (ex: Pedido, Troca)">
+
+        <label for="contactMessage">Mensagem</label>
+        <textarea id="contactMessage" name="message" rows="5" required placeholder="Descreva sua dúvida ou problema"></textarea>
+
+        <div class="contact-actions" style="display:flex; justify-content:center; gap:12px; align-items:center;">
+          <div style="display:flex; gap:8px;">
+            <button type="submit" class="btn-send" id="btnSend" style="min-width:160px;">Enviar Mensagem</button>
+          </div>
+          <button type="button" class="btn-secondary" id="contactCancel" style="min-width:90px;">Cancelar</button>
+        </div>
+        <p class="contact-feedback" id="contactFeedback" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Modal de contato: apenas comportamento de UI (abrir/fechar). Sem lógica de envio.
+    document.addEventListener('DOMContentLoaded', function() {
+      const openBtn = document.getElementById('centralAjuda');
+      const modal = document.getElementById('contactModal');
+      const overlay = document.getElementById('contactOverlay');
+      const closeBtn = document.getElementById('contactClose');
+      const cancelBtn = document.getElementById('contactCancel');
+      const form = document.getElementById('contactForm');
+      const feedback = document.getElementById('contactFeedback');
+      const firstInput = document.getElementById('contactName');
+
+      function showModal() {
+        if (!modal) return;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (firstInput) firstInput.focus();
+      }
+
+      function closeModal() {
+        if (!modal) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (feedback) feedback.textContent = '';
+      }
+
+      if (openBtn) openBtn.addEventListener('click', function(e) { e.preventDefault(); showModal(); });
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+      if (overlay) overlay.addEventListener('click', closeModal);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeModal();
+      });
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          if (!form.name.value.trim() || !form.email.value.trim() || !form.message.value.trim()) {
+            if (feedback) feedback.textContent = 'Por favor preencha os campos obrigatórios.';
+            return;
+          }
+          if (feedback) feedback.textContent = 'Formulário pronto (sem envio automático).';
+          setTimeout(closeModal, 800);
+        });
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginForm = document.getElementById('loginForm');
+      const loginError = document.getElementById('loginError');
+      if (!loginForm) return;
+
+      loginForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        if (loginError) loginError.textContent = '';
+
+        const email = document.getElementById('email').value.trim();
+        const senha = document.getElementById('senha').value;
+
+        if (!email || !senha) {
+          if (loginError) loginError.textContent = 'Preencha e-mail e senha.';
+          return;
+        }
+
+        try {
+          const response = await fetch('https://naredestore-api.onrender.com/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password: senha })
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            if (loginError) loginError.textContent = data.error || 'Erro ao autenticar.';
+            return;
+          }
+
+          alert('Login realizado com sucesso!');
+          window.location.href = '/';
+        } catch (error) {
+          if (loginError) loginError.textContent = 'Erro de conexão com o servidor.';
+          console.error(error);
+        }
+      });
+    });
+  </script>
+
+  <script src="theme-toggle.js"></script>
+</body>
+</html>
