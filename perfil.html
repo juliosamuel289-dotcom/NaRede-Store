@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d1117">
+  <title>Meu Perfil | NaRede Store</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive-pro.css">
+  <link rel="stylesheet" href="theme-toggle.css">
+  <link rel="stylesheet" href="responsive.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+
+    body {
+      background: #0d1117;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      transition: background 0.3s;
+    }
+    body.light-mode { background: #f0f2f5; }
+
+    .perfil-container {
+      background: #161b22;
+      width: 100%;
+      max-width: 560px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    body.light-mode .perfil-container {
+      background: #fff;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    }
+
+    .perfil-header {
+      background: linear-gradient(135deg, #422BFF 0%, #2d1fcc 100%);
+      padding: 32px 32px 24px;
+      text-align: center;
+    }
+    .perfil-avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; margin: 0 auto 12px;
+      border: 3px solid rgba(255,255,255,0.4);
+    }
+    .perfil-header h2 { color: #fff; font-size: 1.3rem; }
+    .perfil-header p  { color: rgba(255,255,255,0.75); font-size: 0.85rem; margin-top: 4px; }
+
+    .perfil-body { padding: 28px 32px 32px; }
+
+    .tabs {
+      display: flex; gap: 8px; margin-bottom: 24px;
+      border-bottom: 1px solid #30363d;
+      padding-bottom: 0;
+    }
+    body.light-mode .tabs { border-color: #e5e7eb; }
+
+    .tab-btn {
+      background: none; border: none; cursor: pointer;
+      padding: 10px 16px; font-size: 0.9rem; font-weight: 600;
+      color: #8b949e; border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: 0.2s;
+    }
+    .tab-btn.active { color: #422BFF; border-bottom-color: #422BFF; }
+    body.light-mode .tab-btn { color: #666; }
+    body.light-mode .tab-btn.active { color: #422BFF; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 0.82rem; color: #8b949e; margin-bottom: 5px; }
+    body.light-mode .field label { color: #555; }
+
+    .field input, .field select {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid #30363d; border-radius: 10px;
+      background: #0d1117; color: #f0f6fc;
+      font-size: 0.93rem; transition: 0.15s;
+    }
+    body.light-mode .field input,
+    body.light-mode .field select {
+      background: #f9fafb; color: #222; border-color: #d1d5db;
+    }
+    .field input:focus, .field select:focus {
+      border-color: #422BFF;
+      box-shadow: 0 0 0 3px rgba(66,43,255,0.1);
+      outline: none;
+    }
+    .field input:read-only {
+      opacity: 0.55; cursor: not-allowed;
+    }
+
+    .row-2 { display: flex; gap: 12px; }
+    .row-2 .field { flex: 1; }
+
+    .senha-wrap { position: relative; }
+    .senha-wrap input { padding-right: 44px; }
+    .senha-wrap .olho {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; padding: 0;
+    }
+
+    .btn-salvar {
+      width: 100%; padding: 12px;
+      background: #422BFF; color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: 0.2s;
+      margin-top: 8px;
+    }
+    .btn-salvar:hover { background: #351ECC; }
+    .btn-salvar:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .msg {
+      text-align: center; margin-top: 14px;
+      font-size: 0.9rem; border-radius: 8px;
+      padding: 10px; display: none;
+    }
+    .msg.success { background: rgba(0,200,83,0.1); color: #00c853; display: block; }
+    .msg.error   { background: rgba(255,77,77,0.1); color: #ff4d4d; display: block; }
+
+    .back-links {
+      text-align: center; margin-top: 20px;
+    }
+    .back-links a {
+      color: #422BFF; text-decoration: none; font-size: 0.88rem; margin: 0 8px;
+    }
+    .back-links a:hover { text-decoration: underline; }
+
+    .logout-btn {
+      display: block; width: 100%; margin-top: 12px;
+      padding: 11px; border: 1.5px solid #ff4d4d;
+      border-radius: 10px; color: #ff4d4d;
+      background: none; cursor: pointer; font-size: 0.93rem; font-weight: 600;
+      transition: 0.2s;
+    }
+    .logout-btn:hover { background: rgba(255,77,77,0.08); }
+
+    @media (max-width: 600px) {
+      .perfil-body { padding: 20px 18px 24px; }
+      .row-2 { flex-direction: column; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="perfil-container">
+    <div class="perfil-header">
+      <div class="perfil-avatar" id="avatarIcon">👤</div>
+      <h2 id="headerNome">Carregando...</h2>
+      <p id="headerEmail"></p>
+    </div>
+
+    <div class="perfil-body">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="dados">Meus Dados</button>
+        <button class="tab-btn" data-tab="senha">Alterar Senha</button>
+      </div>
+
+      <!-- Aba: Dados Pessoais -->
+      <div class="tab-panel active" id="tab-dados">
+        <form id="formDados">
+          <div class="row-2">
+            <div class="field">
+              <label>Nome</label>
+              <input type="text" id="p-nome" placeholder="Nome" required />
+            </div>
+            <div class="field">
+              <label>Sobrenome</label>
+              <input type="text" id="p-sobrenome" placeholder="Sobrenome" />
+            </div>
+          </div>
+
+          <div class="row-2">
+            <div class="field">
+              <label>Gênero</label>
+              <select id="p-genero">
+                <option value="">Selecione</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Celular</label>
+              <input type="tel" id="p-celular" placeholder="(xx) xxxxx-xxxx" maxlength="15" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>CPF</label>
+            <input type="text" id="p-cpf" placeholder="000.000.000-00" maxlength="14" />
+          </div>
+
+          <div class="field">
+            <label>E-mail (não editável)</label>
+            <input type="email" id="p-email" readonly />
+          </div>
+
+          <div class="row-2">
+            <div class="field">
+              <label>CEP</label>
+              <input type="text" id="p-cep" placeholder="00000-000" maxlength="9" />
+            </div>
+            <div class="field">
+              <label>Estado</label>
+              <input type="text" id="p-estado" placeholder="UF" maxlength="2" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Rua / Endereço</label>
+            <input type="text" id="p-rua" placeholder="Rua, número" />
+          </div>
+
+          <div class="row-2">
+            <div class="field">
+              <label>Bairro</label>
+              <input type="text" id="p-bairro" placeholder="Bairro" />
+            </div>
+            <div class="field">
+              <label>Cidade</label>
+              <input type="text" id="p-cidade" placeholder="Cidade" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-salvar" id="btnSalvarDados">Salvar Alterações</button>
+          <div class="msg" id="msgDados"></div>
+        </form>
+      </div>
+
+      <!-- Aba: Alterar Senha -->
+      <div class="tab-panel" id="tab-senha">
+        <form id="formSenha">
+          <div class="field">
+            <label>Senha Atual</label>
+            <div class="senha-wrap">
+              <input type="password" id="p-senhaAtual" placeholder="Senha atual" required />
+              <button type="button" class="olho" onclick="toggleVer('p-senhaAtual','ico1')" aria-label="Ver senha">
+                <svg id="ico1" width="20" height="20" fill="none" stroke="#8b949e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Nova Senha</label>
+            <div class="senha-wrap">
+              <input type="password" id="p-novaSenha" placeholder="Nova senha (mín. 6 caracteres)" required />
+              <button type="button" class="olho" onclick="toggleVer('p-novaSenha','ico2')" aria-label="Ver senha">
+                <svg id="ico2" width="20" height="20" fill="none" stroke="#8b949e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Confirmar Nova Senha</label>
+            <div class="senha-wrap">
+              <input type="password" id="p-confirmarSenha" placeholder="Confirme a nova senha" required />
+              <button type="button" class="olho" onclick="toggleVer('p-confirmarSenha','ico3')" aria-label="Ver senha">
+                <svg id="ico3" width="20" height="20" fill="none" stroke="#8b949e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-salvar" id="btnSalvarSenha">Alterar Senha</button>
+          <div class="msg" id="msgSenha"></div>
+        </form>
+      </div>
+
+      <button class="logout-btn" id="btnLogout">Sair da conta</button>
+
+      <div class="back-links">
+        <a href="index.html">← Voltar à loja</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'https://naredestore-api.onrender.com';
+    const USER_KEY = 'naredestoreUser';
+
+    // ── Redireciona se não estiver logado ─────────────────
+    const userData = (function() {
+      try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch(_) { return null; }
+    })();
+    if (!userData || !userData.email) {
+      window.location.href = 'login.html';
+    }
+
+    // ── Tabs ──────────────────────────────────────────────
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // ── Ver/ocultar senha ─────────────────────────────────
+    function toggleVer(inputId, svgId) {
+      var input = document.getElementById(inputId);
+      var svg   = document.getElementById(svgId);
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
+      if (svg) svg.setAttribute('stroke', input.type === 'text' ? '#422BFF' : '#8b949e');
+    }
+
+    // ── Máscara celular ───────────────────────────────────
+    document.getElementById('p-celular').addEventListener('input', function() {
+      this.value = this.value.replace(/\D/g,'').replace(/^(\d{2})(\d)/g,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2').slice(0,15);
+    });
+    document.getElementById('p-cpf').addEventListener('input', function() {
+      this.value = this.value.replace(/\D/g,'').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2').slice(0,14);
+    });
+    document.getElementById('p-cep').addEventListener('input', async function() {
+      var v = this.value.replace(/\D/g,'');
+      if (v.length === 8) {
+        try {
+          var res  = await fetch('https://viacep.com.br/ws/' + v + '/json/');
+          var data = await res.json();
+          if (!data.erro) {
+            document.getElementById('p-rua').value    = data.logradouro || '';
+            document.getElementById('p-bairro').value = data.bairro     || '';
+            document.getElementById('p-cidade').value = data.localidade || '';
+            document.getElementById('p-estado').value = data.uf         || '';
+          }
+        } catch(_) {}
+      }
+    });
+
+    // ── Preenche e-mail imediatamente do localStorage ─────
+    document.getElementById('p-email').value     = userData.email || '';
+    document.getElementById('headerEmail').textContent = userData.email || '';
+    if (userData.nome) {
+      document.getElementById('headerNome').textContent = userData.nome;
+      document.getElementById('avatarIcon').textContent = userData.nome[0].toUpperCase();
+    }
+
+    // ── Carregar dados do perfil ──────────────────────────
+    async function carregarPerfil(tentativa) {
+      tentativa = tentativa || 1;
+      var headerNome = document.getElementById('headerNome');
+
+      try {
+        headerNome.textContent = tentativa > 1 ? 'Tentando novamente...' : (userData.nome || 'Carregando...');
+
+        var controller = new AbortController();
+        var timeout    = setTimeout(function() { controller.abort(); }, 12000);
+
+        var res  = await fetch(API + '/api/perfil?email=' + encodeURIComponent(userData.email), { signal: controller.signal });
+        clearTimeout(timeout);
+
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erro na API');
+
+        var u = data.usuario;
+        headerNome.textContent = ((u.nome || '') + ' ' + (u.sobrenome || '')).trim() || u.email;
+        document.getElementById('headerEmail').textContent = u.email || '';
+        document.getElementById('avatarIcon').textContent  = (u.nome || userData.email || 'U')[0].toUpperCase();
+
+        document.getElementById('p-nome').value      = u.nome      || '';
+        document.getElementById('p-sobrenome').value = u.sobrenome || '';
+        document.getElementById('p-genero').value    = u.genero    || '';
+        document.getElementById('p-celular').value   = u.celular   || '';
+        document.getElementById('p-cpf').value       = u.cpf       || '';
+        document.getElementById('p-email').value     = u.email     || '';
+        document.getElementById('p-cep').value       = u.cep       || '';
+        document.getElementById('p-rua').value       = u.rua       || '';
+        document.getElementById('p-bairro').value    = u.bairro    || '';
+        document.getElementById('p-cidade').value    = u.cidade    || '';
+        document.getElementById('p-estado').value    = u.estado    || '';
+      } catch(err) {
+        console.error('Erro ao carregar perfil (tentativa ' + tentativa + '):', err);
+
+        if (tentativa < 3) {
+          // Render pode estar em cold start — tenta mais 2 vezes com delay crescente
+          var delay = tentativa * 4000;
+          headerNome.textContent = 'Aguardando servidor... (' + tentativa + '/3)';
+          setTimeout(function() { carregarPerfil(tentativa + 1); }, delay);
+        } else {
+          headerNome.textContent = userData.nome || 'Erro ao carregar';
+          var msgDiv = document.getElementById('msgDados');
+          var detalhe = err.message && err.message !== 'Failed to fetch' ? ' (' + err.message + ')' : '';
+          msgDiv.textContent = '⚠️ Não foi possível carregar seus dados.' + detalhe + ' Recarregue a página.';
+          msgDiv.className = 'msg error';
+        }
+      }
+    }
+    carregarPerfil();
+
+    // ── Salvar dados pessoais ─────────────────────────────
+    document.getElementById('formDados').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var btn = document.getElementById('btnSalvarDados');
+      var msg = document.getElementById('msgDados');
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+      msg.className = 'msg';
+
+      var dados = {
+        email:     userData.email,
+        nome:      document.getElementById('p-nome').value.trim(),
+        sobrenome: document.getElementById('p-sobrenome').value.trim(),
+        genero:    document.getElementById('p-genero').value,
+        celular:   document.getElementById('p-celular').value.trim(),
+        cpf:       document.getElementById('p-cpf').value.trim(),
+        cep:       document.getElementById('p-cep').value.trim(),
+        rua:       document.getElementById('p-rua').value.trim(),
+        bairro:    document.getElementById('p-bairro').value.trim(),
+        cidade:    document.getElementById('p-cidade').value.trim(),
+        estado:    document.getElementById('p-estado').value.trim()
+      };
+
+      try {
+        var res  = await fetch(API + '/api/perfil', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dados)
+        });
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        // Atualiza nome no localStorage
+        userData.nome = dados.nome;
+        localStorage.setItem(USER_KEY, JSON.stringify(userData));
+
+        document.getElementById('headerNome').textContent = dados.nome + ' ' + dados.sobrenome;
+        msg.textContent = '✅ Dados atualizados com sucesso!';
+        msg.className   = 'msg success';
+      } catch(err) {
+        msg.textContent = '❌ ' + (err.message || 'Erro ao salvar.');
+        msg.className   = 'msg error';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Salvar Alterações';
+      }
+    });
+
+    // ── Alterar senha ─────────────────────────────────────
+    document.getElementById('formSenha').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var btn    = document.getElementById('btnSalvarSenha');
+      var msg    = document.getElementById('msgSenha');
+      var atual  = document.getElementById('p-senhaAtual').value;
+      var nova   = document.getElementById('p-novaSenha').value;
+      var confirma = document.getElementById('p-confirmarSenha').value;
+      msg.className = 'msg';
+
+      if (nova !== confirma) {
+        msg.textContent = '❌ As senhas não coincidem.';
+        msg.className   = 'msg error';
+        return;
+      }
+      if (nova.length < 6) {
+        msg.textContent = '❌ A nova senha deve ter pelo menos 6 caracteres.';
+        msg.className   = 'msg error';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Alterando...';
+
+      try {
+        var res  = await fetch(API + '/api/perfil/senha', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userData.email, senhaAtual: atual, novaSenha: nova })
+        });
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        msg.textContent = '✅ Senha alterada com sucesso!';
+        msg.className   = 'msg success';
+        document.getElementById('formSenha').reset();
+      } catch(err) {
+        msg.textContent = '❌ ' + (err.message || 'Erro ao alterar senha.');
+        msg.className   = 'msg error';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Alterar Senha';
+      }
+    });
+
+    // ── Logout ────────────────────────────────────────────
+    document.getElementById('btnLogout').addEventListener('click', function() {
+      localStorage.removeItem(USER_KEY);
+      window.location.href = 'index.html';
+    });
+  </script>
+
+  <script src="theme-toggle.js"></script>
+</body>
+</html>

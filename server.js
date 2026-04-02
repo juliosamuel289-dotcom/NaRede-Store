@@ -5,8 +5,55 @@ const bcrypt   = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const cors     = require('cors');
 const path     = require('path');
+const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 
 const app = express();
+
+// ── Catálogo oficial de preços ───────────────────────────
+// Fonte de verdade para todos os produtos. O servidor NUNCA
+// confia no preço enviado pelo cliente — ele recalcula aqui.
+// Cada produto pode ter múltiplos preços válidos (normal + promo).
+const CATALOGO_PRECOS = {
+  // ── Brasileiros ──────────────────────────────────────
+  'Flamengo':        [0.50, 179.90, 279.90],   // 0.50 = teste temporário
+  'Vasco':           [259.90],
+  'Santos':          [269.90],
+  'Palmeiras':       [289.90, 169.90],
+  'São Paulo':       [279.90],
+  'Corinthians':     [289.90],
+  'Fluminense':      [269.90],
+  'Grêmio':         [259.90],
+  'Atlético Mineiro':[279.90],
+  'Botafogo':        [259.90],
+  'Bahia':           [249.90, 199.90],
+  'Cruzeiro':        [249.90],
+  // ── Internacionais ───────────────────────────────────
+  'Real Madrid':     [299.90],
+  'Barcelona':       [279.90],
+  'Manchester United':[299.90],
+  'Liverpool':       [289.90, 269.90],
+  'Bayern de Munique':[299.90],
+  'Paris Saint-Germain':[289.90],
+  'Arsenal':         [269.90, 249.90],
+  'Chelsea':         [279.90],
+  'Manchester City': [289.90],
+  'Juventus':        [269.90],
+  'AC Milan':        [259.90],
+  'Atlético Madrid': [249.90],
+  // ── Seleções ─────────────────────────────────────────
+  'Brasil':          [249.90],
+  'Argentina':       [239.90, 199.90],
+  'Alemanha':        [229.90],
+  'França':         [239.90],
+  'Inglaterra':      [229.90],
+  'Holanda':         [219.90],
+  'Itália':         [229.90],
+  'Portugal':        [239.90],
+  'México':         [209.90],
+  'Japão':          [199.90, 179.90],
+  'Chile':           [189.90],
+  'Suíça':          [199.90],
+};
 
 // ── Middlewares ──────────────────────────────────────────
 app.use(cors());
@@ -54,6 +101,25 @@ const pool = mysql.createPool({
             )
         `);
         console.log('✅ Tabela "usuarios" verificada/criada.');
+
+        // ── Migração: adiciona colunas que podem não existir em bancos antigos ──
+        const colunasMigracao = [
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS sobrenome  VARCHAR(100)",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS genero     VARCHAR(20)",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS celular    VARCHAR(20)",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS cpf        VARCHAR(14)",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS cep        VARCHAR(9)",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS rua        VARCHAR(255)",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS bairro     VARCHAR(100)",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS cidade     VARCHAR(100)",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS estado     VARCHAR(2)",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS reset_token  VARCHAR(6) DEFAULT NULL",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS token_expiry DATETIME   DEFAULT NULL",
+        ];
+        for (const sql of colunasMigracao) {
+            try { await conn.execute(sql); } catch (_) { /* coluna já existe */ }
+        }
+        console.log('✅ Migração de colunas concluída.');
         conn.release();
     } catch (err) {
         console.error('❌ Falha ao conectar ao banco:', err.message);
@@ -68,6 +134,9 @@ const transporter = nodemailer.createTransport({
         pass: process.env.GMAIL_APP_PASSWORD
     }
 });
+
+// ── MercadoPago ─────────────────────────────────────────────
+const mpClient = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
 
 // ── Rotas de páginas ─────────────────────────────────────
 app.get('/',        (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
@@ -217,6 +286,196 @@ app.post('/api/reset-password', async (req, res) => {
     } catch (err) {
         console.error('Erro em reset-password:', err);
         res.status(500).json({ error: 'Erro ao redefinir senha.' });
+    }
+});
+
+// ── GET /api/perfil?email=... ────────────────────────────
+app.get('/api/perfil', async (req, res) => {
+    const { email } = req.query;
+    if (!email) return res.status(400).json({ error: 'E-mail é obrigatório.' });
+
+    try {
+        const [rows] = await pool.execute(
+            'SELECT id, nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, created_at FROM usuarios WHERE email = ?',
+            [email]
+        );
+        if (rows.length === 0) return res.status(404).json({ error: 'Usuário não encontrado.' });
+        res.json({ usuario: rows[0] });
+    } catch (err) {
+        console.error('Erro em GET /api/perfil:', err);
+        res.status(500).json({ error: 'Erro ao buscar perfil.' });
+    }
+});
+
+// ── PUT /api/perfil ──────────────────────────────────────
+app.put('/api/perfil', async (req, res) => {
+    const { email, nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado } = req.body;
+    if (!email || !nome) return res.status(400).json({ error: 'E-mail e nome são obrigatórios.' });
+
+    try {
+        await pool.execute(
+            `UPDATE usuarios SET nome=?, sobrenome=?, genero=?, celular=?, cpf=?, cep=?, rua=?, bairro=?, cidade=?, estado=? WHERE email=?`,
+            [nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email]
+        );
+        res.json({ success: true, message: 'Perfil atualizado com sucesso!' });
+    } catch (err) {
+        console.error('Erro em PUT /api/perfil:', err);
+        res.status(500).json({ error: 'Erro ao atualizar perfil.' });
+    }
+});
+
+// ── PUT /api/perfil/senha ────────────────────────────────
+app.put('/api/perfil/senha', async (req, res) => {
+    const { email, senhaAtual, novaSenha } = req.body;
+    if (!email || !senhaAtual || !novaSenha) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+    }
+
+    try {
+        const [rows] = await pool.execute('SELECT senha FROM usuarios WHERE email = ?', [email]);
+        if (rows.length === 0) return res.status(404).json({ error: 'Usuário não encontrado.' });
+
+        const senhaValida = await bcrypt.compare(senhaAtual, rows[0].senha);
+        if (!senhaValida) return res.status(401).json({ error: 'Senha atual incorreta.' });
+
+        const senhaHash = await bcrypt.hash(novaSenha, 10);
+        await pool.execute('UPDATE usuarios SET senha = ? WHERE email = ?', [senhaHash, email]);
+
+        res.json({ success: true, message: 'Senha alterada com sucesso!' });
+    } catch (err) {
+        console.error('Erro em PUT /api/perfil/senha:', err);
+        res.status(500).json({ error: 'Erro ao alterar senha.' });
+    }
+});
+
+// ── POST /api/pagar ──────────────────────────────────────
+// metodo: 'pix' | 'cartao' | 'boleto'
+// itens: [{nome, preco, qtd}]  — preço é validado contra o catálogo
+app.post('/api/pagar', async (req, res) => {
+    const { metodo, itens, parcelas, payerEmail } = req.body;
+
+    if (!metodo || !Array.isArray(itens) || !itens.length || !payerEmail) {
+        return res.status(400).json({ error: 'metodo, itens e payerEmail são obrigatórios.' });
+    }
+
+    // ── Validação de preços contra o catálogo ──────────
+    let totalValor = 0;
+    for (const item of itens) {
+        const catalogoItem = CATALOGO_PRECOS[item.nome];
+        if (!catalogoItem) {
+            return res.status(400).json({ error: `Produto desconhecido: "${item.nome}".` });
+        }
+        const precoEnviado = Number(item.preco);
+        const precoValido  = catalogoItem.some(p => Math.abs(p - precoEnviado) < 0.01);
+        if (!precoValido) {
+            return res.status(400).json({
+                error: `Preço inválido para "${item.nome}". Preços aceitos: R$ ${catalogoItem.join(' / R$ ')}.`
+            });
+        }
+        const qtd = Math.max(1, Math.floor(Number(item.qtd) || 1));
+        totalValor += precoEnviado * qtd;
+    }
+    totalValor = Math.round(totalValor * 100) / 100; // arredonda centavos
+
+    const valor = totalValor;
+
+    // Monta descrição e lista de itens para o MP
+    const descricao = itens.map(i => `${i.nome} x${i.qtd || 1}`).join(', ');
+    const mpItens   = itens.map(i => ({
+        title:      i.nome,
+        unit_price: Number(i.preco),
+        quantity:   Math.max(1, Math.floor(Number(i.qtd) || 1)),
+        currency_id: 'BRL'
+    }));
+
+    try {
+        if (metodo === 'pix') {
+            // PIX via Payments API → retorna QR code para exibir na página
+            const payment = new Payment(mpClient);
+            const result = await payment.create({
+                body: {
+                    transaction_amount: valor,
+                    description: descricao || 'Pedido NaRede Store',
+                    payment_method_id: 'pix',
+                    payer: { email: payerEmail }
+                }
+            });
+
+            const txData = result.point_of_interaction?.transaction_data;
+            return res.json({
+                id: result.id,
+                qr_code:        txData?.qr_code        || '',
+                qr_code_base64: txData?.qr_code_base64 || ''
+            });
+        }
+
+        // Cartão de crédito ou Boleto → Checkout Pro (redirect)
+        const preference = new Preference(mpClient);
+        const body = {
+            items: mpItens,
+            payer: { email: payerEmail },
+            back_urls: {
+                success: process.env.SITE_URL + '/sucesso.html',
+                failure: process.env.SITE_URL + '/erro.html'
+            },
+            auto_return: 'approved',
+            payment_methods: {}
+        };
+
+        if (metodo === 'cartao') {
+            body.payment_methods = {
+                excluded_payment_types:  [{ id: 'ticket' }, { id: 'bank_transfer' }],
+                installments: Number(parcelas) || 12,
+                default_installments: Number(parcelas) || 1
+            };
+        } else if (metodo === 'boleto') {
+            body.payment_methods = {
+                excluded_payment_types: [
+                    { id: 'credit_card' },
+                    { id: 'debit_card' },
+                    { id: 'bank_transfer' }
+                ]
+            };
+        }
+
+        const result = await preference.create({ body });
+        return res.json({ init_point: result.init_point });
+
+    } catch (err) {
+        console.error('Erro em POST /api/pagar:', err);
+        res.status(500).json({ error: 'Erro ao processar pagamento.' });
+    }
+});
+
+// ── POST /api/create-preference (MercadoPago) ──────────────
+app.post('/api/create-preference', async (req, res) => {
+    const { description, price, quantity } = req.body;
+    if (!description || !price || !quantity) {
+        return res.status(400).json({ error: 'description, price e quantity são obrigatórios.' });
+    }
+
+    try {
+        const preference = new Preference(mpClient);
+        const result = await preference.create({
+            body: {
+                items: [
+                    {
+                        title: description,
+                        unit_price: Number(price),
+                        quantity: Number(quantity)
+                    }
+                ],
+                back_urls: {
+                    success: process.env.SITE_URL + '/sucesso.html',
+                    failure: process.env.SITE_URL + '/erro.html'
+                },
+                auto_return: 'approved'
+            }
+        });
+        res.json({ init_point: result.init_point });
+    } catch (err) {
+        console.error('Erro ao criar preferência MP:', err);
+        res.status(500).json({ error: 'Erro ao criar pagamento.' });
     }
 });
 
