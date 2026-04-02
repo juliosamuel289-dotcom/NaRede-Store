@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Erro no Pagamento | NaRede Store</title>
+  <link rel="stylesheet" href="theme-toggle.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body {
+      background: #0d1117;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    body.light-mode { background: #f0f2f5; }
+
+    .card {
+      background: #161b22;
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    body.light-mode .card {
+      background: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      color: #ff4d4d;
+      font-size: 1.6rem;
+      margin-bottom: 0.75rem;
+    }
+    body.light-mode h1 { color: #cc0000; }
+
+    p {
+      color: #8b949e;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+    body.light-mode p { color: #555; }
+
+    .btn-primary {
+      display: inline-block;
+      margin-top: 1.75rem;
+      margin-right: 10px;
+      padding: 12px 28px;
+      background: #422BFF;
+      color: #fff;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #351ECC; }
+
+    .btn-secondary {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 12px 28px;
+      background: transparent;
+      color: #8b949e;
+      border: 1.5px solid #30363d;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: #8b949e; color: #f0f6fc; }
+    body.light-mode .btn-secondary { color: #555; border-color: #ccc; }
+    body.light-mode .btn-secondary:hover { border-color: #888; color: #222; }
+
+    .error-info {
+      margin-top: 1.5rem;
+      padding: 14px 18px;
+      background: rgba(255,77,77,0.08);
+      border: 1px solid rgba(255,77,77,0.25);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      color: #ff4d4d;
+    }
+    body.light-mode .error-info {
+      background: rgba(204,0,0,0.06);
+      border-color: rgba(204,0,0,0.2);
+      color: #cc0000;
+    }
+
+    .actions { margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">❌</div>
+    <h1>Houve um problema no pagamento</h1>
+    <p>Não foi possível concluir sua compra.</p>
+    <p>Verifique os dados informados ou tente uma outra forma de pagamento.</p>
+
+    <div class="error-info">
+      💳 Se o problema persistir, entre em contato com nossa Central de Ajuda.
+    </div>
+
+    <div class="actions">
+      <a href="checkout.html" class="btn-primary">Tentar novamente</a>
+      <a href="index.html" class="btn-secondary">Voltar à Loja</a>
+    </div>
+  </div>
+
+  <script src="theme-toggle.js"></script>
+</body>
+</html>

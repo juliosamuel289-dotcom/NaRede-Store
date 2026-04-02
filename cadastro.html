@@ -51,8 +51,18 @@
       <input type="text" id="estado" placeholder="Estado" required />
 
       <input type="email" id="email" placeholder="E-mail" required />
-      <input type="password" id="senha" placeholder="Senha" required />
-      <input type="password" id="confirmar" placeholder="Confirmar Senha" required />
+      <div style="position:relative;">
+        <input type="password" id="senha" placeholder="Senha" required style="padding-right:44px;width:100%;" />
+        <button type="button" onclick="toggleSenha('senha','olhoSenha')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;width:auto;" aria-label="Ver senha">
+          <svg id="olhoSenha" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#8b949e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <div style="position:relative;">
+        <input type="password" id="confirmar" placeholder="Confirmar Senha" required style="padding-right:44px;width:100%;" />
+        <button type="button" onclick="toggleSenha('confirmar','olhoConfirmar')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;width:auto;" aria-label="Ver senha">
+          <svg id="olhoConfirmar" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#8b949e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
       
       <p class="error" id="erroSenha">As senhas não coincidem.</p>
       <p class="error" id="serverError"></p>
@@ -153,6 +163,21 @@
         }
       });
     })();
+  </script>
+
+  <script>
+    function toggleSenha(inputId, svgId) {
+      var input = document.getElementById(inputId);
+      var svg   = document.getElementById(svgId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (svg) svg.setAttribute('stroke', '#422BFF');
+      } else {
+        input.type = 'password';
+        if (svg) svg.setAttribute('stroke', '#8b949e');
+      }
+    }
   </script>
 </body>
 </html>

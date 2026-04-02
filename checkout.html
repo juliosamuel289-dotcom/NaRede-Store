@@ -123,7 +123,7 @@
 
   <div class="checkout-container">
     <h2>Finalizar <span>Compra</span></h2>
-    <p class="subtitle">Preencha seus dados para concluir o pedido</p>
+    <p class="subtitle">Revise seu pedido e escolha a forma de pagamento</p>
 
     <!-- ── Itens do Carrinho ── -->
     <div id="cart-section" style="margin-bottom:1.4rem;">
@@ -159,143 +159,201 @@
       .cart-empty { color:#8b949e; font-size:0.9rem; }
     </style>
 
+    <!-- Dados do comprador (preenchidos automaticamente) -->
+    <div id="dados-comprador" style="margin-bottom:1.4rem;padding:14px 16px;background:rgba(66,43,255,0.07);border:1px solid rgba(66,43,255,0.2);border-radius:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="color:#8b949e;font-size:0.82rem;text-transform:uppercase;letter-spacing:.05em;">Dados do pedido</span>
+        <a href="perfil.html" style="color:#422BFF;font-size:0.82rem;text-decoration:none;">Editar ✏️</a>
+      </div>
+      <div id="info-nome" style="color:#f0f6fc;font-size:0.95rem;font-weight:600;">Carregando...</div>
+      <div id="info-endereco" style="color:#8b949e;font-size:0.85rem;margin-top:4px;"></div>
+      <div id="aviso-sem-endereco" style="display:none;color:#f0a500;font-size:0.83rem;margin-top:6px;">⚠️ Endereço não cadastrado. <a href="perfil.html" style="color:#422BFF;">Adicione no seu perfil.</a></div>
+    </div>
+    <style>
+      body.light-mode #dados-comprador { background:rgba(66,43,255,0.05); }
+      body.light-mode #info-nome { color:#222; }
+    </style>
+
     <form id="checkoutForm" novalidate>
-      <div class="field">
-        <label for="nome">Nome completo</label>
-        <input type="text" id="nome" placeholder="Nome completo" required>
-      </div>
-
-      <div class="field">
-        <label for="endereco">Endereço completo</label>
-        <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade - CEP" required>
-      </div>
-
       <div class="field">
         <label for="pagamento">Forma de pagamento</label>
         <select id="pagamento" required>
           <option value="">Selecione a forma de pagamento</option>
-          <option value="pix">Pix</option>
-          <option value="cartao">Cartão de crédito</option>
-          <option value="boleto">Boleto bancário</option>
+          <option value="pix">&#x1F4F1; PIX</option>
+          <option value="cartao">&#x1F4B3; Cartão de Crédito</option>
+          <option value="boleto">&#x1F4CB; Boleto Bancário</option>
         </select>
       </div>
 
-      <!-- Campos do cartão (aparecem somente se pagamento = cartao) -->
-      <div class="card-fields" id="cardFields">
-        <div class="field">
-          <label for="cardNumber">Número do cartão</label>
-          <!-- pattern simples: 13-19 dígitos (aceita espaços) -->
-          <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" inputmode="numeric" maxlength="19" autocomplete="cc-number" >
-        </div>
-
-        <div class="row">
-          <div class="field col-2">
-            <label for="cardName">Nome no cartão</label>
-            <input type="text" id="cardName" placeholder="Nome como no cartão" autocomplete="cc-name">
-          </div>
-
-          <div class="field col-2">
-            <label for="cardExp">Validade (MM/AA)</label>
-            <input type="text" id="cardExp" placeholder="MM/AA" maxlength="5" inputmode="numeric" autocomplete="cc-exp">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="field col-2">
-            <label for="cardCvv">CVV</label>
-            <input type="password" id="cardCvv" placeholder="123" maxlength="4" inputmode="numeric" autocomplete="cc-csc">
-          </div>
-
-          <div class="field col-2">
-            <label for="installments">Parcelas (opcional)</label>
-            <select id="installments">
-              <option value="1">1x sem juros</option>
-              <option value="2">2x</option>
-              <option value="3">3x</option>
-              <option value="4">4x</option>
-            </select>
-          </div>
-        </div>
-
-        <p class="small">Os dados do cartão são apenas de exemplo — para um fluxo real você precisará integrar um gateway de pagamentos (ex: PagSeguro, MercadoPago, Stripe).</p>
+      <!-- Parcelas (visível apenas para cartão) -->
+      <div id="parcelasField" class="field" style="display:none;">
+        <label for="parcelas">Número de parcelas</label>
+        <select id="parcelas">
+          <option value="1">1x sem juros</option>
+          <option value="2">2x</option>
+          <option value="3">3x</option>
+          <option value="4">4x</option>
+          <option value="5">5x</option>
+          <option value="6">6x</option>
+          <option value="7">7x</option>
+          <option value="8">8x</option>
+          <option value="9">9x</option>
+          <option value="10">10x</option>
+          <option value="11">11x</option>
+          <option value="12">12x</option>
+        </select>
+        <p class="small" style="margin-top:6px;">As parcelas e juros são definidos pelo Mercado Pago conforme seu cartão.</p>
       </div>
 
-      <button type="submit">Finalizar compra</button>
+      <button type="submit" id="btnFinalizar">Finalizar compra</button>
       <a href="index.html" class="back-link">← Voltar à loja</a>
     </form>
 
-    <div class="confirmation" id="confirmMsg">
-      ✅ Compra concluída com sucesso!<br>Obrigado por comprar na <strong>NaRede Store</strong> 💜
+    <!-- Modal PIX -->
+    <div id="pixModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center;">
+      <div style="background:#161b22; border-radius:20px; padding:32px 28px; text-align:center; max-width:380px; width:90%; box-shadow:0 20px 60px rgba(66,43,255,0.4); border:1px solid rgba(66,43,255,0.3);">
+        <div style="font-size:2.5rem; margin-bottom:8px;">&#x1F4F1;</div>
+        <h3 style="color:#f0f6fc; margin-bottom:6px; font-size:1.2rem;">Pague com PIX</h3>
+        <p style="color:#8b949e; font-size:0.88rem; margin-bottom:18px;">Escaneie o QR Code ou copie o código pelo app do seu banco</p>
+        <div style="background:#fff; border-radius:12px; padding:10px; display:inline-block; margin-bottom:16px;">
+          <img id="pixQrImg" src="" alt="QR Code PIX" style="width:200px; height:200px; display:block;" />
+        </div>
+        <div>
+          <input id="pixCopiaECola" type="text" readonly style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid #30363d; background:#0d1117; color:#f0f6fc; font-size:0.78rem; margin-bottom:8px;" />
+          <button type="button" id="btnCopiarPix" style="width:100%; padding:11px; background:#422BFF; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.95rem;">Copiar código PIX</button>
+        </div>
+        <p style="color:#8b949e; font-size:0.78rem; margin-top:14px; line-height:1.5;">O pagamento é confirmado automaticamente. Após pagar, clique em "Acompanhar Pedido".</p>
+        <a href="pedido.html" style="display:block; margin-top:12px; padding:11px; background:#00c853; color:#fff; border-radius:8px; font-weight:600; font-size:0.95rem; text-decoration:none;">🚚 Acompanhar Pedido</a>
+        <button type="button" id="btnFecharPix" style="margin-top:10px; background:none; border:none; color:#8b949e; cursor:pointer; font-size:0.88rem; text-decoration:underline;">Cancelar</button>
+      </div>
     </div>
   </div>
 
   <script>
-    const pagamento = document.getElementById('pagamento');
-    const cardFields = document.getElementById('cardFields');
-    const form = document.getElementById('checkoutForm');
-    const confirmMsg = document.getElementById('confirmMsg');
+    var API        = 'https://naredestore-api.onrender.com';
+    var USER_KEY   = 'naredestoreUser';
+    var form       = document.getElementById('checkoutForm');
+    var pagamento  = document.getElementById('pagamento');
+    var btnFinalizar = document.getElementById('btnFinalizar');
+    var pixModal   = document.getElementById('pixModal');
 
-    // mostra/esconde campos do cartão conforme seleção
-    pagamento.addEventListener('change', () => {
-      if (pagamento.value === 'cartao') {
-        cardFields.style.display = 'block';
-      } else {
-        cardFields.style.display = 'none';
-      }
+    // ── Mostra/oculta parcelas conforme método ────────────
+    pagamento.addEventListener('change', function() {
+      document.getElementById('parcelasField').style.display =
+        pagamento.value === 'cartao' ? 'block' : 'none';
     });
 
-    // máscara simples para número do cartão e validade (apenas para UX)
-    const cardNumber = document.getElementById('cardNumber');
-    cardNumber.addEventListener('input', (e) => {
-      // remove tudo que não é número
-      let v = e.target.value.replace(/\D/g, '').slice(0,16);
-      // insere espaços a cada 4 dígitos
-      v = v.replace(/(.{4})/g, '$1 ').trim();
-      e.target.value = v;
+    // ── Preenche dados do comprador automaticamente ───────
+    (function preencherDados() {
+      var userData = null;
+      try { userData = JSON.parse(localStorage.getItem(USER_KEY)); } catch(_) {}
+
+      var infoNome    = document.getElementById('info-nome');
+      var infoEnd     = document.getElementById('info-endereco');
+      var avisoSemEnd = document.getElementById('aviso-sem-endereco');
+
+      if (!userData) { infoNome.textContent = 'Visitante (não logado)'; return; }
+
+      infoNome.textContent = (userData.nome || '') + (userData.sobrenome ? ' ' + userData.sobrenome : '');
+
+      fetch(API + '/api/perfil?email=' + encodeURIComponent(userData.email))
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          var u = d.usuario;
+          if (!u) return;
+          infoNome.textContent = ((u.nome || '') + ' ' + (u.sobrenome || '')).trim();
+          var partes = [u.rua, u.bairro, u.cidade, u.estado, u.cep].filter(Boolean);
+          if (partes.length) { infoEnd.textContent = partes.join(', '); }
+          else { avisoSemEnd.style.display = 'block'; }
+        })
+        .catch(function() { infoNome.textContent = userData.nome || 'Usuário'; });
+    })();
+
+    // ── Copiar código PIX ─────────────────────────────────
+    document.getElementById('btnCopiarPix').addEventListener('click', function() {
+      var input = document.getElementById('pixCopiaECola');
+      navigator.clipboard.writeText(input.value).then(function() {
+        document.getElementById('btnCopiarPix').textContent = '✅ Copiado!';
+        setTimeout(function() { document.getElementById('btnCopiarPix').textContent = 'Copiar código PIX'; }, 3000);
+      }).catch(function() { input.select(); document.execCommand('copy'); });
     });
 
-    const cardExp = document.getElementById('cardExp');
-    cardExp.addEventListener('input', (e) => {
-      let v = e.target.value.replace(/\D/g, '').slice(0,4);
-      if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
-      e.target.value = v;
+    document.getElementById('btnFecharPix').addEventListener('click', function() {
+      pixModal.style.display = 'none';
     });
 
-    // submissão simples: valida campos obrigatórios e mostra confirmação
-    form.addEventListener('submit', (ev) => {
+    // ── Submit ────────────────────────────────────────────
+    form.addEventListener('submit', async function(ev) {
       ev.preventDefault();
 
-      // validação básica
-      const nome = document.getElementById('nome').value.trim();
-      const endereco = document.getElementById('endereco').value.trim();
-      const forma = pagamento.value;
+      var metodo = pagamento.value;
+      if (!metodo) { alert('Selecione a forma de pagamento.'); return; }
 
-      if (!nome || !endereco || !forma) {
-        alert('Preencha Nome, Endereço e escolha a forma de pagamento.');
-        return;
+      var carrinho = [];
+      try { carrinho = JSON.parse(localStorage.getItem('nr_carrinho') || '[]'); } catch(_) {}
+      if (!carrinho.length) { alert('Seu carrinho está vazio.'); return; }
+
+      var totalValor = carrinho.reduce(function(acc, item) {
+        var precoNum = parseFloat((item.preco || '0').replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+        return acc + precoNum * (item.qtd || 1);
+      }, 0);
+
+      var userData = null;
+      try { userData = JSON.parse(localStorage.getItem(USER_KEY)); } catch(_) {}
+      var payerEmail = userData ? userData.email : 'comprador@naredestore.com';
+
+      var parcelas = document.getElementById('parcelas').value || '1';
+
+      btnFinalizar.disabled = true;
+      btnFinalizar.textContent = metodo === 'pix' ? 'Gerando QR Code...' : 'Redirecionando...';
+
+      try {
+        var response = await fetch(API + '/api/pagar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            metodo:     metodo,
+            parcelas:   parcelas,
+            payerEmail: payerEmail,
+            itens: carrinho.map(function(item) {
+              return {
+                nome:  item.nome,
+                preco: parseFloat((item.preco || '0').replace(/[^\d,]/g, '').replace(',', '.')) || 0,
+                qtd:   item.qtd || 1
+              };
+            })
+          })
+        });
+
+        var data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Erro na API');
+
+        // Salva dados do pedido para página de acompanhamento
+        var pedidoData = {
+          id:     Date.now().toString().slice(-8),
+          data:   new Date().toISOString(),
+          metodo: metodo,
+          total:  totalValor,
+          itens:  carrinho
+        };
+        localStorage.setItem('nr_ultimo_pedido', JSON.stringify(pedidoData));
+        localStorage.setItem('nr_carrinho_historico', JSON.stringify(carrinho));
+
+        if (metodo === 'pix') {          document.getElementById('pixQrImg').src = 'data:image/png;base64,' + data.qr_code_base64;
+          document.getElementById('pixCopiaECola').value = data.qr_code;
+          pixModal.style.display = 'flex';
+          btnFinalizar.disabled = false;
+          btnFinalizar.textContent = 'Finalizar compra';
+        } else {
+          window.location.href = data.init_point;
+        }
+
+      } catch(err) {
+        console.error('Erro no pagamento:', err);
+        alert('Não foi possível conectar ao sistema de pagamento. Tente novamente.');
+        btnFinalizar.disabled = false;
+        btnFinalizar.textContent = 'Finalizar compra';
       }
-
-      if (forma === 'cartao') {
-        const num = cardNumber.value.replace(/\s/g, '');
-        const name = document.getElementById('cardName').value.trim();
-        const exp = document.getElementById('cardExp').value.trim();
-        const cvv = document.getElementById('cardCvv').value.trim();
-
-        // validações simples (não substituem validação real no servidor)
-        if (num.length < 13 || num.length > 16) { alert('Número do cartão inválido.'); return; }
-        if (!name) { alert('Informe o nome do cartão.'); return; }
-        if (!/^\d{2}\/\d{2}$/.test(exp)) { alert('Validade inválida. Use MM/AA'); return; }
-        if (cvv.length < 3 || cvv.length > 4) { alert('CVV inválido.'); return; }
-      }
-
-      // se passou pelas validações
-      confirmMsg.style.display = 'block';
-      form.reset();
-      cardFields.style.display = 'none';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      // Limpa carrinho após compra finalizada
-      localStorage.removeItem('nr_carrinho');
-      renderizarCarrinho();
     });
   </script>
 
