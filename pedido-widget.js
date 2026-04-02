@@ -13,6 +13,12 @@
 
   if (!pedido || !pedido.id) return;
 
+  // Só mostra se o usuário logado é o dono do pedido
+  var usuarioAtual = null;
+  try { usuarioAtual = JSON.parse(localStorage.getItem('naredestoreUser')); } catch (_) {}
+  if (!usuarioAtual || !usuarioAtual.email) return;
+  if (pedido.userEmail && pedido.userEmail !== usuarioAtual.email) return;
+
   if (pedido.data) {
     var diff = (Date.now() - new Date(pedido.data).getTime()) / (1000 * 60 * 60 * 24);
     if (diff > EXPIRY_DAYS) return;

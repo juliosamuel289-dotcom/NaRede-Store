@@ -334,7 +334,8 @@
           data:   new Date().toISOString(),
           metodo: metodo,
           total:  totalValor,
-          itens:  carrinho
+          itens:  carrinho,
+          userEmail: payerEmail  // vínculo com o usuário logado
         };
         localStorage.setItem('nr_ultimo_pedido', JSON.stringify(pedidoData));
         localStorage.setItem('nr_carrinho_historico', JSON.stringify(carrinho));
