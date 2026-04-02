@@ -1,133 +1,225 @@
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
-const path = require('path');
+require('dotenv').config();
+const express  = require('express');
+const mysql    = require('mysql2/promise');
+const bcrypt   = require('bcryptjs');
+const nodemailer = require('nodemailer');
+const cors     = require('cors');
+const path     = require('path');
 
 const app = express();
+
+// ── Middlewares ──────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// Conexão com o Banco de Dados
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  ssl: {
-    rejectUnauthorized: false
-  }
+// ── Pool de conexão (Aiven MySQL) ────────────────────────
+const pool = mysql.createPool({
+    host:            process.env.DB_HOST,
+    port:            Number(process.env.DB_PORT) || 16604,
+    user:            process.env.DB_USER,
+    password:        process.env.DB_PASSWORD,
+    database:        process.env.DB_NAME,
+    ssl:             { rejectUnauthorized: false },
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit:      0
 });
 
-db.connect((err) => {
-  if (err) {
-    console.error('Erro ao conectar ao MySQL na Nuvem:', err);
-    return;
-  }
-  console.log('Conectado ao MySQL do Aiven com sucesso!');
+// ── Cria a tabela se não existir e testa conexão ─────────
+(async () => {
+    try {
+        const conn = await pool.getConnection();
+        console.log('✅ Banco de dados conectado com sucesso!');
 
-  const setupUsersTable = `
-    CREATE TABLE IF NOT EXISTS users (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(100) NOT NULL,
-      email VARCHAR(150) NOT NULL UNIQUE,
-      password VARCHAR(255) NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB;
-  `;
-
-  db.query(setupUsersTable, (setupErr) => {
-    if (setupErr) {
-      console.error('Erro ao criar tabela users:', setupErr.message);
-    } else {
-      console.log('Tabela users pronta');
+        await conn.execute(`
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id           INT AUTO_INCREMENT PRIMARY KEY,
+                nome         VARCHAR(100) NOT NULL,
+                sobrenome    VARCHAR(100),
+                genero       VARCHAR(20),
+                celular      VARCHAR(20),
+                cpf          VARCHAR(14),
+                cep          VARCHAR(9),
+                rua          VARCHAR(255),
+                bairro       VARCHAR(100),
+                cidade       VARCHAR(100),
+                estado       VARCHAR(2),
+                email        VARCHAR(255) NOT NULL UNIQUE,
+                senha        VARCHAR(255) NOT NULL,
+                reset_token  VARCHAR(6)   DEFAULT NULL,
+                token_expiry DATETIME     DEFAULT NULL,
+                created_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ Tabela "usuarios" verificada/criada.');
+        conn.release();
+    } catch (err) {
+        console.error('❌ Falha ao conectar ao banco:', err.message);
     }
-  });
+})();
 
-  const setupUsuariosTable = `
-    CREATE TABLE IF NOT EXISTS usuarios (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      nome VARCHAR(100) NOT NULL,
-      sobrenome VARCHAR(100) NULL,
-      genero VARCHAR(50) NULL,
-      celular VARCHAR(20) NULL,
-      cpf VARCHAR(20) NULL,
-      cep VARCHAR(20) NULL,
-      rua VARCHAR(255) NULL,
-      bairro VARCHAR(100) NULL,
-      cidade VARCHAR(100) NULL,
-      estado VARCHAR(100) NULL,
-      email VARCHAR(150) NOT NULL UNIQUE,
-      senha VARCHAR(255) NOT NULL,
-      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB;
-  `;
-
-  db.query(setupUsuariosTable, (setupErr) => {
-    if (setupErr) {
-      console.error('Erro ao criar tabela usuarios:', setupErr.message);
-    } else {
-      console.log('Tabela usuarios pronta');
+// ── Nodemailer (Gmail) ───────────────────────────────────
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
     }
-  });
 });
 
-// Rotas de páginas HTML
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+// ── Rotas de páginas ─────────────────────────────────────
+app.get('/',        (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/cadastro',(req, res) => res.sendFile(path.join(__dirname, 'cadastro.html')));
+app.get('/login',   (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
+app.post('/envio',  (req, res) => res.status(200).send('Inscrição recebida!'));
 
-app.get('/cadastro', (req, res) => {
-  res.sendFile(path.join(__dirname, 'cadastro.html'));
-});
+// ── POST /api/register ───────────────────────────────────
+app.post('/api/register', async (req, res) => {
+    const { nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha } = req.body;
 
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'login.html'));
-});
-
-// Rota para cadastrar um novo usuário
-app.post('/api/register', (req, res) => {
-  const { nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha } = req.body;
-
-  const query = `INSERT INTO usuarios 
-    (nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-  db.query(query, [nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha], (err, result) => {
-    if (err) {
-      console.error('Erro no banco:', err);
-      return res.status(500).json({ error: 'Erro ao salvar no banco' });
-    }
-    res.json({ message: 'Cadastro realizado com sucesso!' });
-  });
-});
-
-// Login de usuário
-app.post('/api/login', (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email e senha são obrigatórios.' });
-  }
-
-  const sql = 'SELECT id, name, email, password FROM users WHERE email = ?';
-  db.query(sql, [email], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Erro ao buscar usuário.' });
-    }
-    if (results.length === 0) {
-      return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+    if (!nome || !email || !senha) {
+        return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios.' });
     }
 
-    const user = results[0];
-    if (user.password !== password) {
-      return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
-    }
+    try {
+        const [existing] = await pool.execute('SELECT id FROM usuarios WHERE email = ?', [email]);
+        if (existing.length > 0) {
+            return res.status(409).json({ error: 'E-mail já cadastrado.' });
+        }
 
-    return res.json({ message: 'Login realizado com sucesso.', user: { id: user.id, name: user.name, email: user.email } });
-  });
+        const senhaHash = await bcrypt.hash(senha, 10);
+
+        await pool.execute(
+            `INSERT INTO usuarios
+                (nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senhaHash]
+        );
+
+        res.status(201).json({ success: true, message: 'Cadastro realizado com sucesso!' });
+    } catch (err) {
+        console.error('Erro no cadastro:', err);
+        res.status(500).json({ error: 'Erro ao salvar no banco.' });
+    }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+// ── POST /api/login ──────────────────────────────────────
+app.post('/api/login', async (req, res) => {
+    const { email, password, senha } = req.body;
+    const senhaFornecida = password || senha; // aceita ambos os campos
+
+    if (!email || !senhaFornecida) {
+        return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
+    }
+
+    try {
+        const [rows] = await pool.execute('SELECT * FROM usuarios WHERE email = ?', [email]);
+
+        if (rows.length === 0) {
+            return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+        }
+
+        const user = rows[0];
+        const senhaValida = await bcrypt.compare(senhaFornecida, user.senha);
+
+        if (!senhaValida) {
+            return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+        }
+
+        res.json({ success: true, user: { id: user.id, nome: user.nome, email: user.email } });
+    } catch (err) {
+        console.error('Erro no login:', err);
+        res.status(500).json({ error: 'Erro de conexão com o banco.' });
+    }
+});
+
+// ── POST /api/forgot-password ────────────────────────────
+app.post('/api/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'E-mail é obrigatório.' });
+    }
+
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
+
+    try {
+        const [rows] = await pool.execute('SELECT id FROM usuarios WHERE email = ?', [email]);
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'E-mail não encontrado.' });
+        }
+
+        await pool.execute(
+            'UPDATE usuarios SET reset_token = ?, token_expiry = ? WHERE email = ?',
+            [codigo, expiry, email]
+        );
+
+        try {
+            await transporter.sendMail({
+                from: `"NaRede Store" <${process.env.GMAIL_USER}>`,
+                to: email,
+                subject: 'Código de Recuperação de Senha — NaRede Store',
+                html: `
+                  <div style="font-family:Poppins,sans-serif;max-width:480px;margin:0 auto;">
+                    <h2 style="color:#422BFF;">NaRede Store</h2>
+                    <p>Seu código de recuperação de senha é:</p>
+                    <h1 style="letter-spacing:6px;color:#222;">${codigo}</h1>
+                    <p style="color:#666;">Válido por <strong>15 minutos</strong>. Ignore se não solicitou.</p>
+                  </div>`
+            });
+            res.json({ success: true });
+        } catch (mailErr) {
+            console.error('Erro ao enviar e-mail:', mailErr.message);
+            // Em ambiente de desenvolvimento retorna o código diretamente
+            const debugCode = process.env.NODE_ENV !== 'production' ? codigo : undefined;
+            res.json({ success: true, debugCode });
+        }
+    } catch (err) {
+        console.error('Erro em forgot-password:', err);
+        res.status(500).json({ error: 'Erro no processamento.' });
+    }
+});
+
+// ── POST /api/reset-password ─────────────────────────────
+app.post('/api/reset-password', async (req, res) => {
+    const { email, code, newPassword } = req.body;
+
+    if (!email || !code || !newPassword) {
+        return res.status(400).json({ error: 'E-mail, código e nova senha são obrigatórios.' });
+    }
+
+    try {
+        const [rows] = await pool.execute(
+            'SELECT * FROM usuarios WHERE email = ? AND reset_token = ?',
+            [email, code]
+        );
+
+        if (rows.length === 0) {
+            return res.status(400).json({ error: 'Código inválido.' });
+        }
+
+        const user = rows[0];
+        if (user.token_expiry && new Date() > new Date(user.token_expiry)) {
+            return res.status(400).json({ error: 'Código expirado. Solicite um novo.' });
+        }
+
+        const senhaHash = await bcrypt.hash(newPassword, 10);
+
+        await pool.execute(
+            'UPDATE usuarios SET senha = ?, reset_token = NULL, token_expiry = NULL WHERE email = ?',
+            [senhaHash, email]
+        );
+
+        res.json({ success: true, message: 'Senha redefinida com sucesso!' });
+    } catch (err) {
+        console.error('Erro em reset-password:', err);
+        res.status(500).json({ error: 'Erro ao redefinir senha.' });
+    }
+});
+
+// ── Inicia servidor ──────────────────────────────────────
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));

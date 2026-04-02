@@ -125,6 +125,40 @@
     <h2>Finalizar <span>Compra</span></h2>
     <p class="subtitle">Preencha seus dados para concluir o pedido</p>
 
+    <!-- ── Itens do Carrinho ── -->
+    <div id="cart-section" style="margin-bottom:1.4rem;">
+      <h3 style="color:#f0f6fc;font-size:1rem;margin-bottom:10px;border-bottom:1px solid #30363d;padding-bottom:6px;">
+        🛍️ Itens no Carrinho
+      </h3>
+      <div id="cart-items-list">
+        <p style="color:#8b949e;font-size:0.9rem;">Nenhum item no carrinho.</p>
+      </div>
+      <div id="cart-total" style="display:none;text-align:right;margin-top:8px;font-weight:700;color:#f0f6fc;font-size:1rem;"></div>
+    </div>
+    <style>
+      body.light-mode #cart-section h3 { color:#222; border-color:#ddd; }
+      body.light-mode #cart-total { color:#222; }
+      .cart-item {
+        display:flex; align-items:center; gap:10px;
+        padding:8px 0; border-bottom:1px solid #30363d;
+      }
+      body.light-mode .cart-item { border-color:#eee; }
+      .cart-item img {
+        width:48px; height:48px; object-fit:cover; border-radius:6px; flex-shrink:0;
+      }
+      .cart-item-info { flex:1; }
+      .cart-item-name { color:#f0f6fc; font-size:0.9rem; font-weight:600; }
+      body.light-mode .cart-item-name { color:#222; }
+      .cart-item-preco { color:#00AA00; font-size:0.85rem; }
+      .cart-item-qtd { color:#8b949e; font-size:0.82rem; }
+      .cart-item-remove {
+        background:none; border:none; color:#ff4d4d; font-size:1.1rem;
+        cursor:pointer; padding:2px 6px; border-radius:4px; line-height:1;
+      }
+      .cart-item-remove:hover { background:rgba(255,77,77,0.1); }
+      .cart-empty { color:#8b949e; font-size:0.9rem; }
+    </style>
+
     <form id="checkoutForm" novalidate>
       <div class="field">
         <label for="nome">Nome completo</label>
@@ -259,7 +293,81 @@
       form.reset();
       cardFields.style.display = 'none';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Limpa carrinho após compra finalizada
+      localStorage.removeItem('nr_carrinho');
+      renderizarCarrinho();
     });
+  </script>
+
+  <script>
+    /* ── Renderização do carrinho no checkout ── */
+    function getCarrinho() {
+      try { return JSON.parse(localStorage.getItem('nr_carrinho') || '[]'); }
+      catch (_) { return []; }
+    }
+    function setCarrinho(c) { localStorage.setItem('nr_carrinho', JSON.stringify(c)); }
+
+    function renderizarCarrinho() {
+      var carrinho = getCarrinho();
+      var lista    = document.getElementById('cart-items-list');
+      var totalDiv = document.getElementById('cart-total');
+
+      lista.innerHTML = '';
+
+      if (!carrinho.length) {
+        lista.innerHTML = '<p class="cart-empty">Nenhum item no carrinho.</p>';
+        totalDiv.style.display = 'none';
+        return;
+      }
+
+      var totalValor = 0;
+
+      carrinho.forEach(function(item, idx) {
+        // Extrai valor numérico do preço (ex: "R$ 249,90" -> 249.90)
+        var precoNum = parseFloat(
+          item.preco.replace(/[^\d,]/g, '').replace(',', '.')
+        ) || 0;
+        totalValor += precoNum * item.qtd;
+
+        var div = document.createElement('div');
+        div.className = 'cart-item';
+
+        var imgHtml = item.img
+          ? '<img src="' + item.img + '" alt="' + item.nome + '">'
+          : '<div style="width:48px;height:48px;background:#30363d;border-radius:6px;flex-shrink:0;"></div>';
+
+        div.innerHTML = imgHtml +
+          '<div class="cart-item-info">' +
+            '<div class="cart-item-name">' + item.nome + '</div>' +
+            '<div class="cart-item-preco">' + item.preco + '</div>' +
+            '<div class="cart-item-qtd">Qtd: ' + item.qtd + '&nbsp;&nbsp;' +
+              '<button class="cart-item-remove" data-idx="' + idx + '" title="Remover">✕</button>' +
+            '</div>' +
+          '</div>';
+
+        lista.appendChild(div);
+      });
+
+      totalDiv.style.display = 'block';
+      totalDiv.textContent = 'Total: R$ ' + totalValor.toFixed(2).replace('.', ',');
+
+      // Eventos de remoção
+      lista.querySelectorAll('.cart-item-remove').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var i = parseInt(btn.getAttribute('data-idx'));
+          var c = getCarrinho();
+          if (c[i].qtd > 1) {
+            c[i].qtd--;
+          } else {
+            c.splice(i, 1);
+          }
+          setCarrinho(c);
+          renderizarCarrinho();
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', renderizarCarrinho);
   </script>
   <script src="theme-toggle.js"></script>
   

@@ -268,6 +268,39 @@
       background-color: #422BFF;
     }
 
+    .login-container .hidden {
+      display: none;
+    }
+
+    .login-container .info,
+    .login-container .error {
+      text-align: left;
+      margin-top: 12px;
+      font-size: 0.95rem;
+    }
+
+    .login-container .info {
+      color: #8b949e;
+    }
+
+    .login-container .error {
+      color: #ff6b6b;
+    }
+
+    .login-container .success {
+      color: #2dd4bf;
+    }
+
+    .login-container .link-button {
+      display: inline-block;
+      margin-top: 12px;
+      color: #422BFF;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      text-decoration: underline;
+    }
 
     .login-container a {
       display: inline-block;
@@ -353,7 +386,30 @@
       <button type="submit">Entrar</button>
       <p class="error" id="loginError"></p>
     </form>
-    <a href="#">Esqueceu a senha?</a><br>
+
+    <div id="forgotPasswordContainer" class="hidden">
+      <p>Digite o e-mail da sua conta para receber um código de redefinição.</p>
+      <form id="forgotPasswordForm">
+        <input type="email" id="forgotEmail" placeholder="Seu e-mail" required />
+        <button type="submit">Enviar código</button>
+        <p class="info" id="forgotPasswordInfo"></p>
+        <button type="button" id="backToLoginBtn" class="link-button">Voltar ao login</button>
+      </form>
+    </div>
+
+    <div id="resetPasswordContainer" class="hidden">
+      <p>Insira o código recebido e escolha uma nova senha.</p>
+      <form id="resetPasswordForm">
+        <input type="text" id="resetCode" placeholder="Código de verificação" required />
+        <input type="password" id="newPassword" placeholder="Nova senha" required />
+        <input type="password" id="confirmPassword" placeholder="Confirme a nova senha" required />
+        <button type="submit">Redefinir senha</button>
+        <p class="info" id="resetPasswordInfo"></p>
+        <button type="button" id="cancelResetBtn" class="link-button">Cancelar</button>
+      </form>
+    </div>
+
+    <a href="#" id="forgotPasswordLink">Esqueceu a senha?</a><br>
     <a href="cadastro.html">Não tem conta? Cadastre-se</a>
     <a class="back-link" href="index.html">← Voltar à loja</a>
   </div>
@@ -448,6 +504,183 @@
     document.addEventListener('DOMContentLoaded', function() {
       const loginForm = document.getElementById('loginForm');
       const loginError = document.getElementById('loginError');
+      const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+      const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
+      const resetPasswordContainer = document.getElementById('resetPasswordContainer');
+      const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+      const resetPasswordForm = document.getElementById('resetPasswordForm');
+      const forgotPasswordInfo = document.getElementById('forgotPasswordInfo');
+      const resetPasswordInfo = document.getElementById('resetPasswordInfo');
+      const backToLoginBtn = document.getElementById('backToLoginBtn');
+      const cancelResetBtn = document.getElementById('cancelResetBtn');
+
+      let resetEmail = '';
+      let debugResetCode = '';
+
+      function showForgotPassword() {
+        loginForm.classList.add('hidden');
+        resetPasswordContainer.classList.add('hidden');
+        forgotPasswordContainer.classList.remove('hidden');
+        forgotPasswordInfo.textContent = '';
+      }
+
+      function showResetPassword() {
+        loginForm.classList.add('hidden');
+        forgotPasswordContainer.classList.add('hidden');
+        resetPasswordContainer.classList.remove('hidden');
+        resetPasswordInfo.textContent = '';
+      }
+
+      function showLoginForm() {
+        loginForm.classList.remove('hidden');
+        forgotPasswordContainer.classList.add('hidden');
+        resetPasswordContainer.classList.add('hidden');
+        loginError.textContent = '';
+      }
+
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', function(event) {
+          event.preventDefault();
+          showForgotPassword();
+        });
+      }
+
+      if (backToLoginBtn) {
+        backToLoginBtn.addEventListener('click', showLoginForm);
+      }
+
+      if (cancelResetBtn) {
+        cancelResetBtn.addEventListener('click', showLoginForm);
+      }
+
+      if (forgotPasswordForm) {
+        forgotPasswordForm.addEventListener('submit', async function(event) {
+          event.preventDefault();
+          const emailField = document.getElementById('forgotEmail');
+          const email = emailField ? emailField.value.trim() : '';
+
+          if (!email || !isValidEmail(email)) {
+            if (forgotPasswordInfo) {
+              forgotPasswordInfo.textContent = 'Digite um e-mail válido.';
+              forgotPasswordInfo.className = 'info error';
+            }
+            return;
+          }
+
+          try {
+            const response = await fetch('https://naredestore-api.onrender.com/api/forgot-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email })
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+              if (forgotPasswordInfo) {
+                forgotPasswordInfo.textContent = data.error || 'Erro ao enviar código.';
+                forgotPasswordInfo.className = 'info error';
+              }
+              return;
+            }
+
+            resetEmail = email;
+            debugResetCode = data.debugCode || '';
+            if (forgotPasswordInfo) {
+              forgotPasswordInfo.textContent = data.debugCode
+                ? `Código de recuperação (modo dev): ${data.debugCode}`
+                : 'Código enviado. Verifique seu e-mail.';
+              forgotPasswordInfo.className = 'info success';
+            }
+            if (emailField) {
+              emailField.value = '';
+            }
+            setTimeout(showResetPassword, 1200);
+          } catch (error) {
+            if (forgotPasswordInfo) {
+              forgotPasswordInfo.textContent = 'Erro de conexão ao solicitar recuperação.';
+              forgotPasswordInfo.className = 'info error';
+            }
+            console.error(error);
+          }
+        });
+      }
+
+      if (resetPasswordForm) {
+        resetPasswordForm.addEventListener('submit', async function(event) {
+          event.preventDefault();
+          const codeField = document.getElementById('resetCode');
+          const newPasswordField = document.getElementById('newPassword');
+          const confirmPasswordField = document.getElementById('confirmPassword');
+          const code = codeField ? codeField.value.trim() : '';
+          const newPassword = newPasswordField ? newPasswordField.value : '';
+          const confirmPassword = confirmPasswordField ? confirmPasswordField.value : '';
+
+          if (!resetEmail) {
+            if (resetPasswordInfo) {
+              resetPasswordInfo.textContent = 'Volte e informe o e-mail antes de redefinir a senha.';
+              resetPasswordInfo.className = 'info error';
+            }
+            return;
+          }
+
+          if (!code || !newPassword || !confirmPassword) {
+            if (resetPasswordInfo) {
+              resetPasswordInfo.textContent = 'Preencha todos os campos.';
+              resetPasswordInfo.className = 'info error';
+            }
+            return;
+          }
+
+          if (newPassword !== confirmPassword) {
+            if (resetPasswordInfo) {
+              resetPasswordInfo.textContent = 'As senhas não conferem.';
+              resetPasswordInfo.className = 'info error';
+            }
+            return;
+          }
+
+          try {
+            const response = await fetch('https://naredestore-api.onrender.com/api/reset-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: resetEmail, code, newPassword })
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+              if (resetPasswordInfo) {
+                resetPasswordInfo.textContent = data.error || 'Erro ao redefinir senha.';
+                resetPasswordInfo.className = 'info error';
+              }
+              return;
+            }
+
+            if (resetPasswordInfo) {
+              resetPasswordInfo.textContent = 'Senha redefinida com sucesso! Faça login com a nova senha.';
+              resetPasswordInfo.className = 'info success';
+            }
+            if (newPasswordField) newPasswordField.value = '';
+            if (confirmPasswordField) confirmPasswordField.value = '';
+            if (codeField) codeField.value = '';
+            const senhaInput = document.getElementById('senha');
+            if (senhaInput) {
+              senhaInput.value = newPassword;
+            }
+            setTimeout(showLoginForm, 1800);
+          } catch (error) {
+            if (resetPasswordInfo) {
+              resetPasswordInfo.textContent = 'Erro de conexão ao redefinir senha.';
+              resetPasswordInfo.className = 'info error';
+            }
+            console.error(error);
+          }
+        });
+      }
+
       if (!loginForm) return;
 
       loginForm.addEventListener('submit', async function(event) {
@@ -473,6 +706,12 @@
           if (!response.ok) {
             if (loginError) loginError.textContent = data.error || 'Erro ao autenticar.';
             return;
+          }
+
+          const userData = data.user || { email };
+          localStorage.setItem('naredestoreUser', JSON.stringify(userData));
+          if (!localStorage.getItem('naredestoreCartHistory')) {
+            localStorage.setItem('naredestoreCartHistory', JSON.stringify([]));
           }
 
           alert('Login realizado com sucesso!');
