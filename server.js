@@ -146,6 +146,16 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Verifica conexão do e-mail ao iniciar
+transporter.verify(function(err) {
+    if (err) {
+        console.error('❌ Gmail NÃO conectado:', err.message);
+        console.error('   → Verifique GMAIL_USER e GMAIL_APP_PASSWORD no Render');
+    } else {
+        console.log('✅ Gmail conectado. Remetente:', process.env.GMAIL_USER);
+    }
+});
+
 // ── MercadoPago ─────────────────────────────────────────────
 const mpClient = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
 
@@ -253,9 +263,7 @@ app.post('/api/forgot-password', async (req, res) => {
             res.json({ success: true });
         } catch (mailErr) {
             console.error('Erro ao enviar e-mail:', mailErr.message);
-            // Em ambiente de desenvolvimento retorna o código diretamente
-            const debugCode = process.env.NODE_ENV !== 'production' ? codigo : undefined;
-            res.json({ success: true, debugCode });
+            res.status(500).json({ error: `Erro ao enviar e-mail: ${mailErr.message}` });
         }
     } catch (err) {
         console.error('Erro em forgot-password:', err);
