@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acompanhar Pedido | NaRede Store</title>
+  <link rel="stylesheet" href="theme-toggle.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+
+    body {
+      background: #0d1117;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px 60px;
+      transition: background 0.3s;
+    }
+    body.light-mode { background: #f0f2f5; }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    /* ── Cabeçalho ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .check-circle {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00c853, #00a040);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 24px rgba(0,200,83,0.35);
+    }
+    .page-header h1 { color: #f0f6fc; font-size: 1.5rem; margin-bottom: 6px; }
+    .page-header p  { color: #8b949e; font-size: 0.92rem; }
+    body.light-mode .page-header h1 { color: #111; }
+
+    /* ── Card ── */
+    .card {
+      background: #161b22;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+    body.light-mode .card {
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .card-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #8b949e;
+      margin-bottom: 16px;
+    }
+
+    /* ── Resumo do pedido ── */
+    .order-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .meta-item label { display: block; font-size: 0.75rem; color: #8b949e; margin-bottom: 3px; }
+    .meta-item span  { font-size: 0.95rem; font-weight: 600; color: #f0f6fc; }
+    body.light-mode .meta-item span { color: #111; }
+
+    /* ── Itens do pedido ── */
+    .order-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #30363d;
+    }
+    body.light-mode .order-item { border-color: #eee; }
+    .order-item:last-child { border-bottom: none; }
+    .order-item img {
+      width: 52px; height: 52px; object-fit: cover;
+      border-radius: 8px; flex-shrink: 0;
+    }
+    .order-item-info { flex: 1; }
+    .order-item-name  { color: #f0f6fc; font-size: 0.9rem; font-weight: 600; }
+    .order-item-sub   { color: #8b949e; font-size: 0.82rem; }
+    body.light-mode .order-item-name { color: #111; }
+    .order-item-preco { color: #00c853; font-size: 0.9rem; font-weight: 700; }
+    .order-total {
+      text-align: right; margin-top: 14px;
+      font-size: 1.05rem; font-weight: 700; color: #f0f6fc;
+    }
+    body.light-mode .order-total { color: #111; }
+
+    /* ── Timeline de rastreamento ── */
+    .timeline { position: relative; padding-left: 36px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 14px; top: 8px; bottom: 0;
+      width: 2px;
+      background: #30363d;
+    }
+
+    .step {
+      position: relative;
+      margin-bottom: 28px;
+      opacity: .45;
+      transition: opacity .4s;
+    }
+    .step.done   { opacity: 1; }
+    .step.active { opacity: 1; }
+    .step:last-child { margin-bottom: 0; }
+
+    .step-dot {
+      position: absolute;
+      left: -36px;
+      top: 2px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #30363d;
+      border: 2px solid #30363d;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem;
+      transition: all .4s;
+      z-index: 1;
+    }
+    .step.done .step-dot {
+      background: #00c853;
+      border-color: #00c853;
+    }
+    .step.active .step-dot {
+      background: #422BFF;
+      border-color: #422BFF;
+      box-shadow: 0 0 0 4px rgba(66,43,255,0.2);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 4px rgba(66,43,255,0.2); }
+      50%      { box-shadow: 0 0 0 8px rgba(66,43,255,0.08); }
+    }
+
+    .step-label {
+      font-size: .95rem;
+      font-weight: 600;
+      color: #8b949e;
+      margin-bottom: 3px;
+      transition: color .4s;
+    }
+    .step.done .step-label   { color: #00c853; }
+    .step.active .step-label { color: #f0f6fc; }
+    body.light-mode .step.active .step-label { color: #111; }
+
+    .step-desc {
+      font-size: .82rem;
+      color: #8b949e;
+      line-height: 1.5;
+    }
+    .step-date {
+      font-size: .75rem;
+      color: #422BFF;
+      margin-top: 3px;
+      font-weight: 500;
+    }
+
+    /* ── Previsão de entrega ── */
+    .delivery-box {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(66,43,255,0.08);
+      border: 1px solid rgba(66,43,255,0.22);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .delivery-icon { font-size: 2rem; flex-shrink: 0; }
+    .delivery-label { font-size: .75rem; color: #8b949e; margin-bottom: 3px; }
+    .delivery-date  { font-size: 1.05rem; font-weight: 700; color: #422BFF; }
+
+    /* ── Botões ── */
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      background: #422BFF;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: background .2s;
+    }
+    .btn-primary:hover { background: #351ECC; }
+    .btn-outline {
+      display: block;
+      width: 100%;
+      padding: 11px;
+      background: transparent;
+      color: #8b949e;
+      border: 1.5px solid #30363d;
+      border-radius: 12px;
+      font-size: .93rem;
+      text-align: center;
+      text-decoration: none;
+      margin-top: 10px;
+      transition: all .2s;
+    }
+    .btn-outline:hover { border-color: #8b949e; color: #f0f6fc; }
+    body.light-mode .btn-outline { color: #555; border-color: #ccc; }
+    body.light-mode .btn-outline:hover { border-color: #888; color: #222; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Cabeçalho -->
+    <div class="page-header">
+      <div class="check-circle">✅</div>
+      <h1>Pedido Confirmado!</h1>
+      <p>Obrigado pela sua compra na <strong style="color:#422BFF;">NaRede Store</strong></p>
+    </div>
+
+    <!-- Resumo do pedido -->
+    <div class="card">
+      <div class="card-title">Resumo do Pedido</div>
+      <div class="order-meta">
+        <div class="meta-item">
+          <label>Número do Pedido</label>
+          <span id="numPedido">#—</span>
+        </div>
+        <div class="meta-item">
+          <label>Data</label>
+          <span id="dataPedido">—</span>
+        </div>
+        <div class="meta-item">
+          <label>Pagamento</label>
+          <span id="metodoPagamento">—</span>
+        </div>
+        <div class="meta-item">
+          <label>Total</label>
+          <span id="totalPedido" style="color:#00c853;">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Itens comprados -->
+    <div class="card">
+      <div class="card-title">Itens do Pedido</div>
+      <div id="itensPedido">
+        <p style="color:#8b949e;font-size:.88rem;">Carregando itens...</p>
+      </div>
+      <div class="order-total" id="totalItens"></div>
+    </div>
+
+    <!-- Previsão de entrega -->
+    <div class="card">
+      <div class="card-title">Previsão de Entrega</div>
+      <div class="delivery-box">
+        <div class="delivery-icon">🚚</div>
+        <div>
+          <div class="delivery-label">Estimativa de chegada</div>
+          <div class="delivery-date" id="dataEntrega">Calculando...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline de envio -->
+    <div class="card">
+      <div class="card-title">Acompanhamento do Envio</div>
+      <div class="timeline">
+
+        <div class="step done" id="step-confirmado">
+          <div class="step-dot">✓</div>
+          <div class="step-label">Pedido Confirmado</div>
+          <div class="step-desc">Seu pagamento foi aprovado e o pedido foi registrado.</div>
+          <div class="step-date" id="date-confirmado"></div>
+        </div>
+
+        <div class="step" id="step-separando">
+          <div class="step-dot">📦</div>
+          <div class="step-label">Separando Itens</div>
+          <div class="step-desc">Sua camiseta está sendo separada e embalada pela equipe.</div>
+          <div class="step-date" id="date-separando"></div>
+        </div>
+
+        <div class="step" id="step-enviado">
+          <div class="step-dot">🚀</div>
+          <div class="step-label">Pedido Enviado</div>
+          <div class="step-desc">O pacote foi despachado e está a caminho dos Correios.</div>
+          <div class="step-date" id="date-enviado"></div>
+        </div>
+
+        <div class="step" id="step-transito">
+          <div class="step-dot">🚚</div>
+          <div class="step-label">Em Trânsito</div>
+          <div class="step-desc">O pacote está sendo transportado para a sua cidade.</div>
+          <div class="step-date" id="date-transito"></div>
+        </div>
+
+        <div class="step" id="step-saiu">
+          <div class="step-dot">🏍️</div>
+          <div class="step-label">Saiu para Entrega</div>
+          <div class="step-desc">O entregador está a caminho do seu endereço hoje.</div>
+          <div class="step-date" id="date-saiu"></div>
+        </div>
+
+        <div class="step" id="step-entregue">
+          <div class="step-dot">🏠</div>
+          <div class="step-label">Entregue</div>
+          <div class="step-desc">Pedido entregue com sucesso. Aproveite sua camiseta!</div>
+          <div class="step-date" id="date-entregue"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <a href="index.html" class="btn-primary">🛒 Continuar Comprando</a>
+    <a href="perfil.html" class="btn-outline">👤 Ver Meu Perfil</a>
+
+  </div>
+
+  <script src="theme-toggle.js"></script>
+  <script>
+    var USER_KEY   = 'naredestoreUser';
+    var PEDIDO_KEY = 'nr_ultimo_pedido';
+
+    // ── Formata data ──────────────────────────────────────
+    function fmt(date) {
+      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+    function fmtHora(date) {
+      return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+    function addDias(date, n) {
+      var d = new Date(date);
+      d.setDate(d.getDate() + n);
+      return d;
+    }
+    function diasUteis(date, n) {
+      var d = new Date(date);
+      var adicionados = 0;
+      while (adicionados < n) {
+        d.setDate(d.getDate() + 1);
+        var dia = d.getDay();
+        if (dia !== 0 && dia !== 6) adicionados++;
+      }
+      return d;
+    }
+
+    // ── Carrega dados do pedido ───────────────────────────
+    var pedido = null;
+    try { pedido = JSON.parse(localStorage.getItem(PEDIDO_KEY)); } catch(_) {}
+
+    var carrinho = [];
+    try { carrinho = JSON.parse(localStorage.getItem('nr_carrinho_historico') || '[]'); } catch(_) {}
+
+    var userData = null;
+    try { userData = JSON.parse(localStorage.getItem(USER_KEY)); } catch(_) {}
+
+    // Número do pedido aleatório se não existir
+    var numPedido = pedido && pedido.id ? '#' + pedido.id : '#NR' + Date.now().toString().slice(-6);
+    var agora     = pedido && pedido.data ? new Date(pedido.data) : new Date();
+    var metodo    = pedido && pedido.metodo ? pedido.metodo : 'Mercado Pago';
+    var total     = pedido && pedido.total  ? pedido.total  : 0;
+    var itens     = pedido && pedido.itens  ? pedido.itens  : carrinho;
+
+    // Nomes bonitos dos métodos
+    var metodosNome = { pix: 'PIX', cartao: 'Cartão de Crédito', boleto: 'Boleto Bancário' };
+
+    // Preenche resumo
+    document.getElementById('numPedido').textContent      = numPedido;
+    document.getElementById('dataPedido').textContent     = fmt(agora) + ' às ' + fmtHora(agora);
+    document.getElementById('metodoPagamento').textContent = metodosNome[metodo] || metodo;
+    document.getElementById('totalPedido').textContent    = 'R$ ' + Number(total).toFixed(2).replace('.', ',');
+
+    // Preenche itens
+    var itensList = document.getElementById('itensPedido');
+    if (itens && itens.length) {
+      var html = '';
+      var totalCalc = 0;
+      itens.forEach(function(item) {
+        var precoNum = parseFloat((item.preco || '0').replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+        totalCalc += precoNum * (item.qtd || 1);
+        var imgHtml = item.img
+          ? '<img src="' + item.img + '" alt="' + item.nome + '">'
+          : '<div style="width:52px;height:52px;background:#30363d;border-radius:8px;flex-shrink:0;"></div>';
+        html += '<div class="order-item">' +
+          imgHtml +
+          '<div class="order-item-info">' +
+            '<div class="order-item-name">' + item.nome + '</div>' +
+            '<div class="order-item-sub">Qtd: ' + (item.qtd || 1) + '</div>' +
+          '</div>' +
+          '<div class="order-item-preco">' + item.preco + '</div>' +
+        '</div>';
+      });
+      itensList.innerHTML = html;
+      if (!total) total = totalCalc;
+      document.getElementById('totalItens').textContent = 'Total: R$ ' + totalCalc.toFixed(2).replace('.', ',');
+      document.getElementById('totalPedido').textContent = 'R$ ' + totalCalc.toFixed(2).replace('.', ',');
+    } else {
+      itensList.innerHTML = '<p style="color:#8b949e;font-size:.88rem;">Nenhum item registrado.</p>';
+    }
+
+    // ── Previsão de entrega (7 a 12 dias úteis) ───────────
+    var minEntrega = diasUteis(agora, 7);
+    var maxEntrega = diasUteis(agora, 12);
+    document.getElementById('dataEntrega').textContent =
+      fmt(minEntrega) + ' – ' + fmt(maxEntrega);
+
+    // ── Timeline: define datas de cada etapa ──────────────
+    var steps = [
+      { id: 'confirmado', dias: 0,  label: 'Hoje, ' + fmtHora(agora) },
+      { id: 'separando',  dias: 1,  label: null },
+      { id: 'enviado',    dias: 2,  label: null },
+      { id: 'transito',   dias: 5,  label: null },
+      { id: 'saiu',       dias: 10, label: null },
+      { id: 'entregue',   dias: 12, label: null }
+    ];
+
+    // Etapa atual simulada com base na data do pedido
+    var agora2   = new Date();
+    var diasDecorridos = Math.floor((agora2 - agora) / (1000 * 60 * 60 * 24));
+
+    steps.forEach(function(s, i) {
+      var stepEl = document.getElementById('step-' + s.id);
+      var dateEl = document.getElementById('date-' + s.id);
+      var stepDate = diasUteis(agora, s.dias);
+
+      // Formatação da data
+      var dataLabel = s.label || fmt(stepDate);
+      if (s.id !== 'confirmado' && s.id !== 'entregue') {
+        dataLabel = 'Previsto: ' + dataLabel;
+      }
+
+      // Determina estado
+      if (diasDecorridos >= s.dias) {
+        if (i + 1 < steps.length && diasDecorridos < steps[i + 1].dias) {
+          stepEl.classList.add('active'); // etapa atual
+          dateEl.textContent = s.id === 'confirmado' ? dataLabel : 'Em andamento';
+        } else {
+          stepEl.classList.add('done');
+          stepEl.querySelector('.step-dot').textContent = '✓';
+          dateEl.textContent = s.id === 'confirmado' ? dataLabel : fmt(stepDate);
+        }
+      } else {
+        dateEl.textContent = dataLabel;
+      }
+    });
+
+    // Limpa o carrinho ativo (já foi pago)
+    localStorage.removeItem('nr_carrinho');
+  </script>
+</body>
+</html>

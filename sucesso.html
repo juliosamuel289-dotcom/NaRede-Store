@@ -92,13 +92,20 @@
       📦 Você receberá um e-mail de confirmação com os detalhes do pedido.
     </div>
 
-    <a href="index.html" class="btn">← Voltar à Loja</a>
+    <a href="pedido.html" class="btn" style="display:block;margin-bottom:12px;">🚚 Acompanhar Pedido</a>
+    <a href="index.html" class="btn" style="background:#30363d;">← Voltar à Loja</a>
   </div>
 
   <script src="theme-toggle.js"></script>
   <script>
-    // Limpa o carrinho após pagamento aprovado
-    localStorage.removeItem('nr_carrinho');
+    // Salva histórico do carrinho e depois limpa
+    var carrinhoAtivo = localStorage.getItem('nr_carrinho');
+    if (carrinhoAtivo) {
+      localStorage.setItem('nr_carrinho_historico', carrinhoAtivo);
+      localStorage.removeItem('nr_carrinho');
+    }
+    // Auto-redireciona para a página de acompanhamento após 4 segundos
+    setTimeout(function() { window.location.href = 'pedido.html'; }, 4000);
   </script>
 </body>
 </html>

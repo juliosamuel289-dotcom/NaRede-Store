@@ -337,17 +337,35 @@
       }
     });
 
+    // ── Preenche e-mail imediatamente do localStorage ─────
+    document.getElementById('p-email').value     = userData.email || '';
+    document.getElementById('headerEmail').textContent = userData.email || '';
+    if (userData.nome) {
+      document.getElementById('headerNome').textContent = userData.nome;
+      document.getElementById('avatarIcon').textContent = userData.nome[0].toUpperCase();
+    }
+
     // ── Carregar dados do perfil ──────────────────────────
-    async function carregarPerfil() {
+    async function carregarPerfil(tentativa) {
+      tentativa = tentativa || 1;
+      var headerNome = document.getElementById('headerNome');
+
       try {
-        var res  = await fetch(API + '/api/perfil?email=' + encodeURIComponent(userData.email));
+        headerNome.textContent = tentativa > 1 ? 'Tentando novamente...' : (userData.nome || 'Carregando...');
+
+        var controller = new AbortController();
+        var timeout    = setTimeout(function() { controller.abort(); }, 12000);
+
+        var res  = await fetch(API + '/api/perfil?email=' + encodeURIComponent(userData.email), { signal: controller.signal });
+        clearTimeout(timeout);
+
         var data = await res.json();
-        if (!res.ok) throw new Error(data.error);
+        if (!res.ok) throw new Error(data.error || 'Erro na API');
 
         var u = data.usuario;
-        document.getElementById('headerNome').textContent  = (u.nome || '') + ' ' + (u.sobrenome || '');
+        headerNome.textContent = ((u.nome || '') + ' ' + (u.sobrenome || '')).trim() || u.email;
         document.getElementById('headerEmail').textContent = u.email || '';
-        document.getElementById('avatarIcon').textContent  = (u.nome || 'U')[0].toUpperCase();
+        document.getElementById('avatarIcon').textContent  = (u.nome || userData.email || 'U')[0].toUpperCase();
 
         document.getElementById('p-nome').value      = u.nome      || '';
         document.getElementById('p-sobrenome').value = u.sobrenome || '';
@@ -361,7 +379,19 @@
         document.getElementById('p-cidade').value    = u.cidade    || '';
         document.getElementById('p-estado').value    = u.estado    || '';
       } catch(err) {
-        console.error('Erro ao carregar perfil:', err);
+        console.error('Erro ao carregar perfil (tentativa ' + tentativa + '):', err);
+
+        if (tentativa < 3) {
+          // Render pode estar em cold start — tenta mais 2 vezes com delay crescente
+          var delay = tentativa * 4000;
+          headerNome.textContent = 'Aguardando servidor... (' + tentativa + '/3)';
+          setTimeout(function() { carregarPerfil(tentativa + 1); }, delay);
+        } else {
+          headerNome.textContent = userData.nome || 'Erro ao carregar';
+          var msgDiv = document.getElementById('msgDados');
+          msgDiv.textContent = '⚠️ Não foi possível carregar seus dados. Verifique sua conexão e recarregue a página.';
+          msgDiv.className = 'msg error';
+        }
       }
     }
     carregarPerfil();

@@ -5,9 +5,55 @@ const bcrypt   = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const cors     = require('cors');
 const path     = require('path');
-const { MercadoPagoConfig, Preference } = require('mercadopago');
+const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 
 const app = express();
+
+// ── Catálogo oficial de preços ───────────────────────────
+// Fonte de verdade para todos os produtos. O servidor NUNCA
+// confia no preço enviado pelo cliente — ele recalcula aqui.
+// Cada produto pode ter múltiplos preços válidos (normal + promo).
+const CATALOGO_PRECOS = {
+  // ── Brasileiros ──────────────────────────────────────
+  'Flamengo':        [0.50, 179.90, 279.90],   // 0.50 = teste temporário
+  'Vasco':           [259.90],
+  'Santos':          [269.90],
+  'Palmeiras':       [289.90, 169.90],
+  'São Paulo':       [279.90],
+  'Corinthians':     [289.90],
+  'Fluminense':      [269.90],
+  'Grêmio':         [259.90],
+  'Atlético Mineiro':[279.90],
+  'Botafogo':        [259.90],
+  'Bahia':           [249.90, 199.90],
+  'Cruzeiro':        [249.90],
+  // ── Internacionais ───────────────────────────────────
+  'Real Madrid':     [299.90],
+  'Barcelona':       [279.90],
+  'Manchester United':[299.90],
+  'Liverpool':       [289.90, 269.90],
+  'Bayern de Munique':[299.90],
+  'Paris Saint-Germain':[289.90],
+  'Arsenal':         [269.90, 249.90],
+  'Chelsea':         [279.90],
+  'Manchester City': [289.90],
+  'Juventus':        [269.90],
+  'AC Milan':        [259.90],
+  'Atlético Madrid': [249.90],
+  // ── Seleções ─────────────────────────────────────────
+  'Brasil':          [249.90],
+  'Argentina':       [239.90, 199.90],
+  'Alemanha':        [229.90],
+  'França':         [239.90],
+  'Inglaterra':      [229.90],
+  'Holanda':         [219.90],
+  'Itália':         [229.90],
+  'Portugal':        [239.90],
+  'México':         [209.90],
+  'Japão':          [199.90, 179.90],
+  'Chile':           [189.90],
+  'Suíça':          [199.90],
+};
 
 // ── Middlewares ──────────────────────────────────────────
 app.use(cors());
@@ -280,6 +326,105 @@ app.put('/api/perfil/senha', async (req, res) => {
     } catch (err) {
         console.error('Erro em PUT /api/perfil/senha:', err);
         res.status(500).json({ error: 'Erro ao alterar senha.' });
+    }
+});
+
+// ── POST /api/pagar ──────────────────────────────────────
+// metodo: 'pix' | 'cartao' | 'boleto'
+// itens: [{nome, preco, qtd}]  — preço é validado contra o catálogo
+app.post('/api/pagar', async (req, res) => {
+    const { metodo, itens, parcelas, payerEmail } = req.body;
+
+    if (!metodo || !Array.isArray(itens) || !itens.length || !payerEmail) {
+        return res.status(400).json({ error: 'metodo, itens e payerEmail são obrigatórios.' });
+    }
+
+    // ── Validação de preços contra o catálogo ──────────
+    let totalValor = 0;
+    for (const item of itens) {
+        const catalogoItem = CATALOGO_PRECOS[item.nome];
+        if (!catalogoItem) {
+            return res.status(400).json({ error: `Produto desconhecido: "${item.nome}".` });
+        }
+        const precoEnviado = Number(item.preco);
+        const precoValido  = catalogoItem.some(p => Math.abs(p - precoEnviado) < 0.01);
+        if (!precoValido) {
+            return res.status(400).json({
+                error: `Preço inválido para "${item.nome}". Preços aceitos: R$ ${catalogoItem.join(' / R$ ')}.`
+            });
+        }
+        const qtd = Math.max(1, Math.floor(Number(item.qtd) || 1));
+        totalValor += precoEnviado * qtd;
+    }
+    totalValor = Math.round(totalValor * 100) / 100; // arredonda centavos
+
+    const valor = totalValor;
+
+    // Monta descrição e lista de itens para o MP
+    const descricao = itens.map(i => `${i.nome} x${i.qtd || 1}`).join(', ');
+    const mpItens   = itens.map(i => ({
+        title:      i.nome,
+        unit_price: Number(i.preco),
+        quantity:   Math.max(1, Math.floor(Number(i.qtd) || 1)),
+        currency_id: 'BRL'
+    }));
+
+    try {
+        if (metodo === 'pix') {
+            // PIX via Payments API → retorna QR code para exibir na página
+            const payment = new Payment(mpClient);
+            const result = await payment.create({
+                body: {
+                    transaction_amount: valor,
+                    description: descricao || 'Pedido NaRede Store',
+                    payment_method_id: 'pix',
+                    payer: { email: payerEmail }
+                }
+            });
+
+            const txData = result.point_of_interaction?.transaction_data;
+            return res.json({
+                id: result.id,
+                qr_code:        txData?.qr_code        || '',
+                qr_code_base64: txData?.qr_code_base64 || ''
+            });
+        }
+
+        // Cartão de crédito ou Boleto → Checkout Pro (redirect)
+        const preference = new Preference(mpClient);
+        const body = {
+            items: mpItens,
+            payer: { email: payerEmail },
+            back_urls: {
+                success: process.env.SITE_URL + '/sucesso.html',
+                failure: process.env.SITE_URL + '/erro.html'
+            },
+            auto_return: 'approved',
+            payment_methods: {}
+        };
+
+        if (metodo === 'cartao') {
+            body.payment_methods = {
+                excluded_payment_types:  [{ id: 'ticket' }, { id: 'bank_transfer' }],
+                installments: Number(parcelas) || 12,
+                default_installments: Number(parcelas) || 1
+            };
+        } else if (metodo === 'boleto') {
+            body.payment_methods = {
+                excluded_payment_types: [
+                    { id: 'credit_card' },
+                    { id: 'debit_card' },
+                    { id: 'bank_transfer' }
+                ]
+            };
+        }
+
+        const result = await preference.create({ body });
+        return res.json({ init_point: result.init_point });
+
+    } catch (err) {
+        console.error('Erro em POST /api/pagar:', err);
+        res.status(500).json({ error: 'Erro ao processar pagamento.' });
     }
 });
 
