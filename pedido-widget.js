@@ -1,8 +1,196 @@
 /* ==========================================================
-   pedido-widget.js — Botão flutuante de acompanhamento de pedido
+   pedido-widget.js — Botão "Meu Pedido" no header, ao lado do Carrinho
    Aparece em todas as páginas quando há um pedido recente.
-   Clique → abre mini-painel com resumo; botão abre pedido.html
+   Clique → abre dropdown com resumo; botão abre pedido.html
    ========================================================== */
+
+(function () {
+  var PEDIDO_KEY  = 'nr_ultimo_pedido';
+  var EXPIRY_DAYS = 30;
+
+  var pedido = null;
+  try { pedido = JSON.parse(localStorage.getItem(PEDIDO_KEY)); } catch (_) {}
+
+  if (!pedido || !pedido.id) return;
+
+  if (pedido.data) {
+    var diff = (Date.now() - new Date(pedido.data).getTime()) / (1000 * 60 * 60 * 24);
+    if (diff > EXPIRY_DAYS) return;
+  }
+
+  // ── Helpers ──────────────────────────────────────────────
+  function diasUteis(date, n) {
+    var d = new Date(date);
+    var adicionados = 0;
+    while (adicionados < n) {
+      d.setDate(d.getDate() + 1);
+      var dia = d.getDay();
+      if (dia !== 0 && dia !== 6) adicionados++;
+    }
+    return d;
+  }
+  function fmt(date) {
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  }
+
+  // ── Calcula etapa atual ───────────────────────────────────
+  var ETAPAS = [
+    { label: 'Pedido Confirmado', dias: 0  },
+    { label: 'Separando Itens',   dias: 1  },
+    { label: 'Pedido Enviado',    dias: 2  },
+    { label: 'Em Trânsito',       dias: 5  },
+    { label: 'Saiu p/ Entrega',   dias: 10 },
+    { label: 'Entregue',          dias: 12 },
+  ];
+
+  var pedidoDate   = pedido.data ? new Date(pedido.data) : new Date();
+  var diasPassados = Math.floor((Date.now() - pedidoDate.getTime()) / (1000 * 60 * 60 * 24));
+  var etapaAtual   = ETAPAS[0];
+  var etapaIdx     = 0;
+  for (var i = 0; i < ETAPAS.length; i++) {
+    if (diasPassados >= ETAPAS[i].dias) { etapaAtual = ETAPAS[i]; etapaIdx = i; }
+  }
+
+  var progress     = Math.round(((etapaIdx) / (ETAPAS.length - 1)) * 100);
+  var entregaMin   = diasUteis(pedidoDate, 7);
+  var entregaMax   = diasUteis(pedidoDate, 12);
+  var nPedido      = '#NR' + String(pedido.id).slice(-6);
+  var total        = pedido.total ? 'R$ ' + Number(pedido.total).toFixed(2).replace('.', ',') : '—';
+  var metodos      = { pix: 'PIX', cartao: 'Cartão', boleto: 'Boleto' };
+  var metodoLabel  = metodos[pedido.metodo] || pedido.metodo || '—';
+
+  // ── CSS ────────────────────────────────────────────────────
+  var style = document.createElement('style');
+  style.textContent = [
+    /* wrapper relativo para o dropdown */
+    '#nr-ped-wrap{position:relative;display:inline-flex;align-items:center;}',
+
+    /* botão — imita .user-link do header */
+    '#nr-ped-btn{display:flex;align-items:center;gap:6px;background:none;border:none;',
+    'cursor:pointer;color:#fff;font-family:Poppins,sans-serif;font-size:.9rem;',
+    'padding:6px 10px;border-radius:8px;transition:background .2s;white-space:nowrap;}',
+    '#nr-ped-btn:hover{background:rgba(66,43,255,.15);}',
+    'body.light-mode #nr-ped-btn{color:#111;}',
+
+    /* ponto verde pulsante */
+    '#nr-ped-dot{width:8px;height:8px;border-radius:50%;background:#00c853;flex-shrink:0;',
+    'animation:nr-pulse-dot 1.8s infinite;}',
+    '@keyframes nr-pulse-dot{0%,100%{box-shadow:0 0 0 2px rgba(0,200,83,.3);}',
+    '50%{box-shadow:0 0 0 5px rgba(0,200,83,.08);}}',
+
+    /* ícone caminhão */
+    '#nr-ped-btn .nr-icon{font-size:1.1rem;line-height:1;}',
+
+    /* dropdown */
+    '#nr-ped-dropdown{display:none;position:absolute;top:calc(100% + 12px);right:0;',
+    'width:270px;background:#161b22;border:1px solid rgba(66,43,255,.3);',
+    'border-radius:14px;padding:16px;z-index:999999;',
+    'box-shadow:0 12px 40px rgba(0,0,0,.55);}',
+    'body.light-mode #nr-ped-dropdown{background:#fff;border-color:#e0e0e0;',
+    'box-shadow:0 8px 30px rgba(0,0,0,.12);}',
+    '#nr-ped-dropdown.open{display:block;}',
+
+    /* cabeçalho do dropdown */
+    '.nr-drop-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}',
+    '.nr-drop-head span{color:#f0f6fc;font-size:.85rem;font-weight:700;}',
+    'body.light-mode .nr-drop-head span{color:#111;}',
+    '.nr-drop-close{background:none;border:none;color:#8b949e;cursor:pointer;font-size:1.1rem;line-height:1;padding:0;}',
+    '.nr-drop-close:hover{color:#fff;}',
+    'body.light-mode .nr-drop-close:hover{color:#111;}',
+
+    /* barra de progresso */
+    '.nr-prog-bar{height:5px;background:#30363d;border-radius:99px;margin-bottom:6px;}',
+    '.nr-prog-fill{height:100%;background:linear-gradient(90deg,#422BFF,#00c853);',
+    'border-radius:99px;transition:width .5s;}',
+    '.nr-prog-label{font-size:.78rem;color:#00c853;font-weight:600;margin-bottom:12px;}',
+
+    /* info */
+    '.nr-drop-info{font-size:.78rem;color:#8b949e;line-height:1.9;border-top:1px solid #30363d;',
+    'padding-top:10px;margin-bottom:12px;}',
+    'body.light-mode .nr-drop-info{border-color:#eee;color:#666;}',
+    '.nr-drop-info b{color:#f0f6fc;}',
+    'body.light-mode .nr-drop-info b{color:#111;}',
+
+    /* botão ver mais */
+    '#nr-ped-link{display:block;text-align:center;padding:8px;background:#422BFF;',
+    'color:#fff;border-radius:8px;text-decoration:none;font-size:.83rem;font-weight:600;',
+    'transition:background .2s;}',
+    '#nr-ped-link:hover{background:#351ECC;}',
+  ].join('');
+  document.head.appendChild(style);
+
+  // ── HTML ──────────────────────────────────────────────────
+  var wrap = document.createElement('div');
+  wrap.id = 'nr-ped-wrap';
+  wrap.innerHTML =
+    '<button id="nr-ped-btn" title="Acompanhar meu pedido">' +
+      '<span id="nr-ped-dot"></span>' +
+      '<span class="nr-icon">🚚</span>' +
+      '<span class="label"><b>Meu Pedido</b></span>' +
+    '</button>' +
+    '<div id="nr-ped-dropdown">' +
+      '<div class="nr-drop-head">' +
+        '<span>🚚 Acompanhar Pedido</span>' +
+        '<button class="nr-drop-close" id="nr-ped-close">×</button>' +
+      '</div>' +
+      '<div class="nr-prog-bar"><div class="nr-prog-fill" style="width:' + progress + '%"></div></div>' +
+      '<div class="nr-prog-label">' + etapaAtual.label + '</div>' +
+      '<div class="nr-drop-info">' +
+        '<b>Pedido:</b> ' + nPedido + '<br>' +
+        '<b>Pagamento:</b> ' + metodoLabel + '<br>' +
+        '<b>Total:</b> ' + total + '<br>' +
+        '<b>Entrega:</b> ' + fmt(entregaMin) + ' – ' + fmt(entregaMax) +
+      '</div>' +
+      '<a href="pedido.html" id="nr-ped-link">Ver acompanhamento completo →</a>' +
+    '</div>';
+
+  // ── Insere antes do link do Carrinho no .user-bar ─────────
+  function inserir() {
+    // Tenta achar o link do carrinho no header pelo href
+    var cartLink = document.querySelector('.user-bar a[href="checkout.html"]');
+    if (cartLink) {
+      cartLink.parentNode.insertBefore(wrap, cartLink);
+      return true;
+    }
+    // Fallback: qualquer .user-bar
+    var userBar = document.querySelector('.user-bar');
+    if (userBar) {
+      userBar.appendChild(wrap);
+      return true;
+    }
+    return false;
+  }
+
+  // Tenta inserir imediatamente; se DOM ainda não estiver pronto, aguarda
+  if (!inserir()) {
+    document.addEventListener('DOMContentLoaded', inserir);
+  }
+
+  // ── Lógica abrir/fechar ───────────────────────────────────
+  document.addEventListener('click', function (e) {
+    var btn      = document.getElementById('nr-ped-btn');
+    var dropdown = document.getElementById('nr-ped-dropdown');
+    var closeBtn = document.getElementById('nr-ped-close');
+    if (!btn || !dropdown) return;
+
+    if (btn.contains(e.target)) {
+      dropdown.classList.toggle('open');
+    } else if (closeBtn && closeBtn.contains(e.target)) {
+      dropdown.classList.remove('open');
+    } else if (!dropdown.contains(e.target)) {
+      dropdown.classList.remove('open');
+    }
+  });
+
+  // Esconde na própria página pedido.html
+  if (window.location.pathname.includes('pedido.html')) {
+    document.addEventListener('DOMContentLoaded', function () {
+      var w = document.getElementById('nr-ped-wrap');
+      if (w) w.style.display = 'none';
+    });
+  }
+})();
+
 
 (function () {
   var PEDIDO_KEY = 'nr_ultimo_pedido';
