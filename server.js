@@ -173,10 +173,10 @@ app.post('/api/register', async (req, res) => {
         return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios.' });
     }
 
-    // Garante strings vazias para campos NOT NULL do banco
-    const _sobrenome = sobrenome || '';
-    const _celular   = celular   || '';
-    const _cpf       = cpf       || '';
+    // NULL para campos UNIQUE opcionais (evita erro de duplicidade de string vazia)
+    const _sobrenome = sobrenome  || null;
+    const _celular   = celular    || null;
+    const _cpf       = cpf        || null;
 
     try {
         const [existing] = await pool.execute('SELECT id FROM usuarios WHERE email = ?', [email]);
@@ -186,7 +186,7 @@ app.post('/api/register', async (req, res) => {
 
         // Verifica CPF duplicado somente se foi informado
         if (_cpf) {
-            const [cpfExist] = await pool.execute('SELECT id FROM usuarios WHERE cpf = ? AND cpf != ""', [_cpf]);
+            const [cpfExist] = await pool.execute('SELECT id FROM usuarios WHERE cpf = ?', [_cpf]);
             if (cpfExist.length > 0) {
                 return res.status(409).json({ error: 'CPF já cadastrado.' });
             }
@@ -198,13 +198,13 @@ app.post('/api/register', async (req, res) => {
             `INSERT INTO usuarios
                 (nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [nome, _sobrenome, genero, _celular, _cpf, cep, rua, bairro, cidade, estado, email, senhaHash]
+            [nome, _sobrenome, genero, _celular, _cpf, cep || null, rua || null, bairro || null, cidade || null, estado || null, email, senhaHash]
         );
 
         res.status(201).json({ success: true, message: 'Cadastro realizado com sucesso!' });
     } catch (err) {
-        console.error('Erro no cadastro:', err);
-        res.status(500).json({ error: 'Erro ao salvar no banco.' });
+        console.error('Erro no cadastro:', err.message);
+        res.status(500).json({ error: 'Erro ao salvar no banco: ' + err.message });
     }
 });
 
