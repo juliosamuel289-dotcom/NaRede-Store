@@ -174,9 +174,10 @@
         <label for="pagamento">Forma de pagamento</label>
         <select id="pagamento" required>
           <option value="">Selecione a forma de pagamento</option>
-          <option value="pix">Pix</option>
-          <option value="cartao">Cartão de crédito</option>
-          <option value="boleto">Boleto bancário</option>
+          <option value="mercadopago">Mercado Pago (Pix, Cartão, Boleto)</option>
+          <option value="pix">Pix (manual)</option>
+          <option value="cartao">Cartão de crédito (manual)</option>
+          <option value="boleto">Boleto bancário (manual)</option>
         </select>
       </div>
 
@@ -288,7 +289,13 @@
         if (cvv.length < 3 || cvv.length > 4) { alert('CVV inválido.'); return; }
       }
 
-      // se passou pelas validações
+      // Pagamento via MercadoPago: redireciona para checkout deles
+      if (forma === 'mercadopago') {
+        await finalizarCompraMercadoPago();
+        return;
+      }
+
+      // se passou pelas validações (pagamento manual)
       confirmMsg.style.display = 'block';
       form.reset();
       cardFields.style.display = 'none';
@@ -297,6 +304,52 @@
       localStorage.removeItem('nr_carrinho');
       renderizarCarrinho();
     });
+
+    async function finalizarCompraMercadoPago() {
+      // Calcula o total real do carrinho
+      const carrinho = JSON.parse(localStorage.getItem('nr_carrinho') || '[]');
+      if (!carrinho.length) {
+        alert('Seu carrinho está vazio.');
+        return;
+      }
+
+      const totalValor = carrinho.reduce(function(acc, item) {
+        var precoNum = parseFloat(
+          item.preco.replace(/[^\d,]/g, '').replace(',', '.')
+        ) || 0;
+        return acc + precoNum * item.qtd;
+      }, 0);
+
+      const btnSubmit = form.querySelector('button[type="submit"]');
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Redirecionando...';
+
+      try {
+        const response = await fetch('https://naredestore-api.onrender.com/api/create-preference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            description: 'Pedido NaRede Store',
+            price: totalValor,
+            quantity: 1
+          })
+        });
+
+        const data = await response.json();
+        if (data.init_point) {
+          window.location.href = data.init_point;
+        } else {
+          alert('Erro ao iniciar pagamento. Tente novamente.');
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = 'Finalizar compra';
+        }
+      } catch (err) {
+        console.error('Erro no pagamento:', err);
+        alert('Não foi possível conectar ao sistema de pagamento. Tente novamente.');
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Finalizar compra';
+      }
+    }
   </script>
 
   <script>

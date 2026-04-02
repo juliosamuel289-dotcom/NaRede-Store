@@ -5,6 +5,7 @@ const bcrypt   = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const cors     = require('cors');
 const path     = require('path');
+const { MercadoPagoConfig, Preference } = require('mercadopago');
 
 const app = express();
 
@@ -68,6 +69,9 @@ const transporter = nodemailer.createTransport({
         pass: process.env.GMAIL_APP_PASSWORD
     }
 });
+
+// ── MercadoPago ─────────────────────────────────────────────
+const mpClient = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
 
 // ── Rotas de páginas ─────────────────────────────────────
 app.get('/',        (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
@@ -217,6 +221,97 @@ app.post('/api/reset-password', async (req, res) => {
     } catch (err) {
         console.error('Erro em reset-password:', err);
         res.status(500).json({ error: 'Erro ao redefinir senha.' });
+    }
+});
+
+// ── GET /api/perfil?email=... ────────────────────────────
+app.get('/api/perfil', async (req, res) => {
+    const { email } = req.query;
+    if (!email) return res.status(400).json({ error: 'E-mail é obrigatório.' });
+
+    try {
+        const [rows] = await pool.execute(
+            'SELECT id, nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, created_at FROM usuarios WHERE email = ?',
+            [email]
+        );
+        if (rows.length === 0) return res.status(404).json({ error: 'Usuário não encontrado.' });
+        res.json({ usuario: rows[0] });
+    } catch (err) {
+        console.error('Erro em GET /api/perfil:', err);
+        res.status(500).json({ error: 'Erro ao buscar perfil.' });
+    }
+});
+
+// ── PUT /api/perfil ──────────────────────────────────────
+app.put('/api/perfil', async (req, res) => {
+    const { email, nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado } = req.body;
+    if (!email || !nome) return res.status(400).json({ error: 'E-mail e nome são obrigatórios.' });
+
+    try {
+        await pool.execute(
+            `UPDATE usuarios SET nome=?, sobrenome=?, genero=?, celular=?, cpf=?, cep=?, rua=?, bairro=?, cidade=?, estado=? WHERE email=?`,
+            [nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email]
+        );
+        res.json({ success: true, message: 'Perfil atualizado com sucesso!' });
+    } catch (err) {
+        console.error('Erro em PUT /api/perfil:', err);
+        res.status(500).json({ error: 'Erro ao atualizar perfil.' });
+    }
+});
+
+// ── PUT /api/perfil/senha ────────────────────────────────
+app.put('/api/perfil/senha', async (req, res) => {
+    const { email, senhaAtual, novaSenha } = req.body;
+    if (!email || !senhaAtual || !novaSenha) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+    }
+
+    try {
+        const [rows] = await pool.execute('SELECT senha FROM usuarios WHERE email = ?', [email]);
+        if (rows.length === 0) return res.status(404).json({ error: 'Usuário não encontrado.' });
+
+        const senhaValida = await bcrypt.compare(senhaAtual, rows[0].senha);
+        if (!senhaValida) return res.status(401).json({ error: 'Senha atual incorreta.' });
+
+        const senhaHash = await bcrypt.hash(novaSenha, 10);
+        await pool.execute('UPDATE usuarios SET senha = ? WHERE email = ?', [senhaHash, email]);
+
+        res.json({ success: true, message: 'Senha alterada com sucesso!' });
+    } catch (err) {
+        console.error('Erro em PUT /api/perfil/senha:', err);
+        res.status(500).json({ error: 'Erro ao alterar senha.' });
+    }
+});
+
+// ── POST /api/create-preference (MercadoPago) ──────────────
+app.post('/api/create-preference', async (req, res) => {
+    const { description, price, quantity } = req.body;
+    if (!description || !price || !quantity) {
+        return res.status(400).json({ error: 'description, price e quantity são obrigatórios.' });
+    }
+
+    try {
+        const preference = new Preference(mpClient);
+        const result = await preference.create({
+            body: {
+                items: [
+                    {
+                        title: description,
+                        unit_price: Number(price),
+                        quantity: Number(quantity)
+                    }
+                ],
+                back_urls: {
+                    success: process.env.SITE_URL + '/sucesso.html',
+                    failure: process.env.SITE_URL + '/erro.html'
+                },
+                auto_return: 'approved'
+            }
+        });
+        res.json({ init_point: result.init_point });
+    } catch (err) {
+        console.error('Erro ao criar preferência MP:', err);
+        res.status(500).json({ error: 'Erro ao criar pagamento.' });
     }
 });
 

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagamento Aprovado | NaRede Store</title>
+  <link rel="stylesheet" href="theme-toggle.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body {
+      background: #0d1117;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    body.light-mode { background: #f0f2f5; }
+
+    .card {
+      background: #161b22;
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    body.light-mode .card {
+      background: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      color: #00c853;
+      font-size: 1.6rem;
+      margin-bottom: 0.75rem;
+    }
+    body.light-mode h1 { color: #1a801a; }
+
+    p {
+      color: #8b949e;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+    body.light-mode p { color: #555; }
+
+    .btn {
+      display: inline-block;
+      margin-top: 1.75rem;
+      padding: 12px 32px;
+      background: #422BFF;
+      color: #fff;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #351ECC; }
+
+    .order-info {
+      margin-top: 1.5rem;
+      padding: 14px 18px;
+      background: rgba(0,200,83,0.08);
+      border: 1px solid rgba(0,200,83,0.25);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      color: #00c853;
+    }
+    body.light-mode .order-info {
+      background: rgba(26,128,26,0.08);
+      border-color: rgba(26,128,26,0.25);
+      color: #1a801a;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">✅</div>
+    <h1>Pagamento Aprovado!</h1>
+    <p>Obrigado por comprar na <strong style="color:#422BFF;">NaRede Store</strong>.</p>
+    <p>Seu pedido foi confirmado e será processado em breve.</p>
+
+    <div class="order-info">
+      📦 Você receberá um e-mail de confirmação com os detalhes do pedido.
+    </div>
+
+    <a href="index.html" class="btn">← Voltar à Loja</a>
+  </div>
+
+  <script src="theme-toggle.js"></script>
+  <script>
+    // Limpa o carrinho após pagamento aprovado
+    localStorage.removeItem('nr_carrinho');
+  </script>
+</body>
+</html>

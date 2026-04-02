@@ -382,7 +382,12 @@
     <p>Entrar na sua conta</p>
     <form id="loginForm">
       <input type="email" id="email" placeholder="E-mail" required />
-      <input type="password" id="senha" placeholder="Senha" required />
+      <div style="position:relative;">
+        <input type="password" id="senha" placeholder="Senha" required style="padding-right:44px;width:100%;" />
+        <button type="button" onclick="toggleSenha('senha','olhoLogin')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;width:auto;" aria-label="Ver senha">
+          <svg id="olhoLogin" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#8b949e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
       <button type="submit">Entrar</button>
       <p class="error" id="loginError"></p>
     </form>
@@ -401,8 +406,18 @@
       <p>Insira o código recebido e escolha uma nova senha.</p>
       <form id="resetPasswordForm">
         <input type="text" id="resetCode" placeholder="Código de verificação" required />
-        <input type="password" id="newPassword" placeholder="Nova senha" required />
-        <input type="password" id="confirmPassword" placeholder="Confirme a nova senha" required />
+        <div style="position:relative;">
+          <input type="password" id="newPassword" placeholder="Nova senha" required style="padding-right:44px;width:100%;" />
+          <button type="button" onclick="toggleSenha('newPassword','olhoNew')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;width:auto;" aria-label="Ver senha">
+            <svg id="olhoNew" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#8b949e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div style="position:relative;">
+          <input type="password" id="confirmPassword" placeholder="Confirme a nova senha" required style="padding-right:44px;width:100%;" />
+          <button type="button" onclick="toggleSenha('confirmPassword','olhoConfirm')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;width:auto;" aria-label="Ver senha">
+            <svg id="olhoConfirm" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#8b949e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
         <button type="submit">Redefinir senha</button>
         <p class="info" id="resetPasswordInfo"></p>
         <button type="button" id="cancelResetBtn" class="link-button">Cancelar</button>
@@ -722,6 +737,21 @@
         }
       });
     });
+  </script>
+
+  <script>
+    function toggleSenha(inputId, svgId) {
+      var input = document.getElementById(inputId);
+      var svg   = document.getElementById(svgId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (svg) svg.setAttribute('stroke', '#422BFF');
+      } else {
+        input.type = 'password';
+        if (svg) svg.setAttribute('stroke', '#8b949e');
+      }
+    }
   </script>
 
   <script src="theme-toggle.js"></script>

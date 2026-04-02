@@ -130,8 +130,9 @@
     panel.className = 'user-panel';
     panel.innerHTML = `
       <button type="button" class="close-panel" aria-label="Fechar">×</button>
-      <h3>Olá, ${getFirstName(user.name || user.email)}</h3>
-      <p>Você está logado como <strong>${user.email}</strong>.</p>
+      <h3>Olá, ${getFirstName(user.nome || user.name || user.email)}</h3>
+      <p>Você está logado como <strong>${user.nome || user.name || user.email}</strong>.</p>
+      <a href="perfil.html" class="user-panel-link">👤 Meu Perfil</a>
       <button type="button" class="user-panel-link" id="openCartHistoryBtn">Ver histórico do carrinho</button>
       <button type="button" class="user-panel-link" id="logoutBtn">Sair</button>
       <div id="cartHistoryList"></div>
@@ -177,7 +178,7 @@
     if (user && user.email) {
       const label = loginLink.querySelector('.label');
       if (label) {
-        label.innerHTML = `<b>Olá, ${getFirstName(user.name || user.email)}</b>`;
+        label.innerHTML = `<b>Olá, ${getFirstName(user.nome || user.name || user.email)}</b>`;
       }
       loginLink.href = '#';
       loginLink.setAttribute('data-user', 'true');
