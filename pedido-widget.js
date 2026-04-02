@@ -13,10 +13,11 @@
 
   if (!pedido || !pedido.id) return;
 
-  // Só mostra se o usuário logado é o dono do pedido
+  // Só mostra se o usuário estiver logado
   var usuarioAtual = null;
   try { usuarioAtual = JSON.parse(localStorage.getItem('naredestoreUser')); } catch (_) {}
   if (!usuarioAtual || !usuarioAtual.email) return;
+  // Se o pedido tem email de dono, garante que é o mesmo usuário
   if (pedido.userEmail && pedido.userEmail !== usuarioAtual.email) return;
 
   if (pedido.data) {
@@ -207,6 +208,13 @@
 
   // Nada a mostrar
   if (!pedido || !pedido.id) return;
+
+  // Só mostra se o usuário estiver logado
+  var usuarioAtual = null;
+  try { usuarioAtual = JSON.parse(localStorage.getItem('naredestoreUser')); } catch (_) {}
+  if (!usuarioAtual || !usuarioAtual.email) return;
+  // Se o pedido tem email de dono, garante que é o mesmo usuário
+  if (pedido.userEmail && pedido.userEmail !== usuarioAtual.email) return;
 
   // Expirado?
   if (pedido.data) {
