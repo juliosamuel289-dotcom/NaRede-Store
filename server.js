@@ -102,22 +102,33 @@ const pool = mysql.createPool({
         `);
         console.log('✅ Tabela "usuarios" verificada/criada.');
 
-        // ── Migração: adiciona colunas que podem não existir em bancos antigos ──
-        const colunasMigracao = [
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS sobrenome  VARCHAR(100)",
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS genero     VARCHAR(20)",
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS celular    VARCHAR(20)",
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS cpf        VARCHAR(14)",
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS cep        VARCHAR(9)",
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS rua        VARCHAR(255)",
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS bairro     VARCHAR(100)",
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS cidade     VARCHAR(100)",
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS estado     VARCHAR(2)",
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS reset_token  VARCHAR(6) DEFAULT NULL",
-            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS token_expiry DATETIME   DEFAULT NULL",
+        // ── Migração: verifica INFORMATION_SCHEMA e só adiciona colunas ausentes ──
+        // Compatível com todas as versões de MySQL (não usa IF NOT EXISTS no ALTER)
+        const [existingCols] = await conn.execute(
+            `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'usuarios'`
+        );
+        const exists = existingCols.map(r => r.COLUMN_NAME.toLowerCase());
+
+        const novasColunas = [
+            { name: 'sobrenome',    def: 'VARCHAR(100)' },
+            { name: 'genero',       def: 'VARCHAR(20)' },
+            { name: 'celular',      def: 'VARCHAR(20)' },
+            { name: 'cpf',          def: 'VARCHAR(14)' },
+            { name: 'cep',          def: 'VARCHAR(9)' },
+            { name: 'rua',          def: 'VARCHAR(255)' },
+            { name: 'bairro',       def: 'VARCHAR(100)' },
+            { name: 'cidade',       def: 'VARCHAR(100)' },
+            { name: 'estado',       def: 'VARCHAR(2)' },
+            { name: 'reset_token',  def: 'VARCHAR(6) DEFAULT NULL' },
+            { name: 'token_expiry', def: 'DATETIME DEFAULT NULL' },
         ];
-        for (const sql of colunasMigracao) {
-            try { await conn.execute(sql); } catch (_) { /* coluna já existe */ }
+
+        for (const col of novasColunas) {
+            if (!exists.includes(col.name)) {
+                await conn.execute(`ALTER TABLE usuarios ADD COLUMN ${col.name} ${col.def}`);
+                console.log(`✅ Coluna "${col.name}" adicionada.`);
+            }
         }
         console.log('✅ Migração de colunas concluída.');
         conn.release();
