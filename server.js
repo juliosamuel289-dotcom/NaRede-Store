@@ -173,10 +173,23 @@ app.post('/api/register', async (req, res) => {
         return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios.' });
     }
 
+    // Garante strings vazias para campos NOT NULL do banco
+    const _sobrenome = sobrenome || '';
+    const _celular   = celular   || '';
+    const _cpf       = cpf       || '';
+
     try {
         const [existing] = await pool.execute('SELECT id FROM usuarios WHERE email = ?', [email]);
         if (existing.length > 0) {
             return res.status(409).json({ error: 'E-mail já cadastrado.' });
+        }
+
+        // Verifica CPF duplicado somente se foi informado
+        if (_cpf) {
+            const [cpfExist] = await pool.execute('SELECT id FROM usuarios WHERE cpf = ? AND cpf != ""', [_cpf]);
+            if (cpfExist.length > 0) {
+                return res.status(409).json({ error: 'CPF já cadastrado.' });
+            }
         }
 
         const senhaHash = await bcrypt.hash(senha, 10);
@@ -185,7 +198,7 @@ app.post('/api/register', async (req, res) => {
             `INSERT INTO usuarios
                 (nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senhaHash]
+            [nome, _sobrenome, genero, _celular, _cpf, cep, rua, bairro, cidade, estado, email, senhaHash]
         );
 
         res.status(201).json({ success: true, message: 'Cadastro realizado com sucesso!' });
@@ -315,7 +328,7 @@ app.get('/api/perfil', async (req, res) => {
 
     try {
         const [rows] = await pool.execute(
-            'SELECT id, nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, created_at FROM usuarios WHERE email = ?',
+            'SELECT id, nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email FROM usuarios WHERE email = ?',
             [email]
         );
         if (rows.length === 0) return res.status(404).json({ error: 'Usuário não encontrado.' });
