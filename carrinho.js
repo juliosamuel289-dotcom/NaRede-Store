@@ -84,23 +84,24 @@ function criarBotaoCarrinho(onClickFn) {
   var btn = document.createElement('button');
   btn.className = 'btn-add-cart';
   btn.innerHTML = '🛒 Adicionar ao Carrinho';
-  btn.style.cssText = [
-    'display:block',
-    'width:100%',
-    'margin-top:10px',
-    'padding:9px 14px',
-    'background:#422BFF',
-    'color:#fff',
-    'border:none',
-    'border-radius:8px',
-    'font-size:0.88rem',
-    'font-weight:600',
-    'cursor:pointer',
-    'font-family:Poppins,sans-serif',
-    'transition:background 0.2s'
-  ].join(';');
-  btn.addEventListener('mouseenter', function() { btn.style.background = '#351ECC'; });
-  btn.addEventListener('mouseleave', function() { btn.style.background = '#422BFF'; });
+  btn.setAttribute('style', [
+    'display:block !important',
+    'width:100% !important',
+    'margin-top:10px !important',
+    'padding:9px 14px !important',
+    'background:#422BFF !important',
+    'color:#fff !important',
+    'border:none !important',
+    'border-radius:8px !important',
+    'font-size:0.88rem !important',
+    'font-weight:600 !important',
+    'cursor:pointer !important',
+    'font-family:Poppins,sans-serif !important',
+    'transition:background 0.2s !important',
+    'text-align:center !important'
+  ].join(';'));
+  btn.addEventListener('mouseenter', function() { btn.style.setProperty('background', '#351ECC', 'important'); });
+  btn.addEventListener('mouseleave', function() { btn.style.setProperty('background', '#422BFF', 'important'); });
   btn.addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();

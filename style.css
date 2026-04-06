@@ -979,6 +979,12 @@ body {
     will-change: transform;
 }
 
+body.light-mode .produto {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .produto:hover {
     transform: translateY(-8px) scale(1.02);
@@ -1009,13 +1015,29 @@ body {
     margin-bottom: 8px !important;
 }
 
-/* Forçar branco em AMBOS os modos */
+/* Modo escuro: texto branco */
 .produto p,
 .produto .tamanhos,
-.tamanhos,
+.tamanhos {
+    color: #ffffff !important;
+}
+
+/* Modo claro: texto escuro */
 body.light-mode .produto p,
 body.light-mode .produto .tamanhos,
 body.light-mode .tamanhos {
+    color: #111111 !important;
+}
+
+/* Botão adicionar ao carrinho — sempre azul com texto branco */
+.btn-add-cart {
+    background: #422BFF !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+body.light-mode .btn-add-cart {
+    background: #422BFF !important;
     color: #ffffff !important;
 }
 

@@ -592,7 +592,39 @@
       if(cancelBtn) cancelBtn.addEventListener('click', closeModal);
       if(overlay) overlay.addEventListener('click', closeModal);
       document.addEventListener('keydown', e => { if(e.key==='Escape' && modal && modal.classList.contains('open')) closeModal(); });
-      if(form){ form.addEventListener('submit', e => { e.preventDefault(); if(!form.name.value.trim()||!form.email.value.trim()||!form.message.value.trim()){ if(feedback) feedback.textContent='Por favor preencha os campos obrigatórios.'; return; } if(feedback) feedback.textContent='Formulário pronto (sem envio automático).'; form.reset(); setTimeout(closeModal,800); }); }
+      if (form) {
+        form.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          var nome = document.getElementById('contactName').value.trim();
+          var email = document.getElementById('contactEmail').value.trim();
+          var telefone = document.getElementById('contactPhone').value.trim();
+          var assunto = document.getElementById('contactSubject').value.trim();
+          var mensagem = document.getElementById('contactMessage').value.trim();
+          if (!nome || !email || !mensagem) {
+            if (feedback) { feedback.textContent = 'Preencha nome, e-mail e mensagem.'; feedback.style.color = '#e74c3c'; }
+            return;
+          }
+          var btn = document.getElementById('btnSend');
+          if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+          if (feedback) { feedback.textContent = ''; }
+          try {
+            var res = await fetch('https://naredestore-api.onrender.com/api/contato', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nome, email, telefone, assunto, mensagem })
+            });
+            var data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Erro ao enviar.');
+            if (feedback) { feedback.textContent = 'Mensagem enviada com sucesso!'; feedback.style.color = '#00c853'; }
+            form.reset();
+            setTimeout(closeModal, 1500);
+          } catch (err) {
+            if (feedback) { feedback.textContent = 'Erro ao enviar. Tente novamente.'; feedback.style.color = '#e74c3c'; }
+          } finally {
+            if (btn) { btn.disabled = false; btn.textContent = 'Enviar Mensagem'; }
+          }
+        });
+      }
     });
   </script>
 

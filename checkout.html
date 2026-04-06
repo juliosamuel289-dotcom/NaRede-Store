@@ -510,8 +510,29 @@
             if (feedback) feedback.textContent = 'Por favor preencha os campos obrigatórios.';
             return;
           }
-          if (feedback) feedback.textContent = 'Formulário pronto (sem envio automático).';
-          setTimeout(closeModal, 800);
+          var btn = document.getElementById('btnSend');
+          if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+          try {
+            var nome2 = document.getElementById('contactName').value.trim();
+            var email2 = document.getElementById('contactEmail').value.trim();
+            var telefone2 = document.getElementById('contactPhone').value.trim();
+            var assunto2 = document.getElementById('contactSubject').value.trim();
+            var mensagem2 = document.getElementById('contactMessage').value.trim();
+            var res = await fetch('https://naredestore-api.onrender.com/api/contato', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nome: nome2, email: email2, telefone: telefone2, assunto: assunto2, mensagem: mensagem2 })
+            });
+            var data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Erro ao enviar.');
+            if (feedback) { feedback.textContent = 'Mensagem enviada com sucesso!'; feedback.style.color = '#00c853'; }
+            form.reset();
+            setTimeout(closeModal, 1500);
+          } catch (err) {
+            if (feedback) { feedback.textContent = 'Erro ao enviar. Tente novamente.'; feedback.style.color = '#e74c3c'; }
+          } finally {
+            if (btn) { btn.disabled = false; btn.textContent = 'Enviar Mensagem'; }
+          }
         });
       }
     });

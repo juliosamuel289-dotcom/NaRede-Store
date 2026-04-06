@@ -530,6 +530,35 @@ app.post('/api/create-preference', async (req, res) => {
     }
 });
 
+// ── POST /api/contato ────────────────────────────────────
+app.post('/api/contato', async (req, res) => {
+    const { nome, email, telefone, assunto, mensagem } = req.body;
+    if (!nome || !email || !mensagem) {
+        return res.status(400).json({ error: 'Nome, e-mail e mensagem são obrigatórios.' });
+    }
+
+    try {
+        await enviarEmailBrevo(
+            process.env.BREVO_SENDER_EMAIL,
+            `[Central de Ajuda] ${assunto || 'Sem assunto'} — ${nome}`,
+            `<div style="font-family:Poppins,sans-serif;max-width:600px;margin:0 auto;">
+                <h2 style="color:#422BFF;">Central de Ajuda — NaRede Store</h2>
+                <p><b>Nome:</b> ${nome}</p>
+                <p><b>E-mail:</b> ${email}</p>
+                <p><b>Telefone:</b> ${telefone || 'Não informado'}</p>
+                <p><b>Assunto:</b> ${assunto || 'Não informado'}</p>
+                <hr style="border:1px solid #eee;margin:16px 0;">
+                <p><b>Mensagem:</b></p>
+                <p style="white-space:pre-line;color:#444;">${mensagem}</p>
+            </div>`
+        );
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Erro em POST /api/contato:', err.message);
+        res.status(500).json({ error: 'Erro ao enviar mensagem.' });
+    }
+});
+
 // ── Inicia servidor ──────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
