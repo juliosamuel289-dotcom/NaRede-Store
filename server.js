@@ -142,7 +142,7 @@ const pool = mysql.createPool({
 function enviarEmailBrevo(to, subject, html) {
     return new Promise((resolve, reject) => {
         const body = JSON.stringify({
-            sender:  { name: 'NaRede Store', email: 'no-reply@naredestore.com' },
+            sender:  { name: 'NaRede Store', email: process.env.BREVO_SENDER_EMAIL },
             to:      [{ email: to }],
             subject: subject,
             htmlContent: html
