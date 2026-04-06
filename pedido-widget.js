@@ -17,8 +17,8 @@
   var usuarioAtual = null;
   try { usuarioAtual = JSON.parse(localStorage.getItem('naredestoreUser')); } catch (_) {}
   if (!usuarioAtual || !usuarioAtual.email) return;
-  // Se o pedido tem email de dono, garante que é o mesmo usuário
-  if (pedido.userEmail && pedido.userEmail !== usuarioAtual.email) return;
+  // Pedido sem dono OU de outro usuário — não exibe
+  if (!pedido.userEmail || pedido.userEmail !== usuarioAtual.email) return;
 
   if (pedido.data) {
     var diff = (Date.now() - new Date(pedido.data).getTime()) / (1000 * 60 * 60 * 24);
@@ -213,8 +213,8 @@
   var usuarioAtual = null;
   try { usuarioAtual = JSON.parse(localStorage.getItem('naredestoreUser')); } catch (_) {}
   if (!usuarioAtual || !usuarioAtual.email) return;
-  // Se o pedido tem email de dono, garante que é o mesmo usuário
-  if (pedido.userEmail && pedido.userEmail !== usuarioAtual.email) return;
+  // Pedido sem dono OU de outro usuário — não exibe
+  if (!pedido.userEmail || pedido.userEmail !== usuarioAtual.email) return;
 
   // Expirado?
   if (pedido.data) {
