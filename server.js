@@ -2,7 +2,7 @@ require('dotenv').config();
 const express  = require('express');
 const mysql    = require('mysql2/promise');
 const bcrypt   = require('bcryptjs');
-const { Resend } = require('resend');
+const https    = require('https');
 const cors     = require('cors');
 const path     = require('path');
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
@@ -138,9 +138,42 @@ const pool = mysql.createPool({
     }
 })();
 
-// ── Resend (e-mail via HTTPS) ────────────────────────────
-const resend = new Resend(process.env.RESEND_API_KEY);
-console.log('✅ Resend configurado.');
+// ── Brevo (e-mail via HTTPS API) ─────────────────────────
+function enviarEmailBrevo(to, subject, html) {
+    return new Promise((resolve, reject) => {
+        const body = JSON.stringify({
+            sender:  { name: 'NaRede Store', email: 'no-reply@naredestore.com' },
+            to:      [{ email: to }],
+            subject: subject,
+            htmlContent: html
+        });
+        const options = {
+            hostname: 'api.brevo.com',
+            path:     '/v3/smtp/email',
+            method:   'POST',
+            headers:  {
+                'Content-Type':  'application/json',
+                'api-key':       process.env.BREVO_API_KEY,
+                'Content-Length': Buffer.byteLength(body)
+            }
+        };
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    resolve();
+                } else {
+                    reject(new Error(`Brevo status ${res.statusCode}: ${data}`));
+                }
+            });
+        });
+        req.on('error', reject);
+        req.write(body);
+        req.end();
+    });
+}
+console.log('✅ Brevo configurado.');
 
 // ── MercadoPago ─────────────────────────────────────────────
 const mpClient = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
@@ -249,22 +282,16 @@ app.post('/api/forgot-password', async (req, res) => {
         );
 
         try {
-            const { error: mailErr } = await resend.emails.send({
-                from: 'NaRede Store <onboarding@resend.dev>',
-                to: email,
-                subject: 'Código de Recuperação de Senha — NaRede Store',
-                html: `
-                  <div style="font-family:Poppins,sans-serif;max-width:480px;margin:0 auto;">
+            await enviarEmailBrevo(
+                email,
+                'Código de Recuperação de Senha — NaRede Store',
+                `<div style="font-family:Poppins,sans-serif;max-width:480px;margin:0 auto;">
                     <h2 style="color:#422BFF;">NaRede Store</h2>
                     <p>Seu código de recuperação de senha é:</p>
                     <h1 style="letter-spacing:6px;color:#222;">${codigo}</h1>
                     <p style="color:#666;">Válido por <strong>15 minutos</strong>. Ignore se não solicitou.</p>
                   </div>`
-            });
-            if (mailErr) {
-                console.error('Erro ao enviar e-mail:', mailErr.message);
-                return res.status(500).json({ error: `Erro ao enviar e-mail: ${mailErr.message}` });
-            }
+            );
             res.json({ success: true });
         } catch (mailErr) {
             console.error('Erro ao enviar e-mail:', mailErr.message);
