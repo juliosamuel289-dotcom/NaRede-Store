@@ -2,7 +2,7 @@ require('dotenv').config();
 const express  = require('express');
 const mysql    = require('mysql2/promise');
 const bcrypt   = require('bcryptjs');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const cors     = require('cors');
 const path     = require('path');
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
@@ -138,24 +138,9 @@ const pool = mysql.createPool({
     }
 })();
 
-// ── Nodemailer (Gmail) ───────────────────────────────────
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-    }
-});
-
-// Verifica conexão do e-mail ao iniciar
-transporter.verify(function(err) {
-    if (err) {
-        console.error('❌ Gmail NÃO conectado:', err.message);
-        console.error('   → Verifique GMAIL_USER e GMAIL_APP_PASSWORD no Render');
-    } else {
-        console.log('✅ Gmail conectado. Remetente:', process.env.GMAIL_USER);
-    }
-});
+// ── Resend (e-mail via HTTPS) ────────────────────────────
+const resend = new Resend(process.env.RESEND_API_KEY);
+console.log('✅ Resend configurado.');
 
 // ── MercadoPago ─────────────────────────────────────────────
 const mpClient = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
@@ -264,8 +249,8 @@ app.post('/api/forgot-password', async (req, res) => {
         );
 
         try {
-            await transporter.sendMail({
-                from: `"NaRede Store" <${process.env.GMAIL_USER}>`,
+            const { error: mailErr } = await resend.emails.send({
+                from: 'NaRede Store <onboarding@resend.dev>',
                 to: email,
                 subject: 'Código de Recuperação de Senha — NaRede Store',
                 html: `
@@ -276,6 +261,10 @@ app.post('/api/forgot-password', async (req, res) => {
                     <p style="color:#666;">Válido por <strong>15 minutos</strong>. Ignore se não solicitou.</p>
                   </div>`
             });
+            if (mailErr) {
+                console.error('Erro ao enviar e-mail:', mailErr.message);
+                return res.status(500).json({ error: `Erro ao enviar e-mail: ${mailErr.message}` });
+            }
             res.json({ success: true });
         } catch (mailErr) {
             console.error('Erro ao enviar e-mail:', mailErr.message);
