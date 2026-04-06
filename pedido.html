@@ -321,8 +321,8 @@
 
   </div>
 
-  <script src="theme-toggle.js"></script>
   <script>
+  (function () {
     var USER_KEY   = 'naredestoreUser';
     var PEDIDO_KEY = 'nr_ultimo_pedido';
 
@@ -350,14 +350,33 @@
     }
 
     // ── Carrega dados do pedido ───────────────────────────
+    var userData = null;
+    try { userData = JSON.parse(localStorage.getItem(USER_KEY)); } catch(_) {}
+
     var pedido = null;
     try { pedido = JSON.parse(localStorage.getItem(PEDIDO_KEY)); } catch(_) {}
+
+    // ── Garante que o pedido pertence ao usuário logado ───
+    if (pedido && pedido.userEmail && userData && userData.email) {
+      if (pedido.userEmail !== userData.email) {
+        pedido = null; // pedido de outro usuário — não exibe
+      }
+    }
 
     var carrinho = [];
     try { carrinho = JSON.parse(localStorage.getItem('nr_carrinho_historico') || '[]'); } catch(_) {}
 
-    var userData = null;
-    try { userData = JSON.parse(localStorage.getItem(USER_KEY)); } catch(_) {}
+    // Se não tem pedido, exibe mensagem amigável e encerra
+    if (!pedido && (!carrinho || !carrinho.length)) {
+      document.querySelector('.container').innerHTML =
+        '<div style="text-align:center;padding:80px 20px;">' +
+        '<div style="font-size:3rem;margin-bottom:16px;">📦</div>' +
+        '<h2 style="color:#f0f6fc;margin-bottom:8px;">Nenhum pedido encontrado</h2>' +
+        '<p style="color:#8b949e;">Você ainda não realizou nenhum pedido nesta conta.</p>' +
+        '<a href="index.html" style="display:inline-block;margin-top:24px;padding:12px 28px;background:#422BFF;color:#fff;border-radius:12px;text-decoration:none;font-weight:600;">Ir às compras</a>' +
+        '</div>';
+      return;
+    }
 
     // Número do pedido aleatório se não existir
     var numPedido = pedido && pedido.id ? '#' + pedido.id : '#NR' + Date.now().toString().slice(-6);
@@ -451,6 +470,7 @@
 
     // Limpa o carrinho ativo (já foi pago)
     localStorage.removeItem('nr_carrinho');
+  })();
   </script>
 </body>
 </html>

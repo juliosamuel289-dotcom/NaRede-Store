@@ -122,6 +122,7 @@ const pool = mysql.createPool({
             { name: 'estado',       def: 'VARCHAR(2)' },
             { name: 'reset_token',  def: 'VARCHAR(6) DEFAULT NULL' },
             { name: 'token_expiry', def: 'DATETIME DEFAULT NULL' },
+            { name: 'last_login',   def: 'DATETIME DEFAULT NULL' },
         ];
 
         for (const col of novasColunas) {
@@ -230,6 +231,8 @@ app.post('/api/login', async (req, res) => {
         if (!senhaValida) {
             return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
         }
+
+        await pool.execute('UPDATE usuarios SET last_login = NOW() WHERE id = ?', [user.id]);
 
         res.json({ success: true, user: { id: user.id, nome: user.nome, email: user.email } });
     } catch (err) {
