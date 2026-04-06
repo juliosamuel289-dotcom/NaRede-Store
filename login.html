@@ -404,8 +404,8 @@
 
     <div id="resetPasswordContainer" class="hidden">
       <p>Insira o código recebido e escolha uma nova senha.</p>
-      <form id="resetPasswordForm">
-        <input type="text" id="resetCode" placeholder="Código de verificação" required />
+      <form id="resetPasswordForm" autocomplete="off">
+        <input type="text" id="resetCode" placeholder="Código de verificação" required autocomplete="one-time-code" inputmode="numeric" maxlength="6" />
         <div style="position:relative;">
           <input type="password" id="newPassword" placeholder="Nova senha" required style="padding-right:44px;width:100%;" />
           <button type="button" onclick="toggleSenha('newPassword','olhoNew')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;width:auto;" aria-label="Ver senha">
