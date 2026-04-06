@@ -396,7 +396,7 @@
       <p>Digite o e-mail da sua conta para receber um código de redefinição.</p>
       <form id="forgotPasswordForm">
         <input type="email" id="forgotEmail" placeholder="Seu e-mail" required />
-        <button type="submit">Enviar código</button>
+        <button type="submit" id="btnEnviarCodigo">Enviar código</button>
         <p class="info" id="forgotPasswordInfo"></p>
         <button type="button" id="backToLoginBtn" class="link-button">Voltar ao login</button>
       </form>
@@ -576,6 +576,7 @@
         forgotPasswordForm.addEventListener('submit', async function(event) {
           event.preventDefault();
           const emailField = document.getElementById('forgotEmail');
+          const btnEnviar = document.getElementById('btnEnviarCodigo');
           const email = emailField ? emailField.value.trim() : '';
 
           if (!email || !isValidEmail(email)) {
@@ -586,12 +587,25 @@
             return;
           }
 
+          // Bloqueia o botão para evitar múltiplos envios
+          if (btnEnviar) { btnEnviar.disabled = true; btnEnviar.textContent = 'Aguarde...'; }
+          if (forgotPasswordInfo) {
+            forgotPasswordInfo.textContent = 'Conectando ao servidor, aguarde...';
+            forgotPasswordInfo.className = 'info';
+          }
+
+          // Timeout de 40 segundos (servidor pode estar acordando)
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 40000);
+
           try {
             const response = await fetch('https://naredestore-api.onrender.com/api/forgot-password', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email })
+              body: JSON.stringify({ email }),
+              signal: controller.signal
             });
+            clearTimeout(timeoutId);
             const data = await response.json();
 
             if (!response.ok) {
@@ -599,6 +613,7 @@
                 forgotPasswordInfo.textContent = data.error || 'Erro ao enviar código.';
                 forgotPasswordInfo.className = 'info error';
               }
+              if (btnEnviar) { btnEnviar.disabled = false; btnEnviar.textContent = 'Enviar código'; }
               return;
             }
 
@@ -607,18 +622,20 @@
             if (forgotPasswordInfo) {
               forgotPasswordInfo.textContent = data.debugCode
                 ? `Código de recuperação (modo dev): ${data.debugCode}`
-                : 'Código enviado. Verifique seu e-mail.';
+                : 'Código enviado! Verifique seu e-mail.';
               forgotPasswordInfo.className = 'info success';
             }
-            if (emailField) {
-              emailField.value = '';
-            }
+            if (emailField) emailField.value = '';
             setTimeout(showResetPassword, 1200);
           } catch (error) {
+            clearTimeout(timeoutId);
             if (forgotPasswordInfo) {
-              forgotPasswordInfo.textContent = 'Erro de conexão ao solicitar recuperação.';
+              forgotPasswordInfo.textContent = error.name === 'AbortError'
+                ? 'Tempo limite esgotado. O servidor pode estar iniciando — tente novamente em 30 segundos.'
+                : 'Erro de conexão. Verifique sua internet e tente novamente.';
               forgotPasswordInfo.className = 'info error';
             }
+            if (btnEnviar) { btnEnviar.disabled = false; btnEnviar.textContent = 'Enviar código'; }
             console.error(error);
           }
         });
