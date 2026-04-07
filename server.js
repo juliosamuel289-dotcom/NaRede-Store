@@ -71,8 +71,18 @@ const pool = mysql.createPool({
     ssl:             { rejectUnauthorized: false },
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit:      0
+    queueLimit:      0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000,
+    connectTimeout:  10000
 });
+
+// Mantém o pool vivo — evita conexões "mortas" no Aiven
+setInterval(async () => {
+    try {
+        await pool.execute('SELECT 1');
+    } catch (_) {}
+}, 30000);
 
 // ── Cria a tabela se não existir e testa conexão ─────────
 (async () => {
