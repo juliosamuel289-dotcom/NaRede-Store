@@ -1,3 +1,11 @@
+// ── Handlers de erro global (DEVEM ser os primeiros) ────
+process.on('uncaughtException', (err) => {
+    console.error('\u274c uncaughtException:', err.message, err.stack);
+});
+process.on('unhandledRejection', (reason) => {
+    console.error('\u274c unhandledRejection:', reason);
+});
+
 require('dotenv').config();
 const express  = require('express');
 const https    = require('https');
@@ -544,14 +552,6 @@ app.post('/api/contato', async (req, res) => {
         console.error('Erro em POST /api/contato:', err.message);
         res.status(500).json({ error: 'Erro ao enviar mensagem.' });
     }
-});
-
-// ── Tratamento de erros globais ──────────────────────────
-process.on('uncaughtException', (err) => {
-    console.error('❌ uncaughtException:', err.message, err.stack);
-});
-process.on('unhandledRejection', (reason) => {
-    console.error('❌ unhandledRejection:', reason);
 });
 
 // ── Inicia servidor ──────────────────────────────────────
