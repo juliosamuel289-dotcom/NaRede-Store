@@ -356,7 +356,7 @@
         var controller = new AbortController();
         var timeout    = setTimeout(function() { controller.abort(); }, 12000);
 
-        var res  = await fetch(API + '/api/perfil?email=' + encodeURIComponent(userData.email), { signal: controller.signal });
+        var res  = await fetch(API + '/api/perfil?uid=' + encodeURIComponent(userData.id), { signal: controller.signal });
         clearTimeout(timeout);
 
         var data = await res.json();
@@ -407,7 +407,7 @@
       msg.className = 'msg';
 
       var dados = {
-        email:     userData.email,
+        uid:       userData.id,
         nome:      document.getElementById('p-nome').value.trim(),
         sobrenome: document.getElementById('p-sobrenome').value.trim(),
         genero:    document.getElementById('p-genero').value,
@@ -473,7 +473,7 @@
         var res  = await fetch(API + '/api/perfil/senha', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: userData.email, senhaAtual: atual, novaSenha: nova })
+          body: JSON.stringify({ uid: userData.id, senhaAtual: atual, novaSenha: nova })
         });
         var data = await res.json();
         if (!res.ok) throw new Error(data.error);

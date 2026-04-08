@@ -256,7 +256,7 @@
 
       infoNome.textContent = (userData.nome || '') + (userData.sobrenome ? ' ' + userData.sobrenome : '');
 
-      fetch(API + '/api/perfil?email=' + encodeURIComponent(userData.email))
+      fetch(API + '/api/perfil?uid=' + encodeURIComponent(userData.id))
         .then(function(r) { return r.json(); })
         .then(function(d) {
           var u = d.usuario;

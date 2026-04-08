@@ -1,10 +1,9 @@
 require('dotenv').config();
 const express  = require('express');
-const mysql    = require('mysql2/promise');
-const bcrypt   = require('bcryptjs');
 const https    = require('https');
 const cors     = require('cors');
 const path     = require('path');
+const admin    = require('firebase-admin');
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 
 const app = express();
@@ -55,98 +54,49 @@ const CATALOGO_PRECOS = {
   'Suíça':          [199.90],
 };
 
+// ── Firebase Admin ──────────────────────────────────────
+admin.initializeApp({
+    credential: admin.credential.cert({
+        projectId:   process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey:  process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+    })
+});
+const db   = admin.firestore();
+const auth = admin.auth();
+console.log('✅ Firebase Admin inicializado.');
+
+// Autentica usuário via Firebase REST API (única forma de verificar senha no servidor)
+async function firebaseSignIn(email, password) {
+    const apiKey = process.env.FIREBASE_WEB_API_KEY;
+    const body   = JSON.stringify({ email, password, returnSecureToken: true });
+    return new Promise((resolve, reject) => {
+        const options = {
+            hostname: 'identitytoolkit.googleapis.com',
+            path:     `/v1/accounts:signInWithEmailAndPassword?key=${apiKey}`,
+            method:   'POST',
+            headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+        };
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                const parsed = JSON.parse(data);
+                if (res.statusCode === 200) resolve(parsed);
+                else reject(new Error(parsed.error?.message || 'Credenciais inválidas.'));
+            });
+        });
+        req.on('error', reject);
+        req.write(body);
+        req.end();
+    });
+}
+
 // ── Middlewares ──────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
-
-// ── Pool de conexão (Aiven MySQL) ────────────────────────
-const pool = mysql.createPool({
-    host:            process.env.DB_HOST,
-    port:            Number(process.env.DB_PORT) || 16604,
-    user:            process.env.DB_USER,
-    password:        process.env.DB_PASSWORD,
-    database:        process.env.DB_NAME,
-    ssl:             { rejectUnauthorized: false },
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit:      0,
-    enableKeepAlive: true,
-    keepAliveInitialDelay: 10000,
-    connectTimeout:  10000
-});
-
-// Mantém o pool vivo — evita conexões "mortas" no Aiven
-setInterval(async () => {
-    try {
-        await pool.execute('SELECT 1');
-    } catch (_) {}
-}, 30000);
-
-// ── Cria a tabela se não existir e testa conexão ─────────
-(async () => {
-    try {
-        const conn = await pool.getConnection();
-        console.log('✅ Banco de dados conectado com sucesso!');
-
-        await conn.execute(`
-            CREATE TABLE IF NOT EXISTS usuarios (
-                id           INT AUTO_INCREMENT PRIMARY KEY,
-                nome         VARCHAR(100) NOT NULL,
-                sobrenome    VARCHAR(100),
-                genero       VARCHAR(20),
-                celular      VARCHAR(20),
-                cpf          VARCHAR(14),
-                cep          VARCHAR(9),
-                rua          VARCHAR(255),
-                bairro       VARCHAR(100),
-                cidade       VARCHAR(100),
-                estado       VARCHAR(2),
-                email        VARCHAR(255) NOT NULL UNIQUE,
-                senha        VARCHAR(255) NOT NULL,
-                reset_token  VARCHAR(6)   DEFAULT NULL,
-                token_expiry DATETIME     DEFAULT NULL,
-                created_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-        console.log('✅ Tabela "usuarios" verificada/criada.');
-
-        // ── Migração: verifica INFORMATION_SCHEMA e só adiciona colunas ausentes ──
-        // Compatível com todas as versões de MySQL (não usa IF NOT EXISTS no ALTER)
-        const [existingCols] = await conn.execute(
-            `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'usuarios'`
-        );
-        const exists = existingCols.map(r => r.COLUMN_NAME.toLowerCase());
-
-        const novasColunas = [
-            { name: 'sobrenome',    def: 'VARCHAR(100)' },
-            { name: 'genero',       def: 'VARCHAR(20)' },
-            { name: 'celular',      def: 'VARCHAR(20)' },
-            { name: 'cpf',          def: 'VARCHAR(14)' },
-            { name: 'cep',          def: 'VARCHAR(9)' },
-            { name: 'rua',          def: 'VARCHAR(255)' },
-            { name: 'bairro',       def: 'VARCHAR(100)' },
-            { name: 'cidade',       def: 'VARCHAR(100)' },
-            { name: 'estado',       def: 'VARCHAR(2)' },
-            { name: 'reset_token',  def: 'VARCHAR(6) DEFAULT NULL' },
-            { name: 'token_expiry', def: 'DATETIME DEFAULT NULL' },
-            { name: 'last_login',   def: 'DATETIME DEFAULT NULL' },
-        ];
-
-        for (const col of novasColunas) {
-            if (!exists.includes(col.name)) {
-                await conn.execute(`ALTER TABLE usuarios ADD COLUMN ${col.name} ${col.def}`);
-                console.log(`✅ Coluna "${col.name}" adicionada.`);
-            }
-        }
-        console.log('✅ Migração de colunas concluída.');
-        conn.release();
-    } catch (err) {
-        console.error('❌ Falha ao conectar ao banco:', err.message);
-    }
-})();
 
 // ── Brevo (e-mail via HTTPS API) ─────────────────────────
 function enviarEmailBrevo(to, subject, html) {
@@ -202,33 +152,40 @@ app.post('/api/register', async (req, res) => {
         return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios.' });
     }
 
-    // NULL para campos UNIQUE opcionais (evita erro de duplicidade de string vazia)
-    const _sobrenome = sobrenome  || null;
-    const _celular   = celular    || null;
-    const _cpf       = cpf        || null;
-
     try {
-        const [existing] = await pool.execute('SELECT id FROM usuarios WHERE email = ?', [email]);
-        if (existing.length > 0) {
-            return res.status(409).json({ error: 'E-mail já cadastrado.' });
+        // Verifica CPF duplicado no Firestore (se informado)
+        if (cpf) {
+            const snap = await db.collection('usuarios').where('cpf', '==', cpf).limit(1).get();
+            if (!snap.empty) return res.status(409).json({ error: 'CPF já cadastrado.' });
         }
 
-        // Verifica CPF duplicado somente se foi informado
-        if (_cpf) {
-            const [cpfExist] = await pool.execute('SELECT id FROM usuarios WHERE cpf = ?', [_cpf]);
-            if (cpfExist.length > 0) {
-                return res.status(409).json({ error: 'CPF já cadastrado.' });
+        // Cria usuário no Firebase Auth (garante unicidade de e-mail e armazena senha com segurança)
+        let userRecord;
+        try {
+            userRecord = await auth.createUser({ email, password: senha, displayName: nome });
+        } catch (authErr) {
+            if (authErr.code === 'auth/email-already-exists') {
+                return res.status(409).json({ error: 'E-mail já cadastrado.' });
             }
+            throw authErr;
         }
 
-        const senhaHash = await bcrypt.hash(senha, 10);
-
-        await pool.execute(
-            `INSERT INTO usuarios
-                (nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [nome, _sobrenome, genero, _celular, _cpf, cep || null, rua || null, bairro || null, cidade || null, estado || null, email, senhaHash]
-        );
+        // Salva perfil no Firestore usando o UID como chave do documento
+        await db.collection('usuarios').doc(userRecord.uid).set({
+            uid:       userRecord.uid,
+            nome:      nome,
+            sobrenome: sobrenome || '',
+            genero:    genero    || '',
+            celular:   celular   || '',
+            cpf:       cpf       || '',
+            cep:       cep       || '',
+            rua:       rua       || '',
+            bairro:    bairro    || '',
+            cidade:    cidade    || '',
+            estado:    estado    || '',
+            email:     email,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
 
         res.status(201).json({ success: true, message: 'Cadastro realizado com sucesso!' });
     } catch (err) {
@@ -240,32 +197,37 @@ app.post('/api/register', async (req, res) => {
 // ── POST /api/login ──────────────────────────────────────
 app.post('/api/login', async (req, res) => {
     const { email, password, senha } = req.body;
-    const senhaFornecida = password || senha; // aceita ambos os campos
+    const senhaFornecida = password || senha;
 
     if (!email || !senhaFornecida) {
         return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
     }
 
     try {
-        const [rows] = await pool.execute('SELECT * FROM usuarios WHERE email = ?', [email]);
-
-        if (rows.length === 0) {
+        // Verifica credenciais via Firebase Auth REST API
+        let firebaseUser;
+        try {
+            firebaseUser = await firebaseSignIn(email, senhaFornecida);
+        } catch (_) {
             return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
         }
 
-        const user = rows[0];
-        const senhaValida = await bcrypt.compare(senhaFornecida, user.senha);
+        const uid = firebaseUser.localId;
 
-        if (!senhaValida) {
-            return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
-        }
+        // Busca perfil no Firestore
+        const doc = await db.collection('usuarios').doc(uid).get();
+        const perfil = doc.exists ? doc.data() : {};
 
-        await pool.execute('UPDATE usuarios SET last_login = NOW() WHERE id = ?', [user.id]);
+        // Atualiza último login
+        await db.collection('usuarios').doc(uid).set(
+            { lastLogin: admin.firestore.FieldValue.serverTimestamp() },
+            { merge: true }
+        );
 
-        res.json({ success: true, user: { id: user.id, nome: user.nome, email: user.email } });
+        res.json({ success: true, user: { id: uid, nome: perfil.nome || '', email: email } });
     } catch (err) {
         console.error('Erro no login:', err);
-        res.status(500).json({ error: 'Erro de conexão com o banco.' });
+        res.status(500).json({ error: 'Erro ao autenticar.' });
     }
 });
 
@@ -281,14 +243,18 @@ app.post('/api/forgot-password', async (req, res) => {
     const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
 
     try {
-        const [rows] = await pool.execute('SELECT id FROM usuarios WHERE email = ?', [email]);
-        if (rows.length === 0) {
+        // Verifica se o e-mail existe no Firebase Auth
+        let userRecord;
+        try {
+            userRecord = await auth.getUserByEmail(email);
+        } catch (_) {
             return res.status(404).json({ error: 'E-mail não encontrado.' });
         }
 
-        await pool.execute(
-            'UPDATE usuarios SET reset_token = ?, token_expiry = ? WHERE email = ?',
-            [codigo, expiry, email]
+        // Salva o código de reset no documento do usuário no Firestore
+        await db.collection('usuarios').doc(userRecord.uid).set(
+            { resetToken: codigo, tokenExpiry: expiry.toISOString() },
+            { merge: true }
         );
 
         try {
@@ -322,26 +288,32 @@ app.post('/api/reset-password', async (req, res) => {
     }
 
     try {
-        const [rows] = await pool.execute(
-            'SELECT * FROM usuarios WHERE email = ? AND reset_token = ?',
-            [email, code]
-        );
-
-        if (rows.length === 0) {
-            return res.status(400).json({ error: 'Código inválido.' });
+        // Encontra o usuário pelo e-mail no Firebase Auth
+        let userRecord;
+        try {
+            userRecord = await auth.getUserByEmail(email);
+        } catch (_) {
+            return res.status(404).json({ error: 'E-mail não encontrado.' });
         }
 
-        const user = rows[0];
-        if (user.token_expiry && new Date() > new Date(user.token_expiry)) {
+        // Valida o código no Firestore
+        const doc = await db.collection('usuarios').doc(userRecord.uid).get();
+        if (!doc.exists) return res.status(400).json({ error: 'Código inválido.' });
+
+        const data = doc.data();
+        if (data.resetToken !== code) {
+            return res.status(400).json({ error: 'Código inválido.' });
+        }
+        if (data.tokenExpiry && new Date() > new Date(data.tokenExpiry)) {
             return res.status(400).json({ error: 'Código expirado. Solicite um novo.' });
         }
 
-        const senhaHash = await bcrypt.hash(newPassword, 10);
-
-        await pool.execute(
-            'UPDATE usuarios SET senha = ?, reset_token = NULL, token_expiry = NULL WHERE email = ?',
-            [senhaHash, email]
-        );
+        // Atualiza senha no Firebase Auth e limpa o token no Firestore
+        await auth.updateUser(userRecord.uid, { password: newPassword });
+        await db.collection('usuarios').doc(userRecord.uid).update({
+            resetToken:   admin.firestore.FieldValue.delete(),
+            tokenExpiry:  admin.firestore.FieldValue.delete()
+        });
 
         res.json({ success: true, message: 'Senha redefinida com sucesso!' });
     } catch (err) {
@@ -350,18 +322,15 @@ app.post('/api/reset-password', async (req, res) => {
     }
 });
 
-// ── GET /api/perfil?email=... ────────────────────────────
+// ── GET /api/perfil?uid=... ──────────────────────────────
 app.get('/api/perfil', async (req, res) => {
-    const { email } = req.query;
-    if (!email) return res.status(400).json({ error: 'E-mail é obrigatório.' });
+    const { uid } = req.query;
+    if (!uid) return res.status(400).json({ error: 'uid é obrigatório.' });
 
     try {
-        const [rows] = await pool.execute(
-            'SELECT id, nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email FROM usuarios WHERE email = ?',
-            [email]
-        );
-        if (rows.length === 0) return res.status(404).json({ error: 'Usuário não encontrado.' });
-        res.json({ usuario: rows[0] });
+        const doc = await db.collection('usuarios').doc(uid).get();
+        if (!doc.exists) return res.status(404).json({ error: 'Usuário não encontrado.' });
+        res.json({ usuario: { id: uid, ...doc.data() } });
     } catch (err) {
         console.error('Erro em GET /api/perfil:', err);
         res.status(500).json({ error: 'Erro ao buscar perfil.' });
@@ -370,14 +339,18 @@ app.get('/api/perfil', async (req, res) => {
 
 // ── PUT /api/perfil ──────────────────────────────────────
 app.put('/api/perfil', async (req, res) => {
-    const { email, nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado } = req.body;
-    if (!email || !nome) return res.status(400).json({ error: 'E-mail e nome são obrigatórios.' });
+    const { uid, nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado } = req.body;
+    if (!uid || !nome) return res.status(400).json({ error: 'uid e nome são obrigatórios.' });
 
     try {
-        await pool.execute(
-            `UPDATE usuarios SET nome=?, sobrenome=?, genero=?, celular=?, cpf=?, cep=?, rua=?, bairro=?, cidade=?, estado=? WHERE email=?`,
-            [nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email]
-        );
+        await db.collection('usuarios').doc(uid).update({
+            nome, sobrenome: sobrenome || '', genero: genero || '',
+            celular: celular || '', cpf: cpf || '', cep: cep || '',
+            rua: rua || '', bairro: bairro || '', cidade: cidade || '',
+            estado: estado || '',
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        await auth.updateUser(uid, { displayName: nome });
         res.json({ success: true, message: 'Perfil atualizado com sucesso!' });
     } catch (err) {
         console.error('Erro em PUT /api/perfil:', err);
@@ -387,21 +360,24 @@ app.put('/api/perfil', async (req, res) => {
 
 // ── PUT /api/perfil/senha ────────────────────────────────
 app.put('/api/perfil/senha', async (req, res) => {
-    const { email, senhaAtual, novaSenha } = req.body;
-    if (!email || !senhaAtual || !novaSenha) {
+    const { uid, senhaAtual, novaSenha } = req.body;
+    if (!uid || !senhaAtual || !novaSenha) {
         return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
     }
 
     try {
-        const [rows] = await pool.execute('SELECT senha FROM usuarios WHERE email = ?', [email]);
-        if (rows.length === 0) return res.status(404).json({ error: 'Usuário não encontrado.' });
+        // Busca o e-mail do usuário para verificar a senha atual
+        const userRecord = await auth.getUser(uid);
 
-        const senhaValida = await bcrypt.compare(senhaAtual, rows[0].senha);
-        if (!senhaValida) return res.status(401).json({ error: 'Senha atual incorreta.' });
+        // Verifica senha atual via Firebase Auth REST API
+        try {
+            await firebaseSignIn(userRecord.email, senhaAtual);
+        } catch (_) {
+            return res.status(401).json({ error: 'Senha atual incorreta.' });
+        }
 
-        const senhaHash = await bcrypt.hash(novaSenha, 10);
-        await pool.execute('UPDATE usuarios SET senha = ? WHERE email = ?', [senhaHash, email]);
-
+        // Atualiza para a nova senha via Admin SDK
+        await auth.updateUser(uid, { password: novaSenha });
         res.json({ success: true, message: 'Senha alterada com sucesso!' });
     } catch (err) {
         console.error('Erro em PUT /api/perfil/senha:', err);
