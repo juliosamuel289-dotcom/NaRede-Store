@@ -561,18 +561,31 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`📊 Memória: ${Math.round(process.memoryUsage().rss / 1024 / 1024)}MB`);
 
     // Auto-ping a cada 4 minutos para evitar sleep no Render free tier
+    // NOTA: O Render pode ignorar self-pings. Para manter o serviço ativo,
+    // use um serviço externo como UptimeRobot (https://uptimerobot.com)
+    // apontando para https://naredestore-api.onrender.com/health
     setInterval(() => {
-        const req = https.request({
-            hostname: 'naredestore-api.onrender.com',
-            path: '/health',
-            method: 'GET',
-            timeout: 10000
-        }, (res) => {
-            console.log(`🏓 Keep-alive: ${res.statusCode} | Mem: ${Math.round(process.memoryUsage().rss / 1024 / 1024)}MB`);
-        });
-        req.on('error', (e) => console.log(`🏓 Ping erro: ${e.message}`));
-        req.on('timeout', () => { req.destroy(); console.log('🏓 Ping timeout'); });
-        req.end();
+        try {
+            const req = https.request({
+                hostname: 'naredestore-api.onrender.com',
+                path: '/health',
+                method: 'GET'
+            }, (res) => {
+                let body = '';
+                res.on('data', chunk => body += chunk);
+                res.on('end', () => {
+                    console.log(`🏓 Keep-alive: ${res.statusCode} | Mem: ${Math.round(process.memoryUsage().rss / 1024 / 1024)}MB`);
+                });
+            });
+            req.setTimeout(15000, () => {
+                console.log('🏓 Ping timeout');
+                req.destroy();
+            });
+            req.on('error', (e) => console.log(`🏓 Ping erro: ${e.message}`));
+            req.end();
+        } catch (e) {
+            console.log(`🏓 Ping falhou: ${e.message}`);
+        }
     }, 4 * 60 * 1000);
 });
 
