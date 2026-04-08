@@ -143,6 +143,7 @@ app.get('/',        (req, res) => res.sendFile(path.join(__dirname, 'index.html'
 app.get('/cadastro',(req, res) => res.sendFile(path.join(__dirname, 'cadastro.html')));
 app.get('/login',   (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.post('/envio',  (req, res) => res.status(200).send('Inscrição recebida!'));
+app.get('/health',  (req, res) => res.status(200).json({ status: 'ok' }));
 
 // ── POST /api/register ───────────────────────────────────
 app.post('/api/register', async (req, res) => {
