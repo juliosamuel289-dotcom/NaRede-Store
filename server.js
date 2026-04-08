@@ -556,4 +556,19 @@ process.on('unhandledRejection', (reason) => {
 
 // ── Inicia servidor ──────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+
+    // Auto-ping a cada 10 minutos para evitar sleep no Render free tier
+    setInterval(() => {
+        const req = https.request({
+            hostname: 'naredestore-api.onrender.com',
+            path: '/health',
+            method: 'GET'
+        }, (res) => {
+            console.log(`🏓 Keep-alive ping: ${res.statusCode}`);
+        });
+        req.on('error', () => {});
+        req.end();
+    }, 10 * 60 * 1000);
+});
