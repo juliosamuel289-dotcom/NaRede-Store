@@ -546,6 +546,14 @@ app.post('/api/contato', async (req, res) => {
     }
 });
 
+// ── Tratamento de erros globais ──────────────────────────
+process.on('uncaughtException', (err) => {
+    console.error('❌ uncaughtException:', err.message, err.stack);
+});
+process.on('unhandledRejection', (reason) => {
+    console.error('❌ unhandledRejection:', reason);
+});
+
 // ── Inicia servidor ──────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
