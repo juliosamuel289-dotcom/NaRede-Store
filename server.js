@@ -556,19 +556,28 @@ app.post('/api/contato', async (req, res) => {
 
 // ── Inicia servidor ──────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
+    console.log(`📊 Memória: ${Math.round(process.memoryUsage().rss / 1024 / 1024)}MB`);
 
-    // Auto-ping a cada 10 minutos para evitar sleep no Render free tier
+    // Auto-ping a cada 4 minutos para evitar sleep no Render free tier
     setInterval(() => {
         const req = https.request({
             hostname: 'naredestore-api.onrender.com',
             path: '/health',
-            method: 'GET'
+            method: 'GET',
+            timeout: 10000
         }, (res) => {
-            console.log(`🏓 Keep-alive ping: ${res.statusCode}`);
+            console.log(`🏓 Keep-alive: ${res.statusCode} | Mem: ${Math.round(process.memoryUsage().rss / 1024 / 1024)}MB`);
         });
-        req.on('error', () => {});
+        req.on('error', (e) => console.log(`🏓 Ping erro: ${e.message}`));
+        req.on('timeout', () => { req.destroy(); console.log('🏓 Ping timeout'); });
         req.end();
-    }, 10 * 60 * 1000);
+    }, 4 * 60 * 1000);
+});
+
+// Log quando Render mata o processo
+process.on('SIGTERM', () => {
+    console.log('⚠️ SIGTERM recebido — Render está desligando o servidor');
+    process.exit(0);
 });
