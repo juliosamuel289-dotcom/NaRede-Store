@@ -232,7 +232,25 @@ app.post('/api/login', async (req, res) => {
         let firebaseUser;
         try {
             firebaseUser = await firebaseSignIn(email, senhaFornecida);
-        } catch (_) {
+        } catch (authErr) {
+            const msg = authErr.message || '';
+            console.error('Erro firebaseSignIn:', msg);
+
+            if (msg.includes('EMAIL_NOT_FOUND')) {
+                return res.status(401).json({ error: 'E-mail não cadastrado.' });
+            }
+            if (msg.includes('INVALID_PASSWORD') || msg.includes('INVALID_LOGIN_CREDENTIALS')) {
+                return res.status(401).json({ error: 'Senha incorreta.' });
+            }
+            if (msg.includes('TOO_MANY_ATTEMPTS')) {
+                return res.status(429).json({ error: 'Muitas tentativas. Aguarde alguns minutos.' });
+            }
+            if (msg.includes('USER_DISABLED')) {
+                return res.status(403).json({ error: 'Conta desativada.' });
+            }
+            if (msg.includes('Timeout') || msg.includes('FIREBASE_WEB_API_KEY')) {
+                return res.status(503).json({ error: 'Servidor temporariamente indisponível. Tente novamente.' });
+            }
             return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
         }
 
