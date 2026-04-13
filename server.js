@@ -177,36 +177,6 @@ app.get('/login',   (req, res) => res.sendFile(path.join(__dirname, 'login.html'
 app.post('/envio',  (req, res) => res.status(200).send('Inscrição recebida!'));
 app.get('/health',  (req, res) => res.status(200).json({ status: 'ok' }));
 
-// ── GET /api/debug-auth (TEMPORÁRIO — mostra o que o Firebase Auth responde) ──
-app.get('/api/debug-auth', async (req, res) => {
-    const apiKey = process.env.FIREBASE_WEB_API_KEY;
-    if (!apiKey) return res.json({ error: 'FIREBASE_WEB_API_KEY não definida' });
-
-    const testBody = JSON.stringify({ email: 'teste@teste.com', password: 'teste123', returnSecureToken: true });
-    const options = {
-        hostname: 'identitytoolkit.googleapis.com',
-        path: `/v1/accounts:signInWithPassword?key=${apiKey}`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(testBody) }
-    };
-
-    const httpReq = https.request(options, (httpRes) => {
-        let data = '';
-        httpRes.on('data', chunk => data += chunk);
-        httpRes.on('end', () => {
-            res.json({
-                apiKeyPrimeiros8: apiKey.slice(0, 8) + '...',
-                statusCode: httpRes.statusCode,
-                contentType: httpRes.headers['content-type'],
-                respostaFirebase: data.slice(0, 1000)
-            });
-        });
-    });
-    httpReq.on('error', (err) => res.json({ error: err.message }));
-    httpReq.write(testBody);
-    httpReq.end();
-});
-
 // ── POST /api/register ───────────────────────────────────
 app.post('/api/register', async (req, res) => {
     const { nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha } = req.body;
@@ -601,6 +571,144 @@ app.post('/api/create-preference', async (req, res) => {
         res.status(500).json({ error: 'Erro ao criar pagamento.' });
     }
 });
+
+// ── ADMIN: E-mail do administrador ───────────────────────
+const ADMIN_EMAIL = 'juliosamuel289@gmail.com';
+
+// Middleware de verificação de admin
+async function verificarAdmin(req, res, next) {
+    const uid = req.body.uid || req.query.uid;
+    if (!uid) return res.status(401).json({ error: 'UID obrigatório.' });
+
+    try {
+        const userRecord = await auth.getUser(uid);
+        if (userRecord.email !== ADMIN_EMAIL) {
+            return res.status(403).json({ error: 'Acesso negado.' });
+        }
+        req.adminUid = uid;
+        next();
+    } catch (err) {
+        return res.status(401).json({ error: 'Usuário inválido.' });
+    }
+}
+
+// ── GET /api/admin/check?uid=... ─────────────────────────
+app.get('/api/admin/check', async (req, res) => {
+    const { uid } = req.query;
+    if (!uid) return res.json({ isAdmin: false });
+
+    try {
+        const userRecord = await auth.getUser(uid);
+        res.json({ isAdmin: userRecord.email === ADMIN_EMAIL });
+    } catch (_) {
+        res.json({ isAdmin: false });
+    }
+});
+
+// ── GET /api/admin/pedidos?uid=... ───────────────────────
+app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
+    try {
+        const snapshot = await db.collection('pedidos').orderBy('criadoEm', 'desc').limit(100).get();
+        const pedidos = [];
+        snapshot.forEach(doc => pedidos.push({ id: doc.id, ...doc.data() }));
+        res.json({ pedidos });
+    } catch (err) {
+        console.error('Erro ao listar pedidos:', err);
+        res.status(500).json({ error: 'Erro ao listar pedidos.' });
+    }
+});
+
+// ── PUT /api/admin/pedido/status ─────────────────────────
+app.put('/api/admin/pedido/status', verificarAdmin, async (req, res) => {
+    const { pedidoId, status } = req.body;
+    const statusValidos = ['pendente', 'confirmado', 'preparando', 'enviado', 'entregue', 'cancelado'];
+
+    if (!pedidoId || !status) return res.status(400).json({ error: 'pedidoId e status obrigatórios.' });
+    if (!statusValidos.includes(status)) return res.status(400).json({ error: 'Status inválido. Use: ' + statusValidos.join(', ') });
+
+    try {
+        await db.collection('pedidos').doc(pedidoId).update({
+            status,
+            atualizadoEm: admin.firestore.FieldValue.serverTimestamp()
+        });
+        res.json({ success: true, message: 'Status atualizado.' });
+    } catch (err) {
+        console.error('Erro ao atualizar pedido:', err);
+        res.status(500).json({ error: 'Erro ao atualizar pedido.' });
+    }
+});
+
+// ── GET /api/admin/produtos?uid=... ──────────────────────
+app.get('/api/admin/produtos', verificarAdmin, async (req, res) => {
+    try {
+        const snapshot = await db.collection('produtos').orderBy('criadoEm', 'desc').get();
+        const produtos = [];
+        snapshot.forEach(doc => produtos.push({ id: doc.id, ...doc.data() }));
+        res.json({ produtos });
+    } catch (err) {
+        console.error('Erro ao listar produtos:', err);
+        res.status(500).json({ error: 'Erro ao listar produtos.' });
+    }
+});
+
+// ── POST /api/admin/produto ──────────────────────────────
+app.post('/api/admin/produto', verificarAdmin, async (req, res) => {
+    const { nome, preco, pagina, imagem, descricao } = req.body;
+
+    if (!nome || !preco || !pagina) {
+        return res.status(400).json({ error: 'Nome, preço e página são obrigatórios.' });
+    }
+
+    try {
+        const doc = await db.collection('produtos').add({
+            nome,
+            preco: Number(preco),
+            pagina,
+            imagem: imagem || '',
+            descricao: descricao || '',
+            criadoEm: admin.firestore.FieldValue.serverTimestamp()
+        });
+        res.status(201).json({ success: true, id: doc.id });
+    } catch (err) {
+        console.error('Erro ao criar produto:', err);
+        res.status(500).json({ error: 'Erro ao criar produto.' });
+    }
+});
+
+// ── PUT /api/admin/produto ───────────────────────────────
+app.put('/api/admin/produto', verificarAdmin, async (req, res) => {
+    const { produtoId, nome, preco, pagina, imagem, descricao } = req.body;
+    if (!produtoId || !nome || !preco) return res.status(400).json({ error: 'produtoId, nome e preço obrigatórios.' });
+
+    try {
+        await db.collection('produtos').doc(produtoId).update({
+            nome, preco: Number(preco), pagina: pagina || '',
+            imagem: imagem || '', descricao: descricao || '',
+            atualizadoEm: admin.firestore.FieldValue.serverTimestamp()
+        });
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Erro ao atualizar produto:', err);
+        res.status(500).json({ error: 'Erro ao atualizar produto.' });
+    }
+});
+
+// ── DELETE /api/admin/produto ────────────────────────────
+app.delete('/api/admin/produto', verificarAdmin, async (req, res) => {
+    const { produtoId } = req.body;
+    if (!produtoId) return res.status(400).json({ error: 'produtoId obrigatório.' });
+
+    try {
+        await db.collection('produtos').doc(produtoId).delete();
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Erro ao deletar produto:', err);
+        res.status(500).json({ error: 'Erro ao deletar produto.' });
+    }
+});
+
+// ── Rota da página admin ─────────────────────────────────
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 
 // ── POST /api/contato ────────────────────────────────────
 app.post('/api/contato', async (req, res) => {

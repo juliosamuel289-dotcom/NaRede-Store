@@ -133,11 +133,20 @@
       <h3>Olá, ${getFirstName(user.nome || user.name || user.email)}</h3>
       <p>Você está logado como <strong>${user.nome || user.name || user.email}</strong>.</p>
       <a href="perfil.html" class="user-panel-link">👤 Meu Perfil</a>
+      <a href="admin.html" class="user-panel-link" id="adminLink" style="display:none;">⚙️ Painel Admin</a>
       <button type="button" class="user-panel-link" id="openCartHistoryBtn">Ver histórico do carrinho</button>
       <button type="button" class="user-panel-link" id="logoutBtn">Sair</button>
       <div id="cartHistoryList"></div>
     `;
     document.body.appendChild(panel);
+
+    // Verifica se é admin e mostra o link
+    if (user.id) {
+      fetch('https://naredestore-api.onrender.com/api/admin/check?uid=' + encodeURIComponent(user.id))
+        .then(r => r.json())
+        .then(d => { if (d.isAdmin) { var el = document.getElementById('adminLink'); if (el) el.style.display = 'block'; } })
+        .catch(function() {});
+    }
 
     panel.querySelector('.close-panel')?.addEventListener('click', () => {
       panel.classList.remove('open');
