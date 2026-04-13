@@ -25,6 +25,11 @@
   </style>
 </head>
 <body>
+  <!-- Botão de tema -->
+  <button class="theme-toggle-btn" id="themeToggle" aria-label="Alternar tema" style="position:fixed;top:16px;right:16px;z-index:10000;border:none;background:#422BFF;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(66,43,255,0.3);">
+    <svg id="themeIcon" viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+
   <div class="register-container">
     <h2>Na<span>Rede</span> Store</h2>
     <p>Crie sua conta</p>
@@ -214,5 +219,6 @@
       if(form){form.addEventListener('submit',async function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim(),em=document.getElementById('contactEmail').value.trim(),t=document.getElementById('contactPhone').value.trim(),a=document.getElementById('contactSubject').value.trim(),m=document.getElementById('contactMessage').value.trim();if(!n||!em||!m){if(feedback){feedback.textContent='Preencha nome, e-mail e mensagem.';feedback.style.color='#e74c3c';}return;}var btn=document.getElementById('btnSend');if(btn){btn.disabled=true;btn.textContent='Enviando...';}try{var res=await fetch('https://naredestore-api.onrender.com/api/contato',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:n,email:em,telefone:t,assunto:a,mensagem:m})});var data=await res.json();if(!res.ok)throw new Error(data.error||'Erro ao enviar.');if(feedback){feedback.textContent='Mensagem enviada com sucesso!';feedback.style.color='#00c853';}form.reset();setTimeout(closeModal,1500);}catch(err){if(feedback){feedback.textContent='Erro ao enviar. Tente novamente.';feedback.style.color='#e74c3c';}}finally{if(btn){btn.disabled=false;btn.textContent='Enviar Mensagem';}}});}
     });
   </script>
+  <script src="theme-toggle.js"></script>
 </body>
 </html>
