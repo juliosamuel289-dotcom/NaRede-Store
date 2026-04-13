@@ -748,12 +748,23 @@
           return;
         }
 
+        // Bloqueia o botão para evitar múltiplos envios
+        const btnEntrar = loginForm.querySelector('button[type="submit"]');
+        if (btnEntrar) { btnEntrar.disabled = true; btnEntrar.textContent = 'Conectando...'; }
+        if (loginError) loginError.textContent = 'Conectando ao servidor, aguarde...';
+
+        // Timeout de 40 segundos (servidor pode estar acordando)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 40000);
+
         try {
           const response = await fetch('https://naredestore-api.onrender.com/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password: senha })
+            body: JSON.stringify({ email, password: senha }),
+            signal: controller.signal
           });
+          clearTimeout(timeoutId);
           const data = await response.json();
 
           if (!response.ok) {
@@ -770,8 +781,15 @@
           alert('Login realizado com sucesso!');
           window.location.href = '/';
         } catch (error) {
-          if (loginError) loginError.textContent = 'Erro de conexão com o servidor.';
+          clearTimeout(timeoutId);
+          if (loginError) {
+            loginError.textContent = error.name === 'AbortError'
+              ? 'Tempo limite esgotado. O servidor pode estar iniciando — tente novamente em 30 segundos.'
+              : 'Erro de conexão com o servidor.';
+          }
           console.error(error);
+        } finally {
+          if (btnEntrar) { btnEntrar.disabled = false; btnEntrar.textContent = 'Entrar'; }
         }
       });
     });

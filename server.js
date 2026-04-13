@@ -77,8 +77,15 @@ console.log('✅ Firebase Admin inicializado.');
 // Autentica usuário via Firebase REST API (única forma de verificar senha no servidor)
 async function firebaseSignIn(email, password) {
     const apiKey = process.env.FIREBASE_WEB_API_KEY;
+    if (!apiKey) throw new Error('FIREBASE_WEB_API_KEY não configurada.');
+
     const body   = JSON.stringify({ email, password, returnSecureToken: true });
     return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+            req.destroy();
+            reject(new Error('Timeout ao conectar com Firebase Auth.'));
+        }, 15000);
+
         const options = {
             hostname: 'identitytoolkit.googleapis.com',
             path:     `/v1/accounts:signInWithEmailAndPassword?key=${apiKey}`,
@@ -89,12 +96,20 @@ async function firebaseSignIn(email, password) {
             let data = '';
             res.on('data', chunk => data += chunk);
             res.on('end', () => {
-                const parsed = JSON.parse(data);
-                if (res.statusCode === 200) resolve(parsed);
-                else reject(new Error(parsed.error?.message || 'Credenciais inválidas.'));
+                clearTimeout(timeout);
+                try {
+                    const parsed = JSON.parse(data);
+                    if (res.statusCode === 200) resolve(parsed);
+                    else reject(new Error(parsed.error?.message || 'Credenciais inválidas.'));
+                } catch (e) {
+                    reject(new Error('Resposta inválida do Firebase Auth.'));
+                }
             });
         });
-        req.on('error', reject);
+        req.on('error', (err) => {
+            clearTimeout(timeout);
+            reject(err);
+        });
         req.write(body);
         req.end();
     });
