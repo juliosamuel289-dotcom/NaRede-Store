@@ -78,5 +78,40 @@
             // Aqui você pode redirecionar ou processar o pagamento
         });
     </script>
+
+  <!-- Central de Ajuda -->
+  <button id="centralAjuda" aria-label="Central de Ajuda" style="position:fixed;right:20px;bottom:20px;z-index:10000;background:#422BFF;color:#fff;border-radius:50%;width:56px;height:56px;border:none;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(66,43,255,0.18);cursor:pointer;">?</button>
+  <div id="contactModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="contactModalTitle">
+    <div class="modal-overlay" id="contactOverlay"></div>
+    <div class="modal-content" role="document">
+      <button class="modal-close" id="contactClose" aria-label="Fechar formulário">×</button>
+      <h2 id="contactModalTitle">Central de Ajuda — Fale Conosco</h2>
+      <form id="contactForm" class="contact-form" novalidate>
+        <label for="contactName">Nome</label><input type="text" id="contactName" name="name" required placeholder="Seu nome">
+        <label for="contactEmail">E‑mail</label><input type="email" id="contactEmail" name="email" required placeholder="seu@exemplo.com">
+        <label for="contactPhone">Telefone</label><input type="tel" id="contactPhone" name="phone" placeholder="(xx) 9xxxx-xxxx">
+        <label for="contactSubject">Assunto</label><input type="text" id="contactSubject" name="subject" placeholder="Assunto (ex: Pedido, Troca)">
+        <label for="contactMessage">Mensagem</label><textarea id="contactMessage" name="message" rows="5" required placeholder="Descreva sua dúvida ou problema"></textarea>
+        <div class="contact-actions" style="display:flex;gap:8px;justify-content:center">
+          <button type="submit" class="btn-send" id="btnSend">Enviar Mensagem</button>
+          <button type="button" class="btn-secondary" id="contactCancel">Cancelar</button>
+        </div>
+        <p class="contact-feedback" id="contactFeedback" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var openBtn=document.getElementById('centralAjuda'),modal=document.getElementById('contactModal'),overlay=document.getElementById('contactOverlay'),closeBtn=document.getElementById('contactClose'),cancelBtn=document.getElementById('contactCancel'),form=document.getElementById('contactForm'),feedback=document.getElementById('contactFeedback'),firstInput=document.getElementById('contactName');
+      function showModal(){if(!modal)return;modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';if(firstInput)firstInput.focus();}
+      function closeModal(){if(!modal)return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';if(feedback)feedback.textContent='';}
+      if(openBtn)openBtn.addEventListener('click',function(e){e.preventDefault();showModal();});
+      if(closeBtn)closeBtn.addEventListener('click',closeModal);
+      if(cancelBtn)cancelBtn.addEventListener('click',closeModal);
+      if(overlay)overlay.addEventListener('click',closeModal);
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal&&modal.classList.contains('open'))closeModal();});
+      if(form){form.addEventListener('submit',async function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim(),em=document.getElementById('contactEmail').value.trim(),t=document.getElementById('contactPhone').value.trim(),a=document.getElementById('contactSubject').value.trim(),m=document.getElementById('contactMessage').value.trim();if(!n||!em||!m){if(feedback){feedback.textContent='Preencha nome, e-mail e mensagem.';feedback.style.color='#e74c3c';}return;}var btn=document.getElementById('btnSend');if(btn){btn.disabled=true;btn.textContent='Enviando...';}try{var res=await fetch('https://naredestore-api.onrender.com/api/contato',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:n,email:em,telefone:t,assunto:a,mensagem:m})});var data=await res.json();if(!res.ok)throw new Error(data.error||'Erro ao enviar.');if(feedback){feedback.textContent='Mensagem enviada com sucesso!';feedback.style.color='#00c853';}form.reset();setTimeout(closeModal,1500);}catch(err){if(feedback){feedback.textContent='Erro ao enviar. Tente novamente.';feedback.style.color='#e74c3c';}}finally{if(btn){btn.disabled=false;btn.textContent='Enviar Mensagem';}}});}
+    });
+  </script>
 </body>
 </html>
