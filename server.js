@@ -74,6 +74,13 @@ const db   = admin.firestore();
 const auth = admin.auth();
 console.log('✅ Firebase Admin inicializado.');
 
+// Verifica se a Web API Key está configurada (necessária para login)
+if (!process.env.FIREBASE_WEB_API_KEY) {
+    console.error('⚠️  FIREBASE_WEB_API_KEY não está definida! O login NÃO vai funcionar.');
+} else {
+    console.log('✅ FIREBASE_WEB_API_KEY configurada (' + process.env.FIREBASE_WEB_API_KEY.slice(0, 8) + '...)');
+}
+
 // Autentica usuário via Firebase REST API (única forma de verificar senha no servidor)
 async function firebaseSignIn(email, password) {
     const apiKey = process.env.FIREBASE_WEB_API_KEY;
@@ -234,7 +241,7 @@ app.post('/api/login', async (req, res) => {
             firebaseUser = await firebaseSignIn(email, senhaFornecida);
         } catch (authErr) {
             const msg = authErr.message || '';
-            console.error('Erro firebaseSignIn:', msg);
+            console.error('❌ Erro firebaseSignIn para', email, ':', msg);
 
             if (msg.includes('EMAIL_NOT_FOUND')) {
                 return res.status(401).json({ error: 'E-mail não cadastrado.' });
@@ -248,10 +255,15 @@ app.post('/api/login', async (req, res) => {
             if (msg.includes('USER_DISABLED')) {
                 return res.status(403).json({ error: 'Conta desativada.' });
             }
-            if (msg.includes('Timeout') || msg.includes('FIREBASE_WEB_API_KEY')) {
+            if (msg.includes('FIREBASE_WEB_API_KEY') || msg.includes('Timeout')) {
                 return res.status(503).json({ error: 'Servidor temporariamente indisponível. Tente novamente.' });
             }
-            return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+            if (msg.includes('API key') || msg.includes('API_KEY_INVALID') || msg.includes('INVALID_API_KEY')) {
+                console.error('⚠️  A FIREBASE_WEB_API_KEY está inválida! Verifique no Render.');
+                return res.status(503).json({ error: 'Erro de configuração do servidor. Contate o administrador.' });
+            }
+            // Retorna a mensagem real do Firebase para facilitar debug
+            return res.status(401).json({ error: 'Erro na autenticação: ' + msg });
         }
 
         const uid = firebaseUser.localId;
