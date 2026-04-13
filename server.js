@@ -95,7 +95,7 @@ async function firebaseSignIn(email, password) {
 
         const options = {
             hostname: 'identitytoolkit.googleapis.com',
-            path:     `/v1/accounts:signInWithEmailAndPassword?key=${apiKey}`,
+            path:     `/v1/accounts:signInWithPassword?key=${apiKey}`,
             method:   'POST',
             headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
         };
@@ -185,7 +185,7 @@ app.get('/api/debug-auth', async (req, res) => {
     const testBody = JSON.stringify({ email: 'teste@teste.com', password: 'teste123', returnSecureToken: true });
     const options = {
         hostname: 'identitytoolkit.googleapis.com',
-        path: `/v1/accounts:signInWithEmailAndPassword?key=${apiKey}`,
+        path: `/v1/accounts:signInWithPassword?key=${apiKey}`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(testBody) }
     };
