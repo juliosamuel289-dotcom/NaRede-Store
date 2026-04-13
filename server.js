@@ -177,6 +177,36 @@ app.get('/login',   (req, res) => res.sendFile(path.join(__dirname, 'login.html'
 app.post('/envio',  (req, res) => res.status(200).send('Inscrição recebida!'));
 app.get('/health',  (req, res) => res.status(200).json({ status: 'ok' }));
 
+// ── GET /api/debug-auth (TEMPORÁRIO — mostra o que o Firebase Auth responde) ──
+app.get('/api/debug-auth', async (req, res) => {
+    const apiKey = process.env.FIREBASE_WEB_API_KEY;
+    if (!apiKey) return res.json({ error: 'FIREBASE_WEB_API_KEY não definida' });
+
+    const testBody = JSON.stringify({ email: 'teste@teste.com', password: 'teste123', returnSecureToken: true });
+    const options = {
+        hostname: 'identitytoolkit.googleapis.com',
+        path: `/v1/accounts:signInWithEmailAndPassword?key=${apiKey}`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(testBody) }
+    };
+
+    const httpReq = https.request(options, (httpRes) => {
+        let data = '';
+        httpRes.on('data', chunk => data += chunk);
+        httpRes.on('end', () => {
+            res.json({
+                apiKeyPrimeiros8: apiKey.slice(0, 8) + '...',
+                statusCode: httpRes.statusCode,
+                contentType: httpRes.headers['content-type'],
+                respostaFirebase: data.slice(0, 1000)
+            });
+        });
+    });
+    httpReq.on('error', (err) => res.json({ error: err.message }));
+    httpReq.write(testBody);
+    httpReq.end();
+});
+
 // ── POST /api/register ───────────────────────────────────
 app.post('/api/register', async (req, res) => {
     const { nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha } = req.body;
