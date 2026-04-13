@@ -104,12 +104,14 @@ async function firebaseSignIn(email, password) {
             res.on('data', chunk => data += chunk);
             res.on('end', () => {
                 clearTimeout(timeout);
+                console.log('Firebase Auth response status:', res.statusCode);
                 try {
                     const parsed = JSON.parse(data);
                     if (res.statusCode === 200) resolve(parsed);
                     else reject(new Error(parsed.error?.message || 'Credenciais inválidas.'));
                 } catch (e) {
-                    reject(new Error('Resposta inválida do Firebase Auth.'));
+                    console.error('Firebase Auth resposta não-JSON (status ' + res.statusCode + '):', data.slice(0, 500));
+                    reject(new Error('API Key inválida ou não configurada. Verifique FIREBASE_WEB_API_KEY no Render.'));
                 }
             });
         });
