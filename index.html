@@ -227,6 +227,12 @@
       background: #422BFF !important;
       border-radius: 12px;
     }
+
+    body:not(.light-mode) .produto p { color: #ffffff !important; }
+    body:not(.light-mode) .produto .preco { color: #00c853 !important; }
+
+    body.light-mode .produto p { color: #000000 !important; }
+    body.light-mode .produto .preco { color: #00c853 !important; }
     
     /* Centralizar botões de navegação em telas grandes */
     @media (min-width: 1024px) {

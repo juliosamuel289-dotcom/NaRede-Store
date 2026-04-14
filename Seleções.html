@@ -160,12 +160,18 @@
       border-radius: 12px;
     }
 
+    body:not(.light-mode) .produto p { color: #ffffff !important; }
+    body:not(.light-mode) .produto .preco { color: #00c853 !important; }
+
     /* Fundo branco no modo claro */
     body.light-mode .produto,
     body.light-mode .product-card {
       background: #ffffff !important;
       border: 1px solid #e0e0e0 !important;
     }
+
+    body.light-mode .produto p { color: #000000 !important; }
+    body.light-mode .produto .preco { color: #00c853 !important; }
 
     /* Botão carrinho sempre visível */
     .btn-add-cart {
