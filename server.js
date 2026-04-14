@@ -561,6 +561,7 @@ app.post('/api/pagar', async (req, res) => {
                 failure: process.env.SITE_URL + '/erro.html'
             },
             auto_return: 'approved',
+            notification_url: process.env.SITE_URL + '/api/mp-webhook',
             payment_methods: {}
         };
 
@@ -635,6 +636,49 @@ app.post('/api/create-preference', async (req, res) => {
     }
 });
 
+// ── Webhook MercadoPago (notificações de pagamento) ─────
+app.post('/api/mp-webhook', async (req, res) => {
+    res.sendStatus(200); // responde rápido para o MP não reenviar
+
+    try {
+        const { type, data } = req.body;
+        if (type !== 'payment' || !data?.id) return;
+
+        const payment = new Payment(mpClient);
+        const pgto = await payment.get({ id: data.id });
+        if (!pgto || !pgto.id) return;
+
+        const prefId = pgto.preference_id;
+        const paymentId = pgto.id;
+        const status = pgto.status; // approved, pending, rejected, etc.
+
+        // Busca pedido pela preferência ou pelo mpId
+        let pedidoRef = null;
+
+        if (prefId) {
+            const snap = await db.collection('pedidos')
+                .where('mpPreferenceId', '==', prefId).limit(1).get();
+            if (!snap.empty) pedidoRef = snap.docs[0].ref;
+        }
+
+        if (!pedidoRef) {
+            const snap2 = await db.collection('pedidos')
+                .where('mpId', '==', paymentId).limit(1).get();
+            if (!snap2.empty) pedidoRef = snap2.docs[0].ref;
+        }
+
+        if (pedidoRef) {
+            const update = { mpPaymentId: paymentId };
+            if (status === 'approved') update.status = 'confirmado';
+            if (status === 'rejected') update.status = 'cancelado';
+            await pedidoRef.update(update);
+            console.log(`📬 Webhook MP: pagamento ${paymentId} → ${status}`);
+        }
+    } catch (err) {
+        console.error('Erro no webhook MP:', err.message);
+    }
+});
+
 // ── ADMIN: E-mail do administrador ───────────────────────
 const ADMIN_EMAIL = 'juliosamuel289@gmail.com';
 
@@ -653,6 +697,43 @@ async function verificarAdmin(req, res, next) {
     } catch (err) {
         return res.status(401).json({ error: 'Usuário inválido.' });
     }
+}
+
+// ── Helper: estornar pagamento MercadoPago ───────────────
+async function estornarPagamento(pedidoData, pedidoId) {
+    // Tenta mpPaymentId (salvo pelo webhook), depois mpId (PIX direto)
+    let paymentId = pedidoData.mpPaymentId || pedidoData.mpId;
+
+    // Se não tiver payment_id mas tiver preferência, busca via API
+    if (!paymentId && pedidoData.mpPreferenceId) {
+        try {
+            const searchUrl = `https://api.mercadopago.com/v1/payments/search?preference_id=${pedidoData.mpPreferenceId}&sort=date_created&criteria=desc`;
+            const searchRes = await fetch(searchUrl, {
+                headers: { 'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}` }
+            });
+            const searchData = await searchRes.json();
+            if (searchData.results && searchData.results.length > 0) {
+                paymentId = searchData.results[0].id;
+            }
+        } catch (err) {
+            console.error('⚠️ Erro ao buscar payment_id via preferência:', err.message);
+        }
+    }
+
+    if (!paymentId) {
+        console.log('⚠️ Nenhum payment_id encontrado para estorno do pedido', pedidoId);
+        return false;
+    }
+
+    const refund = new PaymentRefund(mpClient);
+    await refund.create({ payment_id: paymentId, body: {} });
+    console.log(`✅ Estorno realizado para pagamento ${paymentId} (pedido ${pedidoId})`);
+
+    await db.collection('pedidos').doc(pedidoId).update({
+        estornado: true,
+        mpPaymentId: paymentId
+    });
+    return true;
 }
 
 // ── GET /api/admin/check?uid=... ─────────────────────────
@@ -759,15 +840,10 @@ app.post('/api/cancelar-pedido', async (req, res) => {
         });
 
         // Estorno automático via MercadoPago
-        if (pedidoData.mpId) {
-            try {
-                const refund = new PaymentRefund(mpClient);
-                await refund.create({ payment_id: pedidoData.mpId, body: {} });
-                console.log(`✅ Estorno (cliente) realizado para pagamento ${pedidoData.mpId}`);
-                await db.collection('pedidos').doc(pedidoId).update({ estornado: true });
-            } catch (refundErr) {
-                console.error('⚠️ Erro ao estornar pagamento:', refundErr.message);
-            }
+        try {
+            await estornarPagamento(pedidoData, pedidoId);
+        } catch (refundErr) {
+            console.error('⚠️ Erro ao estornar pagamento:', refundErr.message);
         }
 
         // Email de confirmação de cancelamento ao cliente
@@ -841,15 +917,11 @@ app.put('/api/admin/pedido/status', verificarAdmin, async (req, res) => {
         });
 
         // Se cancelado, tenta estornar o pagamento no MercadoPago
-        if (status === 'cancelado' && pedidoData.mpId) {
+        if (status === 'cancelado') {
             try {
-                const refund = new PaymentRefund(mpClient);
-                await refund.create({ payment_id: pedidoData.mpId, body: {} });
-                console.log(`✅ Estorno realizado para pagamento ${pedidoData.mpId}`);
-                await db.collection('pedidos').doc(pedidoId).update({ estornado: true });
+                await estornarPagamento(pedidoData, pedidoId);
             } catch (refundErr) {
                 console.error('⚠️ Erro ao estornar pagamento:', refundErr.message);
-                // Não bloqueia a atualização de status
             }
         }
 
