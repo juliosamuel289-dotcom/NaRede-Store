@@ -715,10 +715,52 @@ app.put('/api/admin/pedido/status', verificarAdmin, async (req, res) => {
     if (!statusValidos.includes(status)) return res.status(400).json({ error: 'Status inválido. Use: ' + statusValidos.join(', ') });
 
     try {
+        // Busca dados do pedido para obter email do cliente
+        const pedidoDoc = await db.collection('pedidos').doc(pedidoId).get();
+        if (!pedidoDoc.exists) return res.status(404).json({ error: 'Pedido não encontrado.' });
+        const pedidoData = pedidoDoc.data();
+
         await db.collection('pedidos').doc(pedidoId).update({
             status,
             atualizadoEm: admin.firestore.FieldValue.serverTimestamp()
         });
+
+        // Envia email de notificação ao cliente
+        const clienteEmail = pedidoData.clienteEmail;
+        if (clienteEmail) {
+            const statusEmoji = {
+                confirmado: '✅', preparando: '📦', enviado: '🚚',
+                entregue: '✔️', cancelado: '❌', pendente: '⏳'
+            };
+            const emoji = statusEmoji[status] || '📋';
+            const itensHtml = (pedidoData.itens || []).map(i =>
+                `<li>${i.nome} x${i.qtd || 1} — R$ ${Number(i.preco * (i.qtd || 1)).toFixed(2)}</li>`
+            ).join('');
+            const totalFormatado = pedidoData.total ? `R$ ${Number(pedidoData.total).toFixed(2)}` : '-';
+
+            const html = `
+              <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#f9f9f9;border-radius:12px;">
+                <h2 style="color:#422BFF;margin-bottom:8px;">NaRede Store</h2>
+                <p>Olá${pedidoData.clienteNome ? ', <strong>' + pedidoData.clienteNome + '</strong>' : ''}!</p>
+                <p>O status do seu pedido <strong>#${pedidoId.slice(0, 8)}</strong> foi atualizado:</p>
+                <div style="background:#fff;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #422BFF;">
+                  <p style="font-size:18px;margin:0;">${emoji} <strong style="text-transform:capitalize;">${status}</strong></p>
+                </div>
+                <h3 style="margin-bottom:8px;">Itens do pedido:</h3>
+                <ul style="padding-left:20px;">${itensHtml}</ul>
+                <p><strong>Total: ${totalFormatado}</strong></p>
+                <hr style="border:none;border-top:1px solid #ddd;margin:20px 0;">
+                <p style="font-size:12px;color:#888;">Este é um e-mail automático. Em caso de dúvidas, acesse nossa Central de Ajuda no site.</p>
+              </div>
+            `;
+
+            enviarEmailBrevo(
+                clienteEmail,
+                `${emoji} Pedido #${pedidoId.slice(0, 8)} — ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+                html
+            ).catch(err => console.error('Erro ao enviar email de status:', err.message));
+        }
+
         res.json({ success: true, message: 'Status atualizado.' });
     } catch (err) {
         console.error('Erro ao atualizar pedido:', err);
