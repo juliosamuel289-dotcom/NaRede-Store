@@ -768,6 +768,39 @@ app.put('/api/admin/pedido/status', verificarAdmin, async (req, res) => {
     }
 });
 
+// ── DELETE /api/admin/pedido ─────────────────────────────
+app.delete('/api/admin/pedido', verificarAdmin, async (req, res) => {
+    const { pedidoId } = req.body;
+    if (!pedidoId) return res.status(400).json({ error: 'pedidoId obrigatório.' });
+
+    try {
+        await db.collection('pedidos').doc(pedidoId).delete();
+        res.json({ success: true, message: 'Pedido deletado.' });
+    } catch (err) {
+        console.error('Erro ao deletar pedido:', err);
+        res.status(500).json({ error: 'Erro ao deletar pedido.' });
+    }
+});
+
+// ── DELETE /api/admin/pedidos-por-email ──────────────────
+app.delete('/api/admin/pedidos-por-email', verificarAdmin, async (req, res) => {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'email obrigatório.' });
+
+    try {
+        const snapshot = await db.collection('pedidos').where('clienteEmail', '==', email).get();
+        if (snapshot.empty) return res.json({ success: true, message: 'Nenhum pedido encontrado para esse email.', deletados: 0 });
+
+        const batch = db.batch();
+        snapshot.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+        res.json({ success: true, message: `${snapshot.size} pedido(s) deletado(s).`, deletados: snapshot.size });
+    } catch (err) {
+        console.error('Erro ao deletar pedidos por email:', err);
+        res.status(500).json({ error: 'Erro ao deletar pedidos.' });
+    }
+});
+
 // ── GET /api/admin/produtos?uid=... ──────────────────────
 app.get('/api/admin/produtos', verificarAdmin, async (req, res) => {
     try {

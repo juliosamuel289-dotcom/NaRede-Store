@@ -123,6 +123,11 @@
       border: 1px solid #30363d; font-size: 0.8rem;
     }
     body.light-mode select.status-select { background: #f9f9f9; color: #222; border-color: #ddd; }
+    .btn-danger-sm {
+      background: #dc3545; color: #fff; border: none; border-radius: 6px;
+      padding: 4px 8px; font-size: 0.75rem; cursor: pointer;
+    }
+    .btn-danger-sm:hover { background: #c82333; }
 
     @media (max-width: 768px) {
       body { padding: 12px; }
@@ -300,6 +305,7 @@
                 '<option value="entregue">✔️ Entregue</option>' +
                 '<option value="cancelado">❌ Cancelado</option>' +
               '</select>' +
+              ' <button class="btn-danger-sm" onclick="deletarPedido(\'' + p.id + '\')">🗑️</button>' +
             '</td></tr>';
         });
 
@@ -323,6 +329,22 @@
         carregarPedidos();
       } catch(err) {
         alert('Erro ao atualizar: ' + err.message);
+      }
+    }
+
+    async function deletarPedido(pedidoId) {
+      if (!confirm('Tem certeza que deseja deletar este pedido?')) return;
+      try {
+        var res = await fetch(API + '/api/admin/pedido', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uid: userData.id, pedidoId })
+        });
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        carregarPedidos();
+      } catch(err) {
+        alert('Erro ao deletar: ' + err.message);
       }
     }
 
