@@ -141,6 +141,12 @@
     'color:#fff;border-radius:8px;text-decoration:none;font-size:.83rem;font-weight:600;',
     'transition:background .2s;}',
     '#nr-ped-link:hover{background:#351ECC;}',
+
+    /* botão cancelar */
+    '#nr-ped-cancelar{display:block;width:100%;text-align:center;padding:8px;margin-top:8px;',
+    'background:transparent;color:#dc3545;border:1px solid #dc3545;border-radius:8px;',
+    'font-size:.78rem;font-weight:600;cursor:pointer;transition:background .2s,color .2s;}',
+    '#nr-ped-cancelar:hover{background:#dc3545;color:#fff;}',
   ].join('');
   document.head.appendChild(style);
 
@@ -167,6 +173,7 @@
         '<b>Entrega:</b> ' + fmt(entregaMin) + ' – ' + fmt(entregaMax) +
       '</div>' +
       '<a href="pedido.html" id="nr-ped-link">Ver acompanhamento completo →</a>' +
+      '<button id="nr-ped-cancelar">Cancelar Pedido</button>' +
     '</div>';
 
   // ── Insere antes do link do Carrinho no .user-bar ─────────
@@ -196,14 +203,57 @@
     var btn      = document.getElementById('nr-ped-btn');
     var dropdown = document.getElementById('nr-ped-dropdown');
     var closeBtn = document.getElementById('nr-ped-close');
+    var cancelBtn = document.getElementById('nr-ped-cancelar');
     if (!btn || !dropdown) return;
 
-    if (btn.contains(e.target)) {
+    if (cancelBtn && cancelBtn.contains(e.target)) {
+      // Não fechar dropdown ao clicar no cancelar
+      return;
+    } else if (btn.contains(e.target)) {
       dropdown.classList.toggle('open');
     } else if (closeBtn && closeBtn.contains(e.target)) {
       dropdown.classList.remove('open');
     } else if (!dropdown.contains(e.target)) {
       dropdown.classList.remove('open');
+    }
+  });
+
+  // ── Cancelar pedido pelo cliente ──────────────────────────
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'nr-ped-cancelar') {
+      if (!confirm('Tem certeza que deseja cancelar seu pedido? O valor será estornado.')) return;
+
+      var cancelBtn = e.target;
+      cancelBtn.disabled = true;
+      cancelBtn.textContent = 'Cancelando...';
+
+      // Busca pedido no servidor para obter o ID real
+      fetch(API_URL + '/api/meu-pedido?email=' + encodeURIComponent(usuarioAtual.email))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.pedidos || !data.pedidos.length) {
+            throw new Error('Pedido não encontrado no servidor.');
+          }
+          var pedidoServidor = data.pedidos[0];
+          return fetch(API_URL + '/api/cancelar-pedido', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pedidoId: pedidoServidor.id, email: usuarioAtual.email })
+          });
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.error) throw new Error(data.error);
+          alert('Pedido cancelado com sucesso! Você receberá o estorno e um email de confirmação.');
+          localStorage.removeItem(PEDIDO_KEY);
+          var w = document.getElementById('nr-ped-wrap');
+          if (w) w.style.display = 'none';
+        })
+        .catch(function(err) {
+          alert('Erro ao cancelar: ' + err.message);
+          cancelBtn.disabled = false;
+          cancelBtn.textContent = 'Cancelar Pedido';
+        });
     }
   });
 

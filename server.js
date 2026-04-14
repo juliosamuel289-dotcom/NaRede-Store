@@ -727,6 +727,87 @@ app.get('/api/meu-pedido', async (req, res) => {
     }
 });
 
+// ── POST /api/cancelar-pedido ────────────────────────────
+app.post('/api/cancelar-pedido', async (req, res) => {
+    const { pedidoId, email } = req.body;
+    if (!pedidoId || !email) return res.status(400).json({ error: 'pedidoId e email obrigatórios.' });
+
+    try {
+        const pedidoDoc = await db.collection('pedidos').doc(pedidoId).get();
+        if (!pedidoDoc.exists) return res.status(404).json({ error: 'Pedido não encontrado.' });
+
+        const pedidoData = pedidoDoc.data();
+
+        // Verificar que o email pertence ao dono do pedido
+        if (pedidoData.clienteEmail !== email) {
+            return res.status(403).json({ error: 'Você não tem permissão para cancelar este pedido.' });
+        }
+
+        // Não permite cancelar pedidos já entregues ou já cancelados
+        if (pedidoData.status === 'entregue') {
+            return res.status(400).json({ error: 'Pedidos entregues não podem ser cancelados.' });
+        }
+        if (pedidoData.status === 'cancelado') {
+            return res.status(400).json({ error: 'Este pedido já foi cancelado.' });
+        }
+
+        // Atualiza status para cancelado
+        await db.collection('pedidos').doc(pedidoId).update({
+            status: 'cancelado',
+            canceladoPor: 'cliente',
+            atualizadoEm: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Estorno automático via MercadoPago
+        if (pedidoData.mpId) {
+            try {
+                const payment = new Payment(mpClient);
+                await payment.refund({ payment_id: pedidoData.mpId });
+                console.log(`✅ Estorno (cliente) realizado para pagamento ${pedidoData.mpId}`);
+                await db.collection('pedidos').doc(pedidoId).update({ estornado: true });
+            } catch (refundErr) {
+                console.error('⚠️ Erro ao estornar pagamento:', refundErr.message);
+            }
+        }
+
+        // Email de confirmação de cancelamento ao cliente
+        const totalFormatado = pedidoData.total ? `R$ ${Number(pedidoData.total).toFixed(2)}` : '-';
+        const itensHtml = (pedidoData.itens || []).map(i =>
+            `<li>${i.nome} x${i.qtd || 1} — R$ ${Number(i.preco * (i.qtd || 1)).toFixed(2)}</li>`
+        ).join('');
+
+        const html = `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#f9f9f9;border-radius:12px;">
+            <h2 style="color:#422BFF;margin-bottom:8px;">NaRede Store</h2>
+            <p>Olá${pedidoData.clienteNome ? ', <strong>' + pedidoData.clienteNome + '</strong>' : ''}!</p>
+            <p>Seu pedido <strong>#${pedidoId.slice(0, 8)}</strong> foi <strong>cancelado</strong> com sucesso.</p>
+            <div style="background:#fff;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #dc3545;">
+              <p style="font-size:18px;margin:0;">❌ <strong>Pedido Cancelado</strong></p>
+            </div>
+            <div style="background:#fff3cd;border-radius:8px;padding:12px;margin:8px 0;border-left:4px solid #ffc107;">
+              <p style="margin:0;font-size:14px;">💰 <strong>O estorno do valor será processado automaticamente.</strong> O prazo para o valor aparecer na sua conta depende da forma de pagamento utilizada.</p>
+            </div>
+            <h3 style="margin-bottom:8px;">Itens do pedido:</h3>
+            <ul style="padding-left:20px;">${itensHtml}</ul>
+            <p><strong>Total: ${totalFormatado}</strong></p>
+            <hr style="border:none;border-top:1px solid #ddd;margin:20px 0;">
+            <p style="font-size:12px;color:#888;">Este é um e-mail automático. Em caso de dúvidas, acesse nossa Central de Ajuda no site.</p>
+          </div>
+        `;
+
+        enviarEmailBrevo(
+            email,
+            `❌ Pedido #${pedidoId.slice(0, 8)} — Cancelado`,
+            html
+        ).catch(err => console.error('Erro ao enviar email de cancelamento:', err.message));
+
+        res.json({ success: true, message: 'Pedido cancelado e estorno solicitado.' });
+    } catch (err) {
+        console.error('Erro ao cancelar pedido:', err);
+        res.status(500).json({ error: 'Erro ao cancelar pedido.' });
+    }
+});
+
 // ── GET /api/admin/pedidos?uid=... ───────────────────────
 app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
     try {
