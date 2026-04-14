@@ -645,15 +645,21 @@ app.get('/api/produtos', async (req, res) => {
     try {
         let q = db.collection('produtos');
         if (pagina) q = q.where('pagina', '==', pagina);
-        const snapshot = await q.orderBy('criadoEm', 'desc').get();
+        const snapshot = await q.get();
         const produtos = [];
         snapshot.forEach(doc => {
             const d = doc.data();
             produtos.push({ id: doc.id, nome: d.nome, preco: d.preco, imagem: d.imagem, descricao: d.descricao, pagina: d.pagina });
         });
+        // Ordena por data de criação (mais recente primeiro) sem precisar de índice composto
+        produtos.sort((a, b) => {
+            const tA = a.criadoEm?._seconds || 0;
+            const tB = b.criadoEm?._seconds || 0;
+            return tB - tA;
+        });
         res.json({ produtos });
     } catch (err) {
-        console.error('Erro em GET /api/produtos:', err);
+        console.error('Erro em GET /api/produtos:', err.message);
         res.status(500).json({ error: 'Erro ao carregar produtos.' });
     }
 });
