@@ -190,10 +190,13 @@
               <option value="index.html">Página Inicial</option>
             </select>
             <div style="flex:1;min-width:200px;">
-              <input type="file" id="prodImagem" accept="image/*" style="display:none;" onchange="previewImagem(this)">
-              <button type="button" class="btn-primary" onclick="document.getElementById('prodImagem').click()" style="width:100%;background:#30363d;">📷 Escolher Imagem</button>
+              <input type="url" id="prodImagemUrl" placeholder="Cole a URL da imagem (ex: https://...)" oninput="previewUrl(this.value)">
+              <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                <span style="color:#8b949e;font-size:0.8rem;">ou</span>
+                <input type="file" id="prodImagemFile" accept="image/*" style="display:none;" onchange="previewImagem(this)">
+                <button type="button" style="padding:4px 12px;border:1px solid #30363d;background:transparent;color:#8b949e;border-radius:6px;cursor:pointer;font-size:0.8rem;" onclick="document.getElementById('prodImagemFile').click()">📷 Enviar arquivo</button>
+              </div>
               <img id="prodImagemPreview" style="display:none;margin-top:8px;max-width:120px;max-height:120px;border-radius:8px;object-fit:cover;">
-              <input type="hidden" id="prodImagemUrl" value="">
             </div>
           </div>
           <div class="form-row">
@@ -325,6 +328,18 @@
 
     // ── Produtos ──────────────────────────────────────────
 
+    function previewUrl(url) {
+      var preview = document.getElementById('prodImagemPreview');
+      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        preview.src = url;
+        preview.style.display = 'block';
+        // Limpa arquivo selecionado se houver
+        document.getElementById('prodImagemFile').value = '';
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
     function previewImagem(input) {
       var preview = document.getElementById('prodImagemPreview');
       if (input.files && input.files[0]) {
@@ -334,13 +349,15 @@
           preview.style.display = 'block';
         };
         reader.readAsDataURL(input.files[0]);
+        // Limpa URL se houver
+        document.getElementById('prodImagemUrl').value = '';
       } else {
         preview.style.display = 'none';
       }
     }
 
     async function uploadImagem() {
-      var fileInput = document.getElementById('prodImagem');
+      var fileInput = document.getElementById('prodImagemFile');
       if (!fileInput.files || !fileInput.files[0]) return '';
 
       var formData = new FormData();
@@ -400,10 +417,11 @@
       msg.textContent = ''; msg.className = 'msg';
 
       try {
-        // Upload da imagem primeiro (se houver)
-        var imagemUrl = '';
-        var fileInput = document.getElementById('prodImagem');
-        if (fileInput.files && fileInput.files[0]) {
+        // Prioridade: URL colada > arquivo enviado
+        var imagemUrl = document.getElementById('prodImagemUrl').value.trim();
+        var fileInput = document.getElementById('prodImagemFile');
+
+        if (!imagemUrl && fileInput.files && fileInput.files[0]) {
           btn.textContent = 'Enviando imagem...';
           imagemUrl = await uploadImagem();
         }
