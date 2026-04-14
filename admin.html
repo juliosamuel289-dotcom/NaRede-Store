@@ -189,7 +189,12 @@
               <option value="Destaques.html">Destaques</option>
               <option value="index.html">Página Inicial</option>
             </select>
-            <input type="url" id="prodImagem" placeholder="URL da imagem do produto">
+            <div style="flex:1;min-width:200px;">
+              <input type="file" id="prodImagem" accept="image/*" style="display:none;" onchange="previewImagem(this)">
+              <button type="button" class="btn-primary" onclick="document.getElementById('prodImagem').click()" style="width:100%;background:#30363d;">📷 Escolher Imagem</button>
+              <img id="prodImagemPreview" style="display:none;margin-top:8px;max-width:120px;max-height:120px;border-radius:8px;object-fit:cover;">
+              <input type="hidden" id="prodImagemUrl" value="">
+            </div>
           </div>
           <div class="form-row">
             <input type="text" id="prodDescricao" placeholder="Descrição curta (ex: Torcedor Nike Masculina - Azul)">
@@ -319,6 +324,35 @@
     }
 
     // ── Produtos ──────────────────────────────────────────
+
+    function previewImagem(input) {
+      var preview = document.getElementById('prodImagemPreview');
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
+    async function uploadImagem() {
+      var fileInput = document.getElementById('prodImagem');
+      if (!fileInput.files || !fileInput.files[0]) return '';
+
+      var formData = new FormData();
+      formData.append('imagem', fileInput.files[0]);
+      formData.append('uid', userData.id);
+
+      var res = await fetch(API + '/api/admin/upload', { method: 'POST', body: formData });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro ao enviar imagem.');
+      return data.url;
+    }
+
     async function carregarProdutos() {
       var container = document.getElementById('produtosContent');
       container.innerHTML = '<p class="loading">Carregando...</p>';
@@ -366,6 +400,15 @@
       msg.textContent = ''; msg.className = 'msg';
 
       try {
+        // Upload da imagem primeiro (se houver)
+        var imagemUrl = '';
+        var fileInput = document.getElementById('prodImagem');
+        if (fileInput.files && fileInput.files[0]) {
+          btn.textContent = 'Enviando imagem...';
+          imagemUrl = await uploadImagem();
+        }
+
+        btn.textContent = 'Salvando produto...';
         var res = await fetch(API + '/api/admin/produto', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -374,7 +417,7 @@
             nome: document.getElementById('prodNome').value.trim(),
             preco: document.getElementById('prodPreco').value,
             pagina: document.getElementById('prodPagina').value,
-            imagem: document.getElementById('prodImagem').value.trim(),
+            imagem: imagemUrl,
             descricao: document.getElementById('prodDescricao').value.trim()
           })
         });
@@ -384,6 +427,7 @@
         msg.textContent = 'Produto adicionado com sucesso!';
         msg.className = 'msg success';
         document.getElementById('formProduto').reset();
+        document.getElementById('prodImagemPreview').style.display = 'none';
         carregarProdutos();
       } catch(err) {
         msg.textContent = 'Erro: ' + err.message;

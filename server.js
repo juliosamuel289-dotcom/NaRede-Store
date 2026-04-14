@@ -12,6 +12,7 @@ const https    = require('https');
 const cors     = require('cors');
 const path     = require('path');
 const admin    = require('firebase-admin');
+const multer   = require('multer');
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 
 const app = express();
@@ -68,11 +69,44 @@ admin.initializeApp({
         projectId:   process.env.FIREBASE_PROJECT_ID,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
         privateKey:  process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
-    })
+    }),
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'naredestore-2e1e1.firebasestorage.app'
 });
-const db   = admin.firestore();
-const auth = admin.auth();
-console.log('✅ Firebase Admin inicializado.');
+const db     = admin.firestore();
+const auth   = admin.auth();
+const bucket = admin.storage().bucket();
+console.log('✅ Firebase Admin inicializado (Storage bucket:', bucket.name + ')');
+
+// ── Multer (upload de imagens em memória) ────────────────
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+    fileFilter: (_req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) cb(null, true);
+        else cb(new Error('Apenas imagens são permitidas.'));
+    }
+});
+
+// ── Sincronizar catálogo com produtos do admin ──────────
+(async () => {
+    try {
+        const snap = await db.collection('produtos').get();
+        let count = 0;
+        snap.forEach(doc => {
+            const p = doc.data();
+            if (p.nome && p.preco) {
+                CATALOGO_PRECOS[p.nome] = CATALOGO_PRECOS[p.nome] || [];
+                if (!CATALOGO_PRECOS[p.nome].includes(Number(p.preco))) {
+                    CATALOGO_PRECOS[p.nome].push(Number(p.preco));
+                    count++;
+                }
+            }
+        });
+        console.log('✅ Catálogo sincronizado com', count, 'preço(s) do admin.');
+    } catch (err) {
+        console.error('⚠️  Erro ao sincronizar catálogo:', err.message);
+    }
+})();
 
 // Verifica se a Web API Key está configurada (necessária para login)
 if (!process.env.FIREBASE_WEB_API_KEY) {
@@ -605,6 +639,25 @@ app.get('/api/admin/check', async (req, res) => {
     }
 });
 
+// ── GET /api/produtos?pagina=... (PÚBLICO) ───────────────
+app.get('/api/produtos', async (req, res) => {
+    const { pagina } = req.query;
+    try {
+        let q = db.collection('produtos');
+        if (pagina) q = q.where('pagina', '==', pagina);
+        const snapshot = await q.orderBy('criadoEm', 'desc').get();
+        const produtos = [];
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            produtos.push({ id: doc.id, nome: d.nome, preco: d.preco, imagem: d.imagem, descricao: d.descricao, pagina: d.pagina });
+        });
+        res.json({ produtos });
+    } catch (err) {
+        console.error('Erro em GET /api/produtos:', err);
+        res.status(500).json({ error: 'Erro ao carregar produtos.' });
+    }
+});
+
 // ── GET /api/admin/pedidos?uid=... ───────────────────────
 app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
     try {
@@ -651,6 +704,28 @@ app.get('/api/admin/produtos', verificarAdmin, async (req, res) => {
     }
 });
 
+// ── POST /api/admin/upload (imagem → Firebase Storage) ───
+app.post('/api/admin/upload', upload.single('imagem'), verificarAdmin, async (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'Nenhuma imagem enviada.' });
+
+    try {
+        const ext = path.extname(req.file.originalname) || '.jpg';
+        const fileName = `produtos/${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`;
+        const file = bucket.file(fileName);
+
+        await file.save(req.file.buffer, {
+            metadata: { contentType: req.file.mimetype },
+            public: true
+        });
+
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+        res.json({ url: publicUrl });
+    } catch (err) {
+        console.error('Erro ao enviar imagem:', err);
+        res.status(500).json({ error: 'Erro ao enviar imagem: ' + err.message });
+    }
+});
+
 // ── POST /api/admin/produto ──────────────────────────────
 app.post('/api/admin/produto', verificarAdmin, async (req, res) => {
     const { nome, preco, pagina, imagem, descricao } = req.body;
@@ -660,14 +735,22 @@ app.post('/api/admin/produto', verificarAdmin, async (req, res) => {
     }
 
     try {
+        const precoNum = Number(preco);
         const doc = await db.collection('produtos').add({
             nome,
-            preco: Number(preco),
+            preco: precoNum,
             pagina,
             imagem: imagem || '',
             descricao: descricao || '',
             criadoEm: admin.firestore.FieldValue.serverTimestamp()
         });
+
+        // Sincroniza catálogo de preços
+        CATALOGO_PRECOS[nome] = CATALOGO_PRECOS[nome] || [];
+        if (!CATALOGO_PRECOS[nome].includes(precoNum)) {
+            CATALOGO_PRECOS[nome].push(precoNum);
+        }
+
         res.status(201).json({ success: true, id: doc.id });
     } catch (err) {
         console.error('Erro ao criar produto:', err);
