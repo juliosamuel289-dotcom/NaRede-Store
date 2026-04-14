@@ -1994,6 +1994,26 @@ button{
 .btn-secondary { background: transparent; color: #cfcfcf; border: 1px solid #333; border-radius: 8px; padding: 10px 16px; }
 .contact-feedback { color: #a0e9a0; margin-top: 8px; font-size: 14px; }
 
+/* Modal no modo claro */
+body.light-mode .modal-content {
+  background: #ffffff !important;
+  color: #222 !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+body.light-mode .modal-close { color: #222 !important; }
+body.light-mode .contact-form label { color: #444 !important; }
+body.light-mode .contact-form input,
+body.light-mode .contact-form textarea {
+  background: #f5f5f5 !important;
+  color: #222 !important;
+  border-color: #ddd !important;
+}
+body.light-mode .btn-secondary {
+  color: #444 !important;
+  border-color: #ccc !important;
+}
+body.light-mode .modal h2 { color: #222 !important; }
+
 /* botão 'Não mostrar novamente' (visual discreto) */
 @media (max-width: 600px) {
   .modal-content { padding: 16px; }
