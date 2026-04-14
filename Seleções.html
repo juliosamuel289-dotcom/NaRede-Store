@@ -628,7 +628,7 @@
       });
 
       if (form) {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
           e.preventDefault();
           var nome = document.getElementById('contactName').value.trim();
           var email = document.getElementById('contactEmail').value.trim();

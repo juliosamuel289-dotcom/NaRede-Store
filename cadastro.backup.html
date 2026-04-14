@@ -241,7 +241,7 @@
       });
 
       if (form) {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
           e.preventDefault();
           if (!form.name.value.trim() || !form.email.value.trim() || !form.message.value.trim()) {
             if (feedback) feedback.textContent = 'Por favor preencha os campos obrigatórios.';
