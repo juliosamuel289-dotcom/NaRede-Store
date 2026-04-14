@@ -1995,10 +1995,16 @@ button{
 .contact-feedback { color: #a0e9a0; margin-top: 8px; font-size: 14px; }
 
 /* Modal no modo claro */
-body.light-mode .modal-content {
+body.light-mode .modal .modal-content,
+body.light-mode #contactModal .modal-content {
   background: #ffffff !important;
   color: #222 !important;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
+  opacity: 1 !important;
+}
+body.light-mode .modal .modal-overlay,
+body.light-mode #contactModal .modal-overlay {
+  background: rgba(0,0,0,0.5) !important;
 }
 body.light-mode .modal-close { color: #222 !important; }
 body.light-mode .contact-form label { color: #444 !important; }
