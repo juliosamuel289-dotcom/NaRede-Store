@@ -199,7 +199,7 @@
         loginLink.appendChild(status);
       }
       status.textContent = 'Cliente';
-      status.style.cssText = 'color:#00ff41;font-size:0.75rem;font-weight:600;display:block;margin-top:2px;';
+      status.setAttribute('style', 'color:#00ff41 !important;font-size:0.75rem;font-weight:600;display:block;margin-top:2px;');
       loginLink.addEventListener('click', function(event) {
         event.preventDefault();
         toggleUserPanel();

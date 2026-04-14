@@ -229,6 +229,14 @@ body.light-mode .user-link .label {
   color: #000000 !important;
 }
 
+/* Texto "Cliente" sempre verde neon */
+.user-link .status {
+  color: #00ff41 !important;
+}
+body.light-mode .user-link .status {
+  color: #00ff41 !important;
+}
+
 body.light-mode .cart-badge {
   background: #ff0000 !important;
   color: #ffffff !important;
