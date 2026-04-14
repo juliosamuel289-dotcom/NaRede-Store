@@ -107,6 +107,35 @@
         font-size: 1rem;
         line-height: 1;
       }
+      /* Modo claro */
+      body.light-mode .user-panel {
+        background: #ffffff !important;
+        border: 1px solid #e0e0e0 !important;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.12) !important;
+        color: #222 !important;
+      }
+      body.light-mode .user-panel h3 { color: #222 !important; }
+      body.light-mode .user-panel p { color: #555 !important; }
+      body.light-mode .user-panel button,
+      body.light-mode .user-panel .user-panel-link {
+        background: #f5f5f5 !important;
+        color: #222 !important;
+      }
+      body.light-mode .user-panel button:hover,
+      body.light-mode .user-panel .user-panel-link:hover {
+        background: rgba(66, 43, 255, 0.12) !important;
+      }
+      body.light-mode .user-panel .close-panel {
+        background: #eee !important;
+        color: #222 !important;
+      }
+      body.light-mode .user-panel .history-item {
+        background: #f0f0f0 !important;
+        color: #222 !important;
+      }
+      body.light-mode .user-panel .history-empty {
+        color: #888 !important;
+      }
       .user-bar .user-link[data-user="true"] {
         pointer-events: auto;
       }
