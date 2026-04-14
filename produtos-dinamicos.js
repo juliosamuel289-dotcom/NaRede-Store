@@ -39,6 +39,17 @@
           (p.imagem ? '<img src="' + escapeHtml(p.imagem) + '" alt="' + escapeHtml(p.nome) + '" width="200" height="200" loading="lazy" decoding="async">' : '') +
           '<a href="#" class="preco">' + precoFormatado + '</a>';
 
+        // Adicionar botão "Adicionar ao Carrinho"
+        if (typeof criarBotaoCarrinho === 'function' && typeof adicionarAoCarrinho === 'function') {
+          var nome = p.nome;
+          var preco = Number(p.preco);
+          var img = p.imagem || '';
+          var btn = criarBotaoCarrinho(function() {
+            adicionarAoCarrinho(nome, preco, img);
+          });
+          card.appendChild(btn);
+        }
+
         container.appendChild(card);
       });
     })
