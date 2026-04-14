@@ -693,6 +693,40 @@ app.get('/api/produtos', async (req, res) => {
     }
 });
 
+// ── GET /api/meu-pedido?email=... ────────────────────────
+app.get('/api/meu-pedido', async (req, res) => {
+    const { email } = req.query;
+    if (!email) return res.status(400).json({ error: 'email obrigatório.' });
+
+    try {
+        const snapshot = await db.collection('pedidos')
+            .where('clienteEmail', '==', email)
+            .limit(5)
+            .get();
+
+        if (snapshot.empty) return res.json({ pedidos: [] });
+
+        const pedidos = [];
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            pedidos.push({
+                id: doc.id,
+                status: d.status,
+                metodo: d.metodo,
+                total: d.total,
+                itens: d.itens,
+                criadoEm: d.criadoEm
+            });
+        });
+        // Ordena por data (mais recente primeiro)
+        pedidos.sort((a, b) => (b.criadoEm?._seconds || 0) - (a.criadoEm?._seconds || 0));
+        res.json({ pedidos });
+    } catch (err) {
+        console.error('Erro em GET /api/meu-pedido:', err.message);
+        res.status(500).json({ error: 'Erro ao buscar pedidos.' });
+    }
+});
+
 // ── GET /api/admin/pedidos?uid=... ───────────────────────
 app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
     try {
@@ -725,6 +759,19 @@ app.put('/api/admin/pedido/status', verificarAdmin, async (req, res) => {
             atualizadoEm: admin.firestore.FieldValue.serverTimestamp()
         });
 
+        // Se cancelado, tenta estornar o pagamento no MercadoPago
+        if (status === 'cancelado' && pedidoData.mpId) {
+            try {
+                const payment = new Payment(mpClient);
+                await payment.refund({ payment_id: pedidoData.mpId });
+                console.log(`✅ Estorno realizado para pagamento ${pedidoData.mpId}`);
+                await db.collection('pedidos').doc(pedidoId).update({ estornado: true });
+            } catch (refundErr) {
+                console.error('⚠️ Erro ao estornar pagamento:', refundErr.message);
+                // Não bloqueia a atualização de status
+            }
+        }
+
         // Envia email de notificação ao cliente
         const clienteEmail = pedidoData.clienteEmail;
         if (clienteEmail) {
@@ -743,9 +790,10 @@ app.put('/api/admin/pedido/status', verificarAdmin, async (req, res) => {
                 <h2 style="color:#422BFF;margin-bottom:8px;">NaRede Store</h2>
                 <p>Olá${pedidoData.clienteNome ? ', <strong>' + pedidoData.clienteNome + '</strong>' : ''}!</p>
                 <p>O status do seu pedido <strong>#${pedidoId.slice(0, 8)}</strong> foi atualizado:</p>
-                <div style="background:#fff;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #422BFF;">
+                <div style="background:#fff;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid ${status === 'cancelado' ? '#dc3545' : '#422BFF'};">
                   <p style="font-size:18px;margin:0;">${emoji} <strong style="text-transform:capitalize;">${status}</strong></p>
                 </div>
+                ${status === 'cancelado' ? '<div style="background:#fff3cd;border-radius:8px;padding:12px;margin:8px 0;border-left:4px solid #ffc107;"><p style="margin:0;font-size:14px;">💰 <strong>O estorno do valor será processado automaticamente.</strong> O prazo para o valor aparecer na sua conta depende da forma de pagamento utilizada.</p></div>' : ''}
                 <h3 style="margin-bottom:8px;">Itens do pedido:</h3>
                 <ul style="padding-left:20px;">${itensHtml}</ul>
                 <p><strong>Total: ${totalFormatado}</strong></p>

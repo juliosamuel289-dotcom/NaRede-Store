@@ -25,6 +25,24 @@
     if (diff > EXPIRY_DAYS) return;
   }
 
+  // ── Verifica status no servidor ──────────────────────────
+  var API_URL = 'https://naredestore-api.onrender.com';
+  (function verificarStatusServidor() {
+    fetch(API_URL + '/api/meu-pedido?email=' + encodeURIComponent(usuarioAtual.email))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.pedidos && data.pedidos.length > 0) {
+          var ultimo = data.pedidos[0];
+          if (ultimo.status === 'cancelado') {
+            localStorage.removeItem(PEDIDO_KEY);
+            var w = document.getElementById('nr-ped-wrap');
+            if (w) w.style.display = 'none';
+          }
+        }
+      })
+      .catch(function() { /* silencioso */ });
+  })();
+
   // ── Helpers ──────────────────────────────────────────────
   function diasUteis(date, n) {
     var d = new Date(date);
