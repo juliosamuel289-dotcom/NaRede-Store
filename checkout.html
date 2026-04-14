@@ -171,7 +171,26 @@
     </div>
     <style>
       body.light-mode #dados-comprador { background:rgba(66,43,255,0.05); }
-      body.light-mode #info-nome { color:#222; }
+      body.light-mode #info-nome { color:#222 !important; }
+      body.light-mode #info-endereco { color:#555 !important; }
+      body.light-mode #aviso-sem-endereco { color:#f0a500 !important; }
+      body.light-mode #cart-section h3 { color:#222 !important; border-color:#ddd !important; }
+      body.light-mode #cart-total { color:#222 !important; }
+      body.light-mode .checkout-container,
+      body.light-mode .checkout-container * {
+        color: #222;
+      }
+      body.light-mode .checkout-container h2 { color: #222 !important; }
+      body.light-mode .checkout-container h2 span { color: #422BFF !important; }
+      body.light-mode .checkout-container p.subtitle { color: #666 !important; }
+      body.light-mode .checkout-container label { color: #444 !important; }
+      body.light-mode .checkout-container .small { color: #666 !important; }
+      body.light-mode .checkout-container .back-link { color: #422BFF !important; }
+      body.light-mode .checkout-container .cart-item-preco { color: #00AA00 !important; }
+      body.light-mode .checkout-container .cart-item-remove { color: #ff4d4d !important; }
+      body.light-mode .checkout-container button[type="submit"] { color: #fff !important; }
+      body.light-mode #dados-comprador span { color: #888 !important; }
+      body.light-mode #dados-comprador a { color: #422BFF !important; }
     </style>
 
     <form id="checkoutForm" novalidate>
