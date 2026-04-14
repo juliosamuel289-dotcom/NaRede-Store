@@ -320,6 +320,8 @@
       var userData = null;
       try { userData = JSON.parse(localStorage.getItem(USER_KEY)); } catch(_) {}
       var payerEmail = userData ? userData.email : 'comprador@naredestore.com';
+      var uid = userData ? (userData.id || '') : '';
+      var clienteNome = userData ? (userData.nome || '') : '';
 
       var parcelas = document.getElementById('parcelas').value || '1';
 
@@ -334,6 +336,8 @@
             metodo:     metodo,
             parcelas:   parcelas,
             payerEmail: payerEmail,
+            uid:        uid,
+            clienteNome: clienteNome,
             itens: carrinho.map(function(item) {
               return {
                 nome:  item.nome,

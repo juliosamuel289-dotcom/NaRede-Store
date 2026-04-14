@@ -479,7 +479,7 @@ app.put('/api/perfil/senha', async (req, res) => {
 // metodo: 'pix' | 'cartao' | 'boleto'
 // itens: [{nome, preco, qtd}]  — preço é validado contra o catálogo
 app.post('/api/pagar', async (req, res) => {
-    const { metodo, itens, parcelas, payerEmail } = req.body;
+    const { metodo, itens, parcelas, payerEmail, uid, clienteNome } = req.body;
 
     if (!metodo || !Array.isArray(itens) || !itens.length || !payerEmail) {
         return res.status(400).json({ error: 'metodo, itens e payerEmail são obrigatórios.' });
@@ -529,8 +529,23 @@ app.post('/api/pagar', async (req, res) => {
             });
 
             const txData = result.point_of_interaction?.transaction_data;
+
+            // Salvar pedido no Firestore
+            const pedidoRef = await db.collection('pedidos').add({
+                clienteEmail: payerEmail,
+                clienteNome: clienteNome || '',
+                uid: uid || '',
+                metodo,
+                itens: itens.map(i => ({ nome: i.nome, preco: Number(i.preco), qtd: i.qtd || 1 })),
+                total: valor,
+                status: 'pendente',
+                mpId: result.id,
+                criadoEm: admin.firestore.FieldValue.serverTimestamp()
+            });
+
             return res.json({
                 id: result.id,
+                pedidoId: pedidoRef.id,
                 qr_code:        txData?.qr_code        || '',
                 qr_code_base64: txData?.qr_code_base64 || ''
             });
@@ -566,6 +581,20 @@ app.post('/api/pagar', async (req, res) => {
         }
 
         const result = await preference.create({ body });
+
+        // Salvar pedido no Firestore
+        await db.collection('pedidos').add({
+            clienteEmail: payerEmail,
+            clienteNome: clienteNome || '',
+            uid: uid || '',
+            metodo,
+            itens: itens.map(i => ({ nome: i.nome, preco: Number(i.preco), qtd: i.qtd || 1 })),
+            total: valor,
+            status: 'pendente',
+            mpPreferenceId: result.id,
+            criadoEm: admin.firestore.FieldValue.serverTimestamp()
+        });
+
         return res.json({ init_point: result.init_point });
 
     } catch (err) {
