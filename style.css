@@ -1591,10 +1591,10 @@ body.light-mode .hero-badge {
 }
 /* Estilo base para ambos os botões */
 .hero-btn {
-  background: #fff;
-  color: #422bff;
+  background: #422bff;
+  color: #ffffff;
   font-weight: 600;
-  border: none;
+  border: 2px solid #422bff;
   border-radius: 8px;
   padding: 12px 24px;
   font-size: 1rem;
@@ -1605,17 +1605,18 @@ body.light-mode .hero-badge {
 }
 /* Estilo específico para o botão primário */
 .hero-btn.primary {
-  background: #fff;
-  color: #422bff;
+  background: #422bff;
+  color: #ffffff;
 }
 /* Estilo para o botão secundário */
 .hero-btn:not(.primary) {
-  background: #e0e0ff;
-  color: #422bff;
+  background: #422bff;
+  color: #ffffff;
 }
 /* Efeito hover para ambos os botões */
 .hero-btn:hover {
   background: #2a1a99;
+  border-color: #2a1a99;
   color: #ffffff;
 }
 /* Imagem do hero */
