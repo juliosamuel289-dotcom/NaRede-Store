@@ -368,6 +368,10 @@ body.light-mode .btn-secondary {
   border-color: #cccccc !important;
   background: #f5f5f5 !important;
 }
+body.light-mode .btn-send {
+  background: #422BFF !important;
+  color: #ffffff !important;
+}
 
 /* Botão tema - Modo Light */
 body.light-mode .theme-toggle-btn {
