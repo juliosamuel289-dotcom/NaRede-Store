@@ -13,7 +13,7 @@ const cors     = require('cors');
 const path     = require('path');
 const admin    = require('firebase-admin');
 const multer   = require('multer');
-const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
+const { MercadoPagoConfig, Preference, Payment, PaymentRefund } = require('mercadopago');
 
 const app = express();
 
@@ -761,8 +761,8 @@ app.post('/api/cancelar-pedido', async (req, res) => {
         // Estorno automático via MercadoPago
         if (pedidoData.mpId) {
             try {
-                const payment = new Payment(mpClient);
-                await payment.refund({ payment_id: pedidoData.mpId });
+                const refund = new PaymentRefund(mpClient);
+                await refund.create({ payment_id: pedidoData.mpId, body: {} });
                 console.log(`✅ Estorno (cliente) realizado para pagamento ${pedidoData.mpId}`);
                 await db.collection('pedidos').doc(pedidoId).update({ estornado: true });
             } catch (refundErr) {
@@ -843,8 +843,8 @@ app.put('/api/admin/pedido/status', verificarAdmin, async (req, res) => {
         // Se cancelado, tenta estornar o pagamento no MercadoPago
         if (status === 'cancelado' && pedidoData.mpId) {
             try {
-                const payment = new Payment(mpClient);
-                await payment.refund({ payment_id: pedidoData.mpId });
+                const refund = new PaymentRefund(mpClient);
+                await refund.create({ payment_id: pedidoData.mpId, body: {} });
                 console.log(`✅ Estorno realizado para pagamento ${pedidoData.mpId}`);
                 await db.collection('pedidos').doc(pedidoId).update({ estornado: true });
             } catch (refundErr) {
