@@ -211,12 +211,122 @@ app.get('/login',   (req, res) => res.sendFile(path.join(__dirname, 'login.html'
 app.post('/envio',  (req, res) => res.status(200).send('Inscrição recebida!'));
 app.get('/health',  (req, res) => res.status(200).json({ status: 'ok' }));
 
+const ADMIN_EMAIL = (process.env.MASTER_EMAIL || 'juliosamuel289@gmail.com').toLowerCase();
+const MAX_2FA_ATTEMPTS = 3;
+const TWO_FA_LOCK_MINUTES = 15;
+
+function onlyDigits(value) {
+    return String(value || '').replace(/\D/g, '');
+}
+
+function validarCPF(cpfRaw) {
+    const cpf = onlyDigits(cpfRaw);
+    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+
+    let soma = 0;
+    for (let i = 0; i < 9; i++) soma += Number(cpf[i]) * (10 - i);
+    let resto = (soma * 10) % 11;
+    if (resto === 10) resto = 0;
+    if (resto !== Number(cpf[9])) return false;
+
+    soma = 0;
+    for (let i = 0; i < 10; i++) soma += Number(cpf[i]) * (11 - i);
+    resto = (soma * 10) % 11;
+    if (resto === 10) resto = 0;
+    return resto === Number(cpf[10]);
+}
+
+function celularNoPadrao(celular) {
+    return /^\(\+55\)\d{2}-\d{8,9}$/.test(String(celular || '').trim());
+}
+
+function normalizarResposta2FA(value) {
+    return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
+async function registrarAuthLog({ uid = '', email = '', tipoDesafio = '', status = '', detalhe = '', req = null }) {
+    try {
+        await db.collection('logs_autenticacao').add({
+            uid,
+            email: String(email || '').toLowerCase(),
+            tipoDesafio,
+            status,
+            detalhe,
+            ip: req?.headers?.['x-forwarded-for'] || req?.ip || '',
+            criadoEm: admin.firestore.FieldValue.serverTimestamp()
+        });
+    } catch (err) {
+        console.error('⚠️ Falha ao salvar log de autenticação:', err.message);
+    }
+}
+
+function montarDesafio2FA(perfil) {
+    const opcoes = [];
+    if (perfil?.cep) {
+        opcoes.push({
+            tipo: 'cep',
+            pergunta: 'Segundo fator: qual e o seu CEP cadastrado?',
+            respostaEsperada: normalizarResposta2FA(onlyDigits(perfil.cep))
+        });
+    }
+    if (perfil?.cidade) {
+        opcoes.push({
+            tipo: 'cidade',
+            pergunta: 'Segundo fator: qual e a sua cidade cadastrada?',
+            respostaEsperada: normalizarResposta2FA(perfil.cidade)
+        });
+    }
+    if (perfil?.nomeMae) {
+        opcoes.push({
+            tipo: 'nomeMae',
+            pergunta: 'Segundo fator: qual e o nome da sua mae?',
+            respostaEsperada: normalizarResposta2FA(perfil.nomeMae)
+        });
+    }
+    if (perfil?.cpf) {
+        const cpf = onlyDigits(perfil.cpf);
+        if (cpf.length === 11) {
+            opcoes.push({
+                tipo: 'cpfFinal',
+                pergunta: 'Segundo fator: informe os 4 ultimos digitos do seu CPF.',
+                respostaEsperada: normalizarResposta2FA(cpf.slice(-4))
+            });
+        }
+    }
+
+    if (!opcoes.length) {
+        return {
+            tipo: 'email',
+            pergunta: 'Segundo fator: confirme seu e-mail cadastrado.',
+            respostaEsperada: normalizarResposta2FA(perfil?.email || '')
+        };
+    }
+    return opcoes[Math.floor(Math.random() * opcoes.length)];
+}
+
 // ── POST /api/register ───────────────────────────────────
 app.post('/api/register', async (req, res) => {
-    const { nome, sobrenome, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha } = req.body;
+    const { nome, sobrenome, nomeMae, genero, celular, cpf, cep, rua, bairro, cidade, estado, email, senha } = req.body;
 
-    if (!nome || !email || !senha) {
-        return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios.' });
+    if (!nome || !sobrenome || !nomeMae || !genero || !celular || !cpf || !cep || !rua || !bairro || !cidade || !estado || !email || !senha) {
+        return res.status(400).json({ error: 'Todos os campos de identificacao, contato e endereco sao obrigatorios.' });
+    }
+
+    const nomeCompleto = `${nome} ${sobrenome}`.trim();
+    if (nomeCompleto.length < 15 || nomeCompleto.length > 80) {
+        return res.status(400).json({ error: 'Nome completo deve ter entre 15 e 80 caracteres.' });
+    }
+
+    if (!validarCPF(cpf)) {
+        return res.status(400).json({ error: 'CPF invalido.' });
+    }
+
+    if (!celularNoPadrao(celular)) {
+        return res.status(400).json({ error: 'Celular deve estar no formato (+55)XX-XXXXXXXX ou (+55)XX-XXXXXXXXX.' });
+    }
+
+    if (String(senha).length < 8) {
+        return res.status(400).json({ error: 'Senha deve ter no minimo 8 caracteres.' });
     }
 
     try {
@@ -241,16 +351,18 @@ app.post('/api/register', async (req, res) => {
         await db.collection('usuarios').doc(userRecord.uid).set({
             uid:       userRecord.uid,
             nome:      nome,
-            sobrenome: sobrenome || '',
-            genero:    genero    || '',
-            celular:   celular   || '',
-            cpf:       cpf       || '',
-            cep:       cep       || '',
-            rua:       rua       || '',
-            bairro:    bairro    || '',
-            cidade:    cidade    || '',
-            estado:    estado    || '',
+            sobrenome: sobrenome,
+            nomeMae:   nomeMae,
+            genero:    genero,
+            celular:   celular,
+            cpf:       cpf,
+            cep:       cep,
+            rua:       rua,
+            bairro:    bairro,
+            cidade:    cidade,
+            estado:    estado,
             email:     email,
+            role:      String(email).toLowerCase() === ADMIN_EMAIL ? 'master' : 'comum',
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
@@ -263,7 +375,7 @@ app.post('/api/register', async (req, res) => {
 
 // ── POST /api/login ──────────────────────────────────────
 app.post('/api/login', async (req, res) => {
-    const { email, password, senha } = req.body;
+    const { email, password, senha, challengeId, resposta2fa } = req.body;
     const senhaFornecida = password || senha;
 
     if (!email || !senhaFornecida) {
@@ -308,13 +420,139 @@ app.post('/api/login', async (req, res) => {
         const doc = await db.collection('usuarios').doc(uid).get();
         const perfil = doc.exists ? doc.data() : {};
 
+        if (!perfil?.email) {
+            await db.collection('usuarios').doc(uid).set({
+                uid,
+                email,
+                nome: firebaseUser.displayName || '',
+                role: email.toLowerCase() === ADMIN_EMAIL ? 'master' : 'comum',
+                createdAt: admin.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+        }
+
+        const role = (perfil?.role || (email.toLowerCase() === ADMIN_EMAIL ? 'master' : 'comum')).toLowerCase();
+        const lockUntil = perfil?.twoFaLockUntil?.toDate?.() || null;
+        if (lockUntil && lockUntil > new Date()) {
+            await registrarAuthLog({
+                uid,
+                email,
+                tipoDesafio: perfil?.twoFaState?.tipo || 'bloqueado',
+                status: 'bloqueado',
+                detalhe: '2FA temporariamente bloqueado',
+                req
+            });
+            return res.status(423).json({ error: 'Acesso temporariamente bloqueado por excesso de tentativas no segundo fator. Tente novamente mais tarde.' });
+        }
+
+        const state = perfil?.twoFaState || null;
+        const precisaValidarResposta = !!(challengeId && resposta2fa);
+
+        if (!precisaValidarResposta) {
+            const desafio = montarDesafio2FA({ ...perfil, email });
+            const novoChallengeId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+            await db.collection('usuarios').doc(uid).set({
+                role,
+                twoFaState: {
+                    challengeId: novoChallengeId,
+                    tipo: desafio.tipo,
+                    pergunta: desafio.pergunta,
+                    respostaEsperada: desafio.respostaEsperada,
+                    tentativas: 0,
+                    criadoEm: admin.firestore.FieldValue.serverTimestamp()
+                }
+            }, { merge: true });
+
+            await registrarAuthLog({
+                uid,
+                email,
+                tipoDesafio: desafio.tipo,
+                status: 'desafio_emitido',
+                detalhe: 'Desafio 2FA emitido',
+                req
+            });
+
+            return res.status(202).json({
+                requires2FA: true,
+                challengeId: novoChallengeId,
+                pergunta: desafio.pergunta,
+                tentativasRestantes: MAX_2FA_ATTEMPTS
+            });
+        }
+
+        if (!state || state.challengeId !== challengeId) {
+            await registrarAuthLog({
+                uid,
+                email,
+                tipoDesafio: state?.tipo || 'desconhecido',
+                status: 'falha_2fa',
+                detalhe: 'challengeId invalido ou expirado',
+                req
+            });
+            return res.status(400).json({ error: 'Desafio 2FA invalido ou expirado. Faca login novamente.' });
+        }
+
+        const respostaOk = normalizarResposta2FA(resposta2fa) === normalizarResposta2FA(state.respostaEsperada);
+        if (!respostaOk) {
+            const tentativas = Number(state.tentativas || 0) + 1;
+            const faltam = Math.max(0, MAX_2FA_ATTEMPTS - tentativas);
+
+            await registrarAuthLog({
+                uid,
+                email,
+                tipoDesafio: state.tipo,
+                status: 'falha_2fa',
+                detalhe: `Tentativa ${tentativas} de ${MAX_2FA_ATTEMPTS}`,
+                req
+            });
+
+            if (tentativas >= MAX_2FA_ATTEMPTS) {
+                const lockDate = new Date(Date.now() + TWO_FA_LOCK_MINUTES * 60 * 1000);
+                await db.collection('usuarios').doc(uid).set({
+                    twoFaState: admin.firestore.FieldValue.delete(),
+                    twoFaLockUntil: admin.firestore.Timestamp.fromDate(lockDate)
+                }, { merge: true });
+                return res.status(423).json({ error: 'Segundo fator bloqueado apos 3 tentativas. Tente novamente em 15 minutos.' });
+            }
+
+            await db.collection('usuarios').doc(uid).set({
+                twoFaState: {
+                    ...state,
+                    tentativas
+                }
+            }, { merge: true });
+
+            return res.status(401).json({
+                error: 'Resposta do segundo fator incorreta.',
+                requires2FA: true,
+                challengeId: state.challengeId,
+                pergunta: state.pergunta,
+                tentativasRestantes: faltam
+            });
+        }
+
+        await db.collection('usuarios').doc(uid).set({
+            role,
+            twoFaState: admin.firestore.FieldValue.delete(),
+            twoFaLockUntil: admin.firestore.FieldValue.delete()
+        }, { merge: true });
+
         // Atualiza último login
         await db.collection('usuarios').doc(uid).set(
             { lastLogin: admin.firestore.FieldValue.serverTimestamp() },
             { merge: true }
         );
 
-        res.json({ success: true, user: { id: uid, nome: perfil.nome || '', email: email } });
+        await registrarAuthLog({
+            uid,
+            email,
+            tipoDesafio: state?.tipo || 'na',
+            status: 'sucesso',
+            detalhe: 'Login autenticado com 2FA',
+            req
+        });
+
+        res.json({ success: true, user: { id: uid, nome: perfil.nome || '', email: email, role } });
     } catch (err) {
         console.error('Erro no login:', err);
         res.status(500).json({ error: 'Erro ao autenticar.' });
@@ -456,6 +694,12 @@ app.put('/api/perfil/senha', async (req, res) => {
     }
 
     try {
+        const perfilDoc = await db.collection('usuarios').doc(uid).get();
+        const role = (perfilDoc.exists ? (perfilDoc.data().role || 'comum') : 'comum').toLowerCase();
+        if (role !== 'comum') {
+            return res.status(403).json({ error: 'Alteracao de senha disponivel apenas para perfil comum.' });
+        }
+
         // Busca o e-mail do usuário para verificar a senha atual
         const userRecord = await auth.getUser(uid);
 
@@ -679,9 +923,6 @@ app.post('/api/mp-webhook', async (req, res) => {
     }
 });
 
-// ── ADMIN: E-mail do administrador ───────────────────────
-const ADMIN_EMAIL = 'juliosamuel289@gmail.com';
-
 // Middleware de verificação de admin
 async function verificarAdmin(req, res, next) {
     const uid = req.body.uid || req.query.uid;
@@ -689,7 +930,11 @@ async function verificarAdmin(req, res, next) {
 
     try {
         const userRecord = await auth.getUser(uid);
-        if (userRecord.email !== ADMIN_EMAIL) {
+        const perfilDoc = await db.collection('usuarios').doc(uid).get();
+        const role = perfilDoc.exists ? String(perfilDoc.data().role || '').toLowerCase() : '';
+        const isMaster = role === 'master' || String(userRecord.email || '').toLowerCase() === ADMIN_EMAIL;
+
+        if (!isMaster) {
             return res.status(403).json({ error: 'Acesso negado.' });
         }
         req.adminUid = uid;
@@ -743,9 +988,104 @@ app.get('/api/admin/check', async (req, res) => {
 
     try {
         const userRecord = await auth.getUser(uid);
-        res.json({ isAdmin: userRecord.email === ADMIN_EMAIL });
+        const perfilDoc = await db.collection('usuarios').doc(uid).get();
+        const role = perfilDoc.exists ? String(perfilDoc.data().role || '').toLowerCase() : '';
+        const isAdmin = role === 'master' || String(userRecord.email || '').toLowerCase() === ADMIN_EMAIL;
+
+        if (isAdmin && role !== 'master') {
+            await db.collection('usuarios').doc(uid).set({ role: 'master' }, { merge: true });
+        }
+
+        res.json({ isAdmin });
     } catch (_) {
         res.json({ isAdmin: false });
+    }
+});
+
+// ── GET /api/admin/usuarios?uid=...&q=... ───────────────
+app.get('/api/admin/usuarios', verificarAdmin, async (req, res) => {
+    const q = String(req.query.q || '').toLowerCase().trim();
+
+    try {
+        const snapshot = await db.collection('usuarios').get();
+        let usuarios = [];
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            const role = String(d.role || 'comum').toLowerCase();
+            const nomeCompleto = `${d.nome || ''} ${d.sobrenome || ''}`.trim();
+
+            usuarios.push({
+                id: doc.id,
+                nome: d.nome || '',
+                sobrenome: d.sobrenome || '',
+                nomeCompleto,
+                email: d.email || '',
+                celular: d.celular || '',
+                cpf: d.cpf || '',
+                cidade: d.cidade || '',
+                role
+            });
+        });
+
+        usuarios = usuarios.filter(u => u.role === 'comum');
+        if (q) {
+            usuarios = usuarios.filter(u =>
+                u.nomeCompleto.toLowerCase().includes(q) ||
+                u.email.toLowerCase().includes(q)
+            );
+        }
+
+        usuarios.sort((a, b) => a.nomeCompleto.localeCompare(b.nomeCompleto, 'pt-BR'));
+        res.json({ usuarios });
+    } catch (err) {
+        console.error('Erro em GET /api/admin/usuarios:', err.message);
+        res.status(500).json({ error: 'Erro ao listar usuarios.' });
+    }
+});
+
+// ── DELETE /api/admin/usuario ────────────────────────────
+app.delete('/api/admin/usuario', verificarAdmin, async (req, res) => {
+    const { targetUid } = req.body;
+    if (!targetUid) return res.status(400).json({ error: 'targetUid obrigatorio.' });
+
+    try {
+        const alvoDoc = await db.collection('usuarios').doc(targetUid).get();
+        if (!alvoDoc.exists) return res.status(404).json({ error: 'Usuario nao encontrado.' });
+
+        const alvo = alvoDoc.data();
+        const role = String(alvo.role || 'comum').toLowerCase();
+        if (role !== 'comum') {
+            return res.status(403).json({ error: 'Apenas usuarios comuns podem ser removidos.' });
+        }
+
+        await auth.deleteUser(targetUid);
+        await db.collection('usuarios').doc(targetUid).delete();
+        res.json({ success: true, message: 'Usuario comum removido com sucesso.' });
+    } catch (err) {
+        console.error('Erro em DELETE /api/admin/usuario:', err.message);
+        res.status(500).json({ error: 'Erro ao remover usuario.' });
+    }
+});
+
+// ── GET /api/admin/auth-logs?uid=... ─────────────────────
+app.get('/api/admin/auth-logs', verificarAdmin, async (req, res) => {
+    try {
+        const snapshot = await db.collection('logs_autenticacao')
+            .orderBy('criadoEm', 'desc')
+            .limit(200)
+            .get();
+
+        const logs = [];
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            logs.push({ id: doc.id, ...d });
+        });
+
+        logs.sort((a, b) => (b.criadoEm?._seconds || 0) - (a.criadoEm?._seconds || 0));
+        res.json({ logs });
+    } catch (err) {
+        console.error('Erro em GET /api/admin/auth-logs:', err.message);
+        res.status(500).json({ error: 'Erro ao carregar logs de autenticacao.' });
     }
 });
 
