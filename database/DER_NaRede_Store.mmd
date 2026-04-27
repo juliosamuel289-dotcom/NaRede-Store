@@ -1,0 +1,71 @@
+erDiagram
+    USUARIOS ||--o{ LOGS_AUTENTICACAO : "gera"
+    USUARIOS ||--o{ PEDIDOS : "realiza"
+    PEDIDOS ||--|{ PEDIDO_ITENS : "possui"
+
+    USUARIOS {
+      bigint id PK
+      varchar uid
+      varchar nome
+      varchar sobrenome
+      varchar nome_mae
+      varchar genero
+      varchar celular
+      char cpf UK
+      char cep
+      varchar rua
+      varchar bairro
+      varchar cidade
+      char estado
+      varchar email UK
+      varchar senha_hash
+      enum role
+      datetime twofa_lock_until
+      datetime created_at
+      datetime updated_at
+    }
+
+    LOGS_AUTENTICACAO {
+      bigint id PK
+      bigint usuario_id FK
+      varchar email
+      varchar tipo_desafio
+      varchar status
+      varchar detalhe
+      varchar ip
+      datetime created_at
+    }
+
+    PRODUTOS {
+      bigint id PK
+      varchar nome
+      varchar descricao
+      varchar pagina
+      varchar imagem
+      decimal preco
+      datetime created_at
+      datetime updated_at
+    }
+
+    PEDIDOS {
+      bigint id PK
+      bigint usuario_id FK
+      varchar cliente_email
+      varchar cliente_nome
+      enum metodo
+      decimal total
+      enum status
+      varchar mp_id
+      varchar mp_preference_id
+      varchar mp_payment_id
+      datetime created_at
+      datetime updated_at
+    }
+
+    PEDIDO_ITENS {
+      bigint id PK
+      bigint pedido_id FK
+      varchar nome
+      decimal preco_unitario
+      int quantidade
+    }

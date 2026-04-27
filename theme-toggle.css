@@ -413,3 +413,85 @@ body.light-mode .theme-toggle-btn svg {
     stroke: #ffffff !important;
   }
 }
+
+/* ===== Acessibilidade ===== */
+.accessibility-tools {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(13, 17, 23, 0.92);
+  border: 1px solid #30363d;
+  backdrop-filter: blur(6px);
+}
+
+.accessibility-tools .acc-btn {
+  border: 1px solid #30363d;
+  background: #161b22;
+  color: #f0f6fc;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.accessibility-tools .acc-btn:hover {
+  border-color: #422BFF;
+}
+
+.accessibility-tools .acc-scale {
+  min-width: 46px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #f0f6fc;
+}
+
+body.light-mode .accessibility-tools {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: #d0d7de;
+}
+
+body.light-mode .accessibility-tools .acc-btn {
+  background: #ffffff;
+  color: #1f2328;
+  border-color: #d0d7de;
+}
+
+body.light-mode .accessibility-tools .acc-scale {
+  color: #1f2328;
+}
+
+body.high-contrast,
+body.high-contrast * {
+  text-shadow: none !important;
+}
+
+body.high-contrast {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+body.high-contrast a,
+body.high-contrast .logotipo span,
+body.high-contrast .btn-primary,
+body.high-contrast .menu-btn {
+  color: #ffff00 !important;
+}
+
+body.high-contrast input,
+body.high-contrast textarea,
+body.high-contrast select,
+body.high-contrast button,
+body.high-contrast .produto,
+body.high-contrast .admin-panel,
+body.high-contrast .register-container {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #ffff00 !important;
+}

@@ -23,6 +23,10 @@
     .error { color: #ff7b72; font-size: 0.85rem; display: none; margin-bottom: 10px; }
     .register-container a { display: block; margin-top: 15px; color: #422BFF; text-decoration: none; font-size: 0.9rem; }
     #statusCEP { font-size: 0.8rem; color: #8b949e; margin-bottom: 10px; display: none; }
+    .toast { position: fixed; left: 50%; transform: translateX(-50%) translateY(20px); bottom: 24px; z-index: 12000; background: #161b22; color: #fff; border: 1px solid #30363d; border-radius: 10px; padding: 10px 14px; opacity: 0; transition: 0.25s ease; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: #2dd4bf; }
+    .toast.error { border-color: #ff6b6b; }
   </style>
 </head>
 <body>
@@ -81,11 +85,20 @@
     <a href="index.html">← Voltar à loja</a>
   </div>
 
+  <div id="toastCadastro" class="toast" role="status" aria-live="polite"></div>
+
   <script>
     (function(){
       const form = document.getElementById('cadastroForm');
       const cepInput = document.getElementById('cep');
       const statusCEP = document.getElementById('statusCEP');
+      const toast = document.getElementById('toastCadastro');
+
+      function showToast(msg, type) {
+        toast.textContent = msg;
+        toast.className = 'toast ' + (type || 'success') + ' show';
+        setTimeout(() => { toast.className = 'toast'; }, 2400);
+      }
 
       // Máscaras (CPF, Celular, CEP)
       const aplicarMascara = (el, maskFn) => el.addEventListener('input', () => el.value = maskFn(el.value));
@@ -207,15 +220,17 @@
           const result = await response.json();
 
           if (response.ok) {
-            alert('Cadastro realizado!');
-            window.location.href = 'login.html';
+            showToast('Cadastro realizado com sucesso!', 'success');
+            setTimeout(() => { window.location.href = 'login.html'; }, 900);
           } else {
             serverError.style.display = 'block';
             serverError.textContent = result.error || 'Erro no cadastro';
+            showToast(result.error || 'Erro no cadastro', 'error');
           }
         } catch (err) {
           serverError.style.display = 'block';
           serverError.textContent = 'Servidor fora do ar';
+          showToast('Servidor fora do ar', 'error');
         } finally {
           btn.disabled = false;
           btn.textContent = 'Cadastrar';

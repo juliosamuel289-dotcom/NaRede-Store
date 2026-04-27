@@ -225,6 +225,7 @@
         <div class="form-row">
           <input type="text" id="filtroUsuario" placeholder="Pesquisar por nome ou e-mail" oninput="carregarUsuarios()">
           <button type="button" class="btn-primary" onclick="carregarUsuarios()">🔄 Atualizar</button>
+          <button type="button" class="btn-primary" onclick="exportarUsuariosPDF()">📄 Exportar PDF</button>
         </div>
         <div id="usuariosContent" class="loading"><p>Carregando usuários...</p></div>
       </div>
@@ -238,6 +239,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script>
     const API = 'https://naredestore-api.onrender.com';
     const USER_KEY = 'naredestoreUser';
@@ -567,6 +569,45 @@
         carregarUsuarios();
       } catch (err) {
         alert('Erro: ' + err.message);
+      }
+    }
+
+    async function exportarUsuariosPDF() {
+      try {
+        var q = encodeURIComponent((document.getElementById('filtroUsuario').value || '').trim());
+        var res = await fetch(API + '/api/admin/usuarios?uid=' + encodeURIComponent(userData.id) + '&q=' + q);
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erro ao carregar usuários.');
+        if (!data.usuarios || !data.usuarios.length) throw new Error('Nenhum usuário para exportar.');
+
+        var doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        var y = 12;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text('NaRede Store - Lista de Usuarios Comuns', 10, y);
+        y += 8;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text('Gerado em: ' + new Date().toLocaleString('pt-BR'), 10, y);
+        y += 8;
+
+        data.usuarios.forEach(function(u, idx) {
+          if (y > 275) {
+            doc.addPage();
+            y = 12;
+          }
+          doc.setFont('helvetica', 'bold');
+          doc.text((idx + 1) + '. ' + (u.nomeCompleto || '-'), 10, y);
+          y += 5;
+          doc.setFont('helvetica', 'normal');
+          doc.text('Email: ' + (u.email || '-'), 12, y); y += 4;
+          doc.text('Celular: ' + (u.celular || '-'), 12, y); y += 4;
+          doc.text('Cidade: ' + (u.cidade || '-'), 12, y); y += 6;
+        });
+
+        doc.save('usuarios-comuns-naredestore.pdf');
+      } catch (err) {
+        alert('Erro ao exportar PDF: ' + err.message);
       }
     }
 
